@@ -3,7 +3,14 @@
 export default {
   content: ['./src/**/*.{html,ts,tsx}'],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        'fc-text-brand': 'var(--figma-color-text-brand)',
+      },
+      fontSize: {
+        sm: ['14px', '20px'],
+      },
+    },
   },
   plugins: [
     require('@tailwindcss/typography'),

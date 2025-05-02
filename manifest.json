@@ -2,7 +2,7 @@
   "api": "1.0.0",
   "editorType": ["figma"],
   "id": "imessage-chat-builder",
-  "name": "iMessage Chat Builder",
+  "name": "Chat Builder",
   "main": "dist/plugin.js",
   "ui": "dist/ui.html"
 }

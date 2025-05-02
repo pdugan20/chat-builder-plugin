@@ -18,7 +18,7 @@ function PLuginScreen({}) {
             option: option,
           },
         },
-        '*',
+        '*'
       );
     }
 
@@ -37,7 +37,7 @@ function PLuginScreen({}) {
       <Navigation />
       <h1 className='text-xl font-bold'>Page 1</h1>
       <label className='block'>
-        <span className='text-gray-700'>Select</span>
+        <span className='text-fc-text-brand'>Select</span>
         <select
           name='reference-language'
           id='reference-language'

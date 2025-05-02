@@ -1,4 +1,4 @@
-figma.showUI(__html__);
+figma.showUI(__html__, { themeColors: true });
 
 figma.ui.onmessage = async (msg) => {
   switch (msg.type) {

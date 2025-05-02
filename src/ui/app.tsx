@@ -3,7 +3,9 @@ import { MemoryRouter, Routes, Route } from 'react-router-dom';
 
 import PluginScreen from '../ui/screens/plugin';
 import SettingsScreen from '../ui/screens/settings';
+
 import '../ui/styles/app.css';
+import '../ui/styles/figma-plugin-ds.css';
 
 function App() {
   return (

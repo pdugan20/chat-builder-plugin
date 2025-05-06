@@ -1,4 +1,4 @@
-figma.showUI(__html__, { themeColors: true });
+figma.showUI(__html__, { themeColors: true, width: 295, height: 375 });
 
 figma.ui.onmessage = async (msg) => {
   switch (msg.type) {

@@ -1,16 +1,12 @@
+import figmaKitPreset from 'figma-kit/tailwind.preset.js';
+
 /** @type {import('tailwindcss').Config} */
 
 export default {
   content: ['./src/**/*.{html,ts,tsx}'],
+  presets: [figmaKitPreset],
   theme: {
-    extend: {
-      colors: {
-        'fc-text-brand': 'var(--figma-color-text-brand)',
-      },
-      fontSize: {
-        sm: ['14px', '20px'],
-      },
-    },
+    extend: {},
   },
   plugins: [
     require('@tailwindcss/typography'),

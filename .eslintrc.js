@@ -35,6 +35,7 @@ module.exports = {
     'import/extensions': ['off'],
     'import/prefer-default-export': 'off',
     'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
+    'tailwindcss/no-custom-classname': ['off'],
   },
   overrides: [
     {

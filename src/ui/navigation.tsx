@@ -2,7 +2,7 @@ import { Tabs } from 'figma-kit';
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 
-function Navigation({ screen }) {
+function Navigation({ screen }): React.JSX.Element {
   return (
     <nav>
       <Tabs.Root defaultValue={screen}>

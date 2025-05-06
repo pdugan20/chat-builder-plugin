@@ -64,6 +64,12 @@ input.fp-Input {
 }
 
 .fp-Text {
+  cursor: default;
+
+  &:hover {
+    cursor: default;
+  }
+
   &.heading {
     font-weight: 500;
     padding-bottom: var(--space-1);
@@ -146,5 +152,13 @@ textarea.fp-textarea,
 
   .fp-Input {
     margin: var(--space-2) 0 var(--space-1);
+  }
+}
+
+.fp-Link {
+  cursor: default !important;
+
+  &:hover {
+    cursor: default !important;
   }
 }

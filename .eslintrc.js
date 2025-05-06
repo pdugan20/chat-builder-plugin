@@ -26,16 +26,8 @@ module.exports = {
   },
   rules: {
     'react/prop-types': 'off',
-    'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
-    '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
-    'react/jsx-filename-extension': [1, { extensions: ['.js', '.jsx', '.ts', '.tsx'] }],
-    'no-restricted-globals': 'off',
-    'react/jsx-props-no-spreading': 'off',
-    'no-param-reassign': ['error', { props: true, ignorePropertyModificationsForRegex: ['^draft'] }],
-    'import/extensions': ['off'],
-    'import/prefer-default-export': 'off',
-    'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
     'tailwindcss/no-custom-classname': ['off'],
+    'jsx-a11y/anchor-is-valid': ['off'],
   },
   overrides: [
     {

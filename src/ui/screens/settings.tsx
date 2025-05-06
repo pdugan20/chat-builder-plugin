@@ -1,32 +1,35 @@
 import React, { useState } from 'react';
-import { AlertDialog, Text, Button, Input } from 'figma-kit';
+import { AlertDialog, Text, Button, Input, Link } from 'figma-kit';
 import Navigation from '../navigation';
 
 const screen = 'settings';
 const keyLength = 108;
+const pluginVersion = '1.0';
 
-function SettingsScreen({}) {
+function SettingsScreen(): React.JSX.Element {
   const [key, setKey] = useState('');
   const [keyIsValid, setKeyIsValid] = useState(false);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.target;
+  interface HandleInputChangeProps {
+    apiKey: string;
+  }
 
-    setKey(value);
-    setKeyIsValid(value.length === keyLength);
-  };
+  function handleInputChange({ apiKey }: { apiKey: HandleInputChangeProps['apiKey'] }): void {
+    setKey(apiKey);
+    setKeyIsValid(apiKey.length === keyLength);
+  }
 
-  const renderNav = () => {
+  function renderNav(): React.JSX.Element {
     return <Navigation screen={screen} />;
-  };
+  }
 
-  const renderKey = () => {
+  function renderKey(): React.JSX.Element {
     return (
       <div className='row-item'>
         <Text className='heading'>Anthropic API key</Text>
         <AlertDialog.Root>
           <AlertDialog.Trigger>
-            <Button variant='secondary'>Add key</Button>
+            <Link href='#'>Add key</Link>
           </AlertDialog.Trigger>
           <AlertDialog.Overlay />
           <AlertDialog.Content>
@@ -36,7 +39,7 @@ function SettingsScreen({}) {
               name='anthropicKey'
               placeholder='Ex. sk-ant-api03-nCjQtbsOljqx4VkPL'
               value={key}
-              onChange={handleInputChange}
+              onChange={(e) => handleInputChange({ apiKey: e.target.value })}
               maxLength={keyLength}
             />
             <AlertDialog.Actions>
@@ -53,11 +56,35 @@ function SettingsScreen({}) {
         </AlertDialog.Root>
       </div>
     );
-  };
+  }
 
-  const renderBody = () => {
-    return <div className='body'>{renderKey()}</div>;
-  };
+  function renderVersionNumber(): React.JSX.Element {
+    return (
+      <div className='row-item'>
+        <Text className='heading'>Version</Text>
+        <Text>{pluginVersion}</Text>
+      </div>
+    );
+  }
+
+  function renderFeedbackLink(): React.JSX.Element {
+    return (
+      <div className='row-item'>
+        <Text className='heading'>Feedback</Text>
+        <Link href='#'>Report a bug</Link>
+      </div>
+    );
+  }
+
+  function renderBody(): React.JSX.Element {
+    return (
+      <div className='body'>
+        {renderVersionNumber()}
+        {renderKey()}
+        {renderFeedbackLink()}
+      </div>
+    );
+  }
 
   return (
     <div>

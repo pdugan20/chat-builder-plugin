@@ -5,17 +5,17 @@ import Navigation from '../navigation';
 
 const screen = 'home';
 
-function PluginScreen({}) {
+function PluginScreen(): React.JSX.Element {
   const [style, setStyle] = useState('light');
   const [participants, setParticipants] = useState('2');
   const [maxMessages, setMaxMessages] = useState('15');
   const [prompt, setPrompt] = useState('');
 
-  const renderNav = () => {
+  function renderNav(): React.JSX.Element {
     return <Navigation screen={screen} />;
-  };
+  }
 
-  const renderStyleSelect = () => {
+  function renderStyleSelect(): React.JSX.Element {
     return (
       <div className='row-item'>
         <Text className='heading'>UI style</Text>
@@ -28,9 +28,9 @@ function PluginScreen({}) {
         </Select.Root>
       </div>
     );
-  };
+  }
 
-  const renderParticipantsSelect = () => {
+  function renderParticipantsSelect(): React.JSX.Element {
     return (
       <div className='row-item'>
         <Text className='heading'>Participants</Text>
@@ -45,9 +45,9 @@ function PluginScreen({}) {
         </Select.Root>
       </div>
     );
-  };
+  }
 
-  const renderMaxMessagesSelect = () => {
+  function renderMaxMessagesSelect(): React.JSX.Element {
     return (
       <div className='row-item'>
         <Text className='heading'>Max number of messages</Text>
@@ -62,9 +62,9 @@ function PluginScreen({}) {
         </Select.Root>
       </div>
     );
-  };
+  }
 
-  const renderPromptTextarea = () => {
+  function renderPromptTextarea(): React.JSX.Element {
     return (
       <div className='row-item'>
         <Text className='heading'>Prompt</Text>
@@ -77,9 +77,9 @@ function PluginScreen({}) {
         />
       </div>
     );
-  };
+  }
 
-  const renderBody = () => {
+  function renderBody(): React.JSX.Element {
     return (
       <div className='body'>
         {renderParticipantsSelect()}
@@ -88,17 +88,17 @@ function PluginScreen({}) {
         {renderPromptTextarea()}
       </div>
     );
-  };
+  }
 
-  const renderFooter = () => {
+  function renderFooter(): React.JSX.Element {
     return (
       <div className='footer'>
-        <Button variant='primary' size='medium'>
+        <Button variant='primary' size='medium' disabled={!prompt.trim()}>
           Generate chat
         </Button>
       </div>
     );
-  };
+  }
 
   return (
     <div>

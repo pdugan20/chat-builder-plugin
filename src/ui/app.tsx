@@ -7,7 +7,7 @@ import SettingsScreen from './screens/settings';
 import './styles/app.css';
 import 'figma-kit/styles.css';
 
-function App() {
+function App(): React.JSX.Element {
   return (
     <MemoryRouter initialEntries={['/PluginScreen']}>
       <Routes>

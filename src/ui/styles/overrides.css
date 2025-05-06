@@ -162,3 +162,7 @@ textarea.fp-textarea,
     cursor: default !important;
   }
 }
+
+.fp-AlertDialogTitle {
+  display: flex;
+}

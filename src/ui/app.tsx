@@ -1,11 +1,11 @@
 import React from 'react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 
-import PluginScreen from '../ui/screens/plugin';
-import SettingsScreen from '../ui/screens/settings';
+import PluginScreen from './screens/plugin';
+import SettingsScreen from './screens/settings';
 
-import '../ui/styles/app.css';
-import '../ui/styles/figma-plugin-ds.css';
+import './styles/app.css';
+import 'figma-kit/styles.css';
 
 function App() {
   return (

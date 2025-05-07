@@ -1,18 +1,37 @@
-figma.showUI(__html__, { themeColors: true, width: 295, height: 375 });
+import updateAnthropicKey from '../scripts/update-key';
 
-figma.ui.onmessage = async (msg) => {
+let anthropicKey: string;
+
+figma.ui.onmessage = (msg) => {
   switch (msg.type) {
-    case 'selected':
-      console.log('option selected.');
-      console.log(msg);
+    case 'updateAnthropicKey':
+      updateAnthropicKey(msg.apiKey);
+      break;
 
-      await figma.clientStorage
-        .setAsync('option', msg.option)
-        .catch(() => {
-          console.log('An error occurred while storing the option.');
-        })
-        .finally(() => {
-          figma.ui.postMessage({ type: 'optionStored' });
-        });
+    default:
+      break;
   }
 };
+
+(async () => {
+  try {
+    anthropicKey = await figma.clientStorage.getAsync('anthropicKey');
+
+    if (anthropicKey) {
+      figma.ui.postMessage({
+        type: 'hasAnthropicKey',
+        hasKey: true,
+        key: anthropicKey,
+      });
+    } else {
+      figma.ui.postMessage({
+        type: 'hasAnthropicKey',
+        hasKey: false,
+      });
+    }
+  } catch (err) {
+    figma.notify('Error retrieving API key.');
+  }
+})();
+
+figma.showUI(__html__, { themeColors: true, width: 295, height: 375 });

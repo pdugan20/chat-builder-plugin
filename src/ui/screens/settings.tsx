@@ -3,10 +3,17 @@ import { Text, Link } from 'figma-kit';
 import Navigation from '../navigation';
 import UpdateKeyDialog from '../components/dialogs/update-key';
 
-const screen = 'settings';
-const pluginVersion = '1.0';
+interface SettingsScreenProps {
+  anthropicKey: string;
+  screen?: string;
+  pluginVersion?: string;
+}
 
-function SettingsScreen({ anthropicKey }): React.JSX.Element {
+function SettingsScreen({
+  anthropicKey,
+  screen = 'settings',
+  pluginVersion = '1.0',
+}: SettingsScreenProps): React.JSX.Element {
   function renderNav(): React.JSX.Element {
     return <Navigation screen={screen} />;
   }

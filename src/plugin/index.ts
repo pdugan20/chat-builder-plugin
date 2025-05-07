@@ -3,7 +3,7 @@ import updateAnthropicKey from '../scripts/update-key';
 
 figma.ui.onmessage = (msg) => {
   switch (msg.type) {
-    case 'updateAnthropicKey':
+    case 'UPDATE_ANTHROPIC_KEY':
       updateAnthropicKey(msg.apiKey);
       break;
 

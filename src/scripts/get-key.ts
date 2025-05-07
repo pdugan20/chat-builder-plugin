@@ -4,13 +4,13 @@ export default async function getAnthropicKey() {
 
     if (anthropicKey) {
       figma.ui.postMessage({
-        type: 'hasAnthropicKey',
+        type: 'HAS_ANTHROPIC_KEY',
         hasKey: true,
         key: anthropicKey,
       });
     } else {
       figma.ui.postMessage({
-        type: 'hasAnthropicKey',
+        type: 'HAS_ANTHROPIC_KEY',
         hasKey: false,
       });
     }

@@ -6,7 +6,7 @@ import UpdateKeyDialog from '../components/dialogs/update-key';
 const screen = 'settings';
 const pluginVersion = '1.0';
 
-function SettingsScreen(): React.JSX.Element {
+function SettingsScreen({ anthropicKey }): React.JSX.Element {
   function renderNav(): React.JSX.Element {
     return <Navigation screen={screen} />;
   }
@@ -15,7 +15,7 @@ function SettingsScreen(): React.JSX.Element {
     return (
       <div className='row-item'>
         <Text className='heading'>Anthropic API key</Text>
-        <UpdateKeyDialog title='Add key' />
+        <UpdateKeyDialog title='Add key' anthropicKey={anthropicKey} />
       </div>
     );
   }

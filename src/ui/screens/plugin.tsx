@@ -3,12 +3,23 @@ import { Text, Button, Select } from 'figma-kit';
 import TextareaAutosize from 'react-textarea-autosize';
 import Navigation from '../navigation';
 
-const screen = 'home';
-const defaultStyle = 'light';
-const defaultParticipants = '2';
-const defaultMaxMessages = '15';
+interface PluginScreenProps {
+  anthropicKey: string;
+  screen?: string;
+  defaultStyle?: string;
+  defaultParticipants?: string;
+  defaultMaxMessages?: string;
+  formVisibility?: string;
+}
 
-function PluginScreen({ hasAnthropicKey }): React.JSX.Element {
+function PluginScreen({
+  anthropicKey,
+  screen = 'home',
+  defaultStyle = 'light',
+  defaultParticipants = '2',
+  defaultMaxMessages = '15',
+  formVisibility = 'invisible',
+}: PluginScreenProps): React.JSX.Element {
   const [style, setStyle] = useState(defaultStyle);
   const [participants, setParticipants] = useState(defaultParticipants);
   const [maxMessages, setMaxMessages] = useState(defaultMaxMessages);
@@ -103,15 +114,10 @@ function PluginScreen({ hasAnthropicKey }): React.JSX.Element {
     );
   }
 
-  // console.log('hasAnthropicKey', hasAnthropicKey);
-
-  let formVisibility = 'invisible';
-  if (hasAnthropicKey) {
-    formVisibility = 'visible';
-  }
+  const visibility = anthropicKey ? 'visible' : formVisibility;
 
   return (
-    <div className={`${formVisibility}`}>
+    <div className={`${visibility}`}>
       {renderNav()}
       {renderBody()}
       {renderFooter()}

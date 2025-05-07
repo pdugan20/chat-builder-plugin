@@ -4,11 +4,14 @@ import TextareaAutosize from 'react-textarea-autosize';
 import Navigation from '../navigation';
 
 const screen = 'home';
+const defaultStyle = 'light';
+const defaultParticipants = '2';
+const defaultMaxMessages = '15';
 
-function PluginScreen(): React.JSX.Element {
-  const [style, setStyle] = useState('light');
-  const [participants, setParticipants] = useState('2');
-  const [maxMessages, setMaxMessages] = useState('15');
+function PluginScreen({ hasAnthropicKey }): React.JSX.Element {
+  const [style, setStyle] = useState(defaultStyle);
+  const [participants, setParticipants] = useState(defaultParticipants);
+  const [maxMessages, setMaxMessages] = useState(defaultMaxMessages);
   const [prompt, setPrompt] = useState('');
 
   function renderNav(): React.JSX.Element {
@@ -100,8 +103,15 @@ function PluginScreen(): React.JSX.Element {
     );
   }
 
+  // console.log('hasAnthropicKey', hasAnthropicKey);
+
+  let formVisibility = 'invisible';
+  if (hasAnthropicKey) {
+    formVisibility = 'visible';
+  }
+
   return (
-    <div>
+    <div className={`${formVisibility}`}>
       {renderNav()}
       {renderBody()}
       {renderFooter()}

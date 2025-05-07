@@ -3,7 +3,8 @@ import { AlertDialog, Button, Input, Link } from 'figma-kit';
 
 const keyLength = 108;
 
-function AddKeyDialog({ setKey, apiKey }): React.JSX.Element {
+function UpdateKeyDialog({ title }): React.JSX.Element {
+  const [apiKey, setKey] = useState('');
   const [keyIsValid, setKeyIsValid] = useState(false);
 
   interface HandleInputChangeProps {
@@ -24,13 +25,17 @@ function AddKeyDialog({ setKey, apiKey }): React.JSX.Element {
   }
 
   const handleCancelClick = () => {
-    console.log('cancel');
+    setKey('');
+  };
+
+  const handleSaveClick = () => {
+    parent.postMessage({ pluginMessage: { type: 'updateAnthropicKey', apiKey } }, '*');
   };
 
   function renderBody(): React.JSX.Element {
     return (
       <div>
-        <AlertDialog.Title>Add key</AlertDialog.Title>
+        <AlertDialog.Title>{title}</AlertDialog.Title>
         <AlertDialog.Description>Enter your Anthropic API key.</AlertDialog.Description>
         <Input
           name='anthropicKey'
@@ -50,7 +55,7 @@ function AddKeyDialog({ setKey, apiKey }): React.JSX.Element {
           <Button onClick={handleCancelClick}>Cancel</Button>
         </AlertDialog.Cancel>
         <AlertDialog.Action>
-          <Button variant='primary' disabled={!keyIsValid}>
+          <Button variant='primary' disabled={!keyIsValid} onClick={handleSaveClick}>
             Save
           </Button>
         </AlertDialog.Action>
@@ -80,4 +85,4 @@ function AddKeyDialog({ setKey, apiKey }): React.JSX.Element {
   );
 }
 
-export default AddKeyDialog;
+export default UpdateKeyDialog;

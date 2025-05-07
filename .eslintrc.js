@@ -28,6 +28,7 @@ module.exports = {
     'react/prop-types': 'off',
     'tailwindcss/no-custom-classname': ['off'],
     'jsx-a11y/anchor-is-valid': ['off'],
+    'no-restricted-globals': ['off'],
   },
   overrides: [
     {

@@ -1,15 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Text, Link } from 'figma-kit';
 import Navigation from '../navigation';
-import AddKeyDialog from '../components/dialogs/add-key';
+import UpdateKeyDialog from '../components/dialogs/update-key';
 
 const screen = 'settings';
 const pluginVersion = '1.0';
 
 function SettingsScreen(): React.JSX.Element {
-  const [key, setKey] = useState('');
-  // console.log(key);
-
   function renderNav(): React.JSX.Element {
     return <Navigation screen={screen} />;
   }
@@ -18,7 +15,7 @@ function SettingsScreen(): React.JSX.Element {
     return (
       <div className='row-item'>
         <Text className='heading'>Anthropic API key</Text>
-        <AddKeyDialog setKey={setKey} apiKey={key} />
+        <UpdateKeyDialog title='Add key' />
       </div>
     );
   }

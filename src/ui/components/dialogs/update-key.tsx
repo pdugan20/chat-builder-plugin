@@ -3,8 +3,10 @@ import { AlertDialog, Button, Input, Link } from 'figma-kit';
 
 const keyLength = 108;
 
-function UpdateKeyDialog({ title }): React.JSX.Element {
-  const [apiKey, setKey] = useState('');
+function UpdateKeyDialog({ title, anthropicKey }): React.JSX.Element {
+  // console.log(anthropicKey);
+
+  const [apiKey, setKey] = useState(anthropicKey);
   const [keyIsValid, setKeyIsValid] = useState(false);
 
   interface HandleInputChangeProps {

@@ -9,17 +9,28 @@ import 'figma-kit/styles.css';
 
 function App(): React.JSX.Element {
   const [keyIsValid, setKeyIsValid] = useState(false);
+  const [key, setKey] = useState('');
 
   useEffect(() => {
     onmessage = (event) => {
       const { type } = event.data.pluginMessage;
 
-      if (type === 'hasAnthropicKey') {
-        const { hasKey } = event.data.pluginMessage;
+      switch (type) {
+        case 'hasAnthropicKey':
+          if (event.data.pluginMessage.hasKey) {
+            setKeyIsValid(true);
+            setKey(event.data.pluginMessage.key);
+          }
+          break;
 
-        if (hasKey) {
-          setKeyIsValid(true);
-        }
+        case 'updateAnthropicKey':
+          if (event.data.pluginMessage.keyDidUpdate) {
+            setKey(event.data.pluginMessage.key);
+          }
+          break;
+
+        default:
+          break;
       }
     };
   }, []);
@@ -28,7 +39,7 @@ function App(): React.JSX.Element {
     <MemoryRouter initialEntries={['/PluginScreen']}>
       <Routes>
         <Route path='PluginScreen' element={<PluginScreen hasAnthropicKey={keyIsValid} />} />
-        <Route path='SettingsScreen' element={<SettingsScreen />} />
+        <Route path='SettingsScreen' element={<SettingsScreen anthropicKey={key} />} />
       </Routes>
     </MemoryRouter>
   );

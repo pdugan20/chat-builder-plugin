@@ -1,17 +1,19 @@
 import React, { useState } from 'react';
 import { AlertDialog, Button, Input, Link } from 'figma-kit';
 
-const keyLength = 108;
+interface UpdateKeyDialogProps {
+  title: string;
+  anthropicKey: string;
+  keyLength?: number;
+}
 
-function UpdateKeyDialog({ title, anthropicKey }): React.JSX.Element {
-  // console.log(anthropicKey);
+interface HandleInputChangeProps {
+  updatedKey: string;
+}
 
+function UpdateKeyDialog({ title, anthropicKey, keyLength = 108 }: UpdateKeyDialogProps): React.JSX.Element {
   const [apiKey, setKey] = useState(anthropicKey);
   const [keyIsValid, setKeyIsValid] = useState(false);
-
-  interface HandleInputChangeProps {
-    updatedKey: string;
-  }
 
   function handleInputChange({ updatedKey }: { updatedKey: HandleInputChangeProps['updatedKey'] }): void {
     setKey(updatedKey);
@@ -27,11 +29,11 @@ function UpdateKeyDialog({ title, anthropicKey }): React.JSX.Element {
   }
 
   const handleCancelClick = () => {
-    setKey('');
+    setKey(anthropicKey);
   };
 
   const handleSaveClick = () => {
-    parent.postMessage({ pluginMessage: { type: 'updateAnthropicKey', apiKey } }, '*');
+    parent.postMessage({ pluginMessage: { type: 'UPDATE_ANTHROPIC_KEY', apiKey } }, '*');
   };
 
   function renderBody(): React.JSX.Element {

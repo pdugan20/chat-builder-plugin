@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Text, Button, Select } from 'figma-kit';
+import { Text, Button, Select, Link } from 'figma-kit';
 import TextareaAutosize from 'react-textarea-autosize';
 import Navigation from '../navigation';
 
@@ -79,9 +79,53 @@ function PluginScreen({
   }
 
   function renderPromptTextarea(): React.JSX.Element {
+    const promptOptions = [
+      'Friends talking about what movie they want to see this weekend.',
+      'A team brainstorming ideas for a new project.',
+      'Two people planning a surprise birthday party.',
+      'A group discussing their favorite vacation destinations.',
+      'Colleagues debating the best programming language.',
+    ];
+
+    const shufflePrompt = () => {
+      const randomPrompt = promptOptions[Math.floor(Math.random() * promptOptions.length)];
+      setPrompt(randomPrompt);
+    };
+
+    const clearPrompt = () => {
+      setPrompt('');
+    };
+
     return (
       <div className='row-item'>
-        <Text className='heading'>Prompt</Text>
+        <div className='heading-parent'>
+          <Text className='heading'>Prompt</Text>
+          <div className='actionGroup'>
+            {prompt.trim() && ( // Conditionally render clearActionGroup
+              <div className='clearActionGroup'>
+                <Link
+                  href='#'
+                  onClick={(e) => {
+                    e.preventDefault();
+                    clearPrompt();
+                  }}
+                >
+                  Clear
+                </Link>
+                <Text className='linkSeparator'>&#183;</Text>
+              </div>
+            )}
+            <Link
+              href='#'
+              onClick={(e) => {
+                e.preventDefault();
+                shufflePrompt();
+              }}
+            >
+              Shuffle prompt
+            </Link>
+          </div>
+        </div>
         <TextareaAutosize
           className='fp-textarea focus:outline-1 focus:-outline-offset-1'
           minRows={3}

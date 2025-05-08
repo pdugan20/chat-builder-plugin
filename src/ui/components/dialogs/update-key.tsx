@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import { AlertDialog, Button, Input, Link } from 'figma-kit';
 
 interface UpdateKeyDialogProps {
-  title: string;
+  dialogTitle: string;
+  dialogDescription?: string;
+  actionLabel?: string;
   anthropicKey: string;
   keyLength?: number;
 }
@@ -11,7 +13,13 @@ interface HandleInputChangeProps {
   updatedKey: string;
 }
 
-function UpdateKeyDialog({ title, anthropicKey, keyLength = 108 }: UpdateKeyDialogProps): React.JSX.Element {
+function UpdateKeyDialog({
+  dialogTitle,
+  dialogDescription = 'Enter your Anthropic API key.',
+  actionLabel = 'Add key',
+  anthropicKey,
+  keyLength = 108,
+}: UpdateKeyDialogProps): React.JSX.Element {
   const [apiKey, setKey] = useState(anthropicKey);
   const [keyIsValid, setKeyIsValid] = useState(false);
 
@@ -23,7 +31,7 @@ function UpdateKeyDialog({ title, anthropicKey, keyLength = 108 }: UpdateKeyDial
   function renderTrigger(): React.JSX.Element {
     return (
       <AlertDialog.Trigger>
-        <Link href='#'>Add key</Link>
+        <Link href='#'>{actionLabel}</Link>
       </AlertDialog.Trigger>
     );
   }
@@ -39,8 +47,8 @@ function UpdateKeyDialog({ title, anthropicKey, keyLength = 108 }: UpdateKeyDial
   function renderBody(): React.JSX.Element {
     return (
       <div>
-        <AlertDialog.Title>{title}</AlertDialog.Title>
-        <AlertDialog.Description>Enter your Anthropic API key.</AlertDialog.Description>
+        <AlertDialog.Title>{dialogTitle}</AlertDialog.Title>
+        <AlertDialog.Description>{dialogDescription}</AlertDialog.Description>
         <Input
           name='anthropicKey'
           placeholder='Ex. sk-ant-api03-nCjQtbsOljqx4VkPL'

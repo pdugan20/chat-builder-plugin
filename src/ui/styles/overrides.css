@@ -66,6 +66,11 @@ input.fp-Input {
 .fp-Text {
   cursor: default;
 
+  &.linkSeparator {
+    display: flex;
+    margin: 0 var(--space-0_5);
+  }
+
   &:hover {
     cursor: default;
   }
@@ -74,6 +79,17 @@ input.fp-Input {
     font-weight: 500;
     padding-bottom: var(--space-1);
     display: flex;
+  }
+
+  &.subtitle {
+    display: flex;
+
+    &.truncated {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
   }
 }
 
@@ -125,6 +141,24 @@ nav {
 
   &:last-child {
     padding-bottom: 0;
+  }
+}
+
+.heading-parent {
+  display: flex;
+
+  .fp-Link {
+    display: flex;
+    margin-left: auto;
+  }
+
+  .actionGroup {
+    display: flex;
+    margin-left: auto;
+  }
+
+  .clearActionGroup {
+    display: flex;
   }
 }
 

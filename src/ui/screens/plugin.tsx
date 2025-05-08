@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Text, Button, Select, Link } from 'figma-kit';
 import TextareaAutosize from 'react-textarea-autosize';
 import Navigation from '../navigation';
+import promptExamples from '../../constants/prompts';
 
 interface PluginScreenProps {
   anthropicKey: string;
@@ -79,16 +80,8 @@ function PluginScreen({
   }
 
   function renderPromptTextarea(): React.JSX.Element {
-    const promptOptions = [
-      'Friends talking about what movie they want to see this weekend.',
-      'A team brainstorming ideas for a new project.',
-      'Two people planning a surprise birthday party.',
-      'A group discussing their favorite vacation destinations.',
-      'Colleagues debating the best programming language.',
-    ];
-
     const shufflePrompt = () => {
-      const randomPrompt = promptOptions[Math.floor(Math.random() * promptOptions.length)];
+      const randomPrompt = promptExamples[Math.floor(Math.random() * promptExamples.length)];
       setPrompt(randomPrompt);
     };
 
@@ -101,7 +94,7 @@ function PluginScreen({
         <div className='heading-parent'>
           <Text className='heading'>Prompt</Text>
           <div className='actionGroup'>
-            {prompt.trim() && ( // Conditionally render clearActionGroup
+            {prompt.trim() && (
               <div className='clearActionGroup'>
                 <Link
                   href='#'

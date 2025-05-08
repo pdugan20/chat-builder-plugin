@@ -18,11 +18,21 @@ function SettingsScreen({
     return <Navigation screen={screen} />;
   }
 
+  function renderKeyBody(): React.JSX.Element {
+    if (!anthropicKey) {
+      return <UpdateKeyDialog dialogTitle='Add key' anthropicKey={anthropicKey} />;
+    }
+    return <Text className='subtitle truncated'>{anthropicKey}</Text>;
+  }
+
   function renderKey(): React.JSX.Element {
     return (
       <div className='row-item'>
-        <Text className='heading'>Anthropic API key</Text>
-        <UpdateKeyDialog title='Add key' anthropicKey={anthropicKey} />
+        <div className='heading-parent'>
+          <Text className='heading'>Anthropic API key</Text>
+          {anthropicKey && <UpdateKeyDialog dialogTitle='Edit key' actionLabel='Edit' anthropicKey={anthropicKey} />}
+        </div>
+        {renderKeyBody()}
       </div>
     );
   }

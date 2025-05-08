@@ -40,8 +40,17 @@ function SettingsScreen({
   function renderVersionNumber(): React.JSX.Element {
     return (
       <div className='row-item'>
-        <Text className='heading'>Version</Text>
+        <Text className='heading'>Plugin version</Text>
         <Text>{pluginVersion}</Text>
+      </div>
+    );
+  }
+
+  function renderModel(): React.JSX.Element {
+    return (
+      <div className='row-item'>
+        <Text className='heading'>Model</Text>
+        <Text>Claude 3.7 Sonnet</Text>
       </div>
     );
   }
@@ -60,6 +69,7 @@ function SettingsScreen({
       <div className='body'>
         {renderVersionNumber()}
         {renderKey()}
+        {renderModel()}
         {renderFeedbackLink()}
       </div>
     );

@@ -1,5 +1,5 @@
 {
-  "name": "imessage-chat-builders",
+  "name": "imessage-chat-builder",
   "version": "1.0.0",
   "description": "A Figma plugin that allows for the generation of iMessage chats.",
   "main": "dist/plugin.js",

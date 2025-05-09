@@ -3,6 +3,7 @@ import { Text, Button, Select, Link } from 'figma-kit';
 import TextareaAutosize from 'react-textarea-autosize';
 import Navigation from '../navigation';
 import promptExamples from '../../constants/prompts';
+import createChatQuery from '../../api/anthropic';
 
 interface PluginScreenProps {
   anthropicKey: string;
@@ -142,9 +143,32 @@ function PluginScreen({
   }
 
   function renderFooter(): React.JSX.Element {
+    const handleSubmit = async () => {
+      const queryInputs = {
+        participants,
+        maxMessages,
+        prompt,
+      };
+
+      const chatBlob = await createChatQuery({ apiKey: anthropicKey, queryInputs });
+      console.log(chatBlob);
+
+      // Add your submission logic here, e.g., sending data to an API
+      // fetch('/api/submit', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify(submissionData),
+      // });
+    };
+
     return (
       <div className='footer'>
-        <Button variant='primary' size='medium' disabled={!prompt.trim()}>
+        <Button
+          variant='primary'
+          size='medium'
+          disabled={!prompt.trim()} // Disable if prompt is empty
+          onClick={handleSubmit} // Submit data on click
+        >
           Generate chat
         </Button>
       </div>

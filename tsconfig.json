@@ -1,10 +1,12 @@
 {
   "compilerOptions": {
     "target": "es5",
-    "lib": ["es6", "dom"],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "typeRoots": ["./node_modules/@types", "./node_modules/@figma", "src/@types"],
-    "jsx": "react",
+    "jsx": "react-jsx",
+    "module": "esnext",
     "esModuleInterop": true,
+    "resolveJsonModule": true,
     "moduleResolution": "node"
   },
   "include": ["src/**/*", "@types"]

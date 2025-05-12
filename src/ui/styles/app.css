@@ -2,4 +2,5 @@
 @tailwind components;
 @tailwind utilities;
 
+@import 'figma-kit/styles.css';
 @import './overrides.css';

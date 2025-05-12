@@ -1,5 +1,6 @@
 :root {
   --font-weight-default: 400;
+  --font-weight-strong: 500;
 }
 
 textarea.fp-textarea {
@@ -84,14 +85,14 @@ input.fp-Input {
 .fp-Text,
 .fp-SelectTrigger,
 .fp-Textarea {
-  font-weight: 400;
+  font-weight: var(--font-weight-default);
 }
 
 .fp-Text {
   cursor: default;
 
   &.fp-weight-strong {
-    font-weight: 500;
+    font-weight: var(--font-weight-strong);
   }
 
   &.linkSeparator {
@@ -104,7 +105,7 @@ input.fp-Input {
   }
 
   &.heading {
-    font-weight: 500;
+    font-weight: var(--font-weight-strong);
     padding-bottom: var(--space-1);
     display: flex;
   }

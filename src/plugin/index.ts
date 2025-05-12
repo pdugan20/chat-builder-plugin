@@ -1,4 +1,5 @@
 import getAnthropicKey from '../scripts/get-key';
+import loadFonts from '../scripts/load-fonts';
 import updateAnthropicKey from '../scripts/update-key';
 import notifyUser from '../scripts/api-error';
 import buildChatUserInterface from '../scripts/build-chat-ui';
@@ -24,6 +25,7 @@ figma.ui.onmessage = (msg) => {
 
 (async () => {
   await getAnthropicKey();
+  await loadFonts();
 })();
 
 figma.showUI(__html__, { themeColors: true, width: 295, height: 375 });

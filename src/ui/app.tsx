@@ -5,7 +5,6 @@ import PluginScreen from './screens/plugin';
 import SettingsScreen from './screens/settings';
 
 import './styles/app.css';
-import 'figma-kit/styles.css';
 
 function App(): React.JSX.Element {
   const [key, setKey] = useState(null);

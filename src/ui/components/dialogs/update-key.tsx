@@ -55,6 +55,7 @@ function UpdateKeyDialog({
           value={apiKey}
           onChange={(e) => handleInputChange({ updatedKey: e.target.value })}
           maxLength={keyLength}
+          spellCheck={false}
         />
       </div>
     );

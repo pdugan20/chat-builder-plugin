@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { MemoryRouter, Routes, Route } from 'react-router-dom';
+import { MemoryRouter, Routes, Route } from 'react-router';
 
 import PluginScreen from './screens/plugin';
 import SettingsScreen from './screens/settings';

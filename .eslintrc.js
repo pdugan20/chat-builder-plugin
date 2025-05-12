@@ -30,6 +30,7 @@ module.exports = {
     'jsx-a11y/anchor-is-valid': ['off'],
     'no-restricted-globals': ['off'],
     'react/require-default-props': ['off'],
+    'import/no-extraneous-dependencies': ['off'],
   },
   overrides: [
     {

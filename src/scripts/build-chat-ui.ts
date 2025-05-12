@@ -1,11 +1,16 @@
 import chatData from '../constants/test-data';
 import componentKey from '../constants/keys';
 
+interface BuildChatUserInterfaceProps {
+  data: string;
+  width?: number;
+}
+
 // 'First bubble#80:3': 'Testing',
 // 'Second bubble#80:4': 'Testing',
 // 'Third bubble#80:7': 'Testing',
 
-export default async function buildChatUserInterface(data: string) {
+export default async function buildChatUserInterface({ data, width = 402 }: BuildChatUserInterfaceProps) {
   // eslint-disable-next-line no-console
   // console.log(data);
 
@@ -15,7 +20,7 @@ export default async function buildChatUserInterface(data: string) {
 
   const frame = figma.createFrame();
   frame.layoutMode = 'VERTICAL';
-  frame.resize(402, frame.height);
+  frame.resize(width, frame.height);
 
   // const recipientBubbleSet = await figma.importComponentSetByKeyAsync(componentKey.recipientBubble);
   // console.log(recipientBubbleSet);
@@ -34,7 +39,7 @@ export default async function buildChatUserInterface(data: string) {
         'First bubble#80:3': message,
       });
 
-      senderInstance.resize(402, senderInstance.height);
+      senderInstance.resize(width, senderInstance.height);
       frame.appendChild(senderInstance);
     }
 
@@ -55,7 +60,7 @@ export default async function buildChatUserInterface(data: string) {
         [0, 1, currentTransform[1][2]], // Ignore x-axis
       ];
 
-      recipientInstance.resize(402, recipientInstance.height);
+      recipientInstance.resize(width, recipientInstance.height);
       frame.appendChild(recipientInstance);
     }
     // console.log(role, message, messagesInGroup);

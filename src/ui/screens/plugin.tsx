@@ -4,6 +4,7 @@ import TextareaAutosize from 'react-textarea-autosize';
 import Navigation from '../navigation';
 import promptExamples from '../../constants/prompts';
 import createChatQuery from '../../api/anthropic';
+import cleanAndParseJson from '../../utils/json';
 
 interface PluginScreenProps {
   anthropicKey: string;
@@ -150,25 +151,16 @@ function PluginScreen({
         prompt,
       };
 
-      const chatBlob = await createChatQuery({ apiKey: anthropicKey, queryInputs });
-      console.log(chatBlob);
-
-      // Add your submission logic here, e.g., sending data to an API
-      // fetch('/api/submit', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(submissionData),
-      // });
+      const response = await createChatQuery({ apiKey: anthropicKey, queryInputs });
+      if (response) {
+        const chatData = cleanAndParseJson(response.content[0].text);
+        console.log(chatData);
+      }
     };
 
     return (
       <div className='footer'>
-        <Button
-          variant='primary'
-          size='medium'
-          disabled={!prompt.trim()} // Disable if prompt is empty
-          onClick={handleSubmit} // Submit data on click
-        >
+        <Button variant='primary' size='medium' disabled={!prompt.trim()} onClick={handleSubmit}>
           Generate chat
         </Button>
       </div>

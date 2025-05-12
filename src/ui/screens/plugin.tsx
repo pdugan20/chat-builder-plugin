@@ -152,6 +152,7 @@ function PluginScreen({
       };
 
       const response = await createChatQuery({ apiKey: anthropicKey, queryInputs });
+
       if (response) {
         const chatData = cleanAndParseJson(response.content[0].text);
         console.log(chatData);

@@ -47,10 +47,7 @@ export default async function createChatQuery({
     return chatBlob;
   } catch (response) {
     if (response.error) {
-      const { type } = response.error.error;
-      if (type === 'authentication_error') {
-        console.log('Authentication error: Invalid API key');
-      }
+      parent.postMessage({ pluginMessage: { type: 'POST_API_ERROR', errorType: response.error.error.type } }, '*');
     }
     return null;
   }

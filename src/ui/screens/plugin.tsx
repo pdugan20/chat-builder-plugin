@@ -27,6 +27,7 @@ function PluginScreen({
   const [participants, setParticipants] = useState(defaultParticipants);
   const [maxMessages, setMaxMessages] = useState(defaultMaxMessages);
   const [prompt, setPrompt] = useState('');
+  const [loading, setLoading] = useState(false);
 
   function renderNav(): React.JSX.Element {
     return <Navigation screen={screen} />;
@@ -145,23 +146,31 @@ function PluginScreen({
 
   function renderFooter(): React.JSX.Element {
     const handleSubmit = async () => {
+      setLoading(true);
+
       const queryInputs = {
+        style,
         participants,
         maxMessages,
         prompt,
       };
 
-      const response = await createChatQuery({ apiKey: anthropicKey, queryInputs });
-
-      if (response) {
-        const chatData = cleanAndParseJson(response.content[0].text);
-        console.log(chatData);
+      try {
+        const response = await createChatQuery({ apiKey: anthropicKey, queryInputs });
+        if (response) {
+          parent.postMessage(
+            { pluginMessage: { type: 'BUILD_CHAT_UI', data: cleanAndParseJson(response.content[0].text) } },
+            '*'
+          );
+        }
+      } finally {
+        setLoading(false);
       }
     };
 
     return (
       <div className='footer'>
-        <Button variant='primary' size='medium' disabled={!prompt.trim()} onClick={handleSubmit}>
+        <Button variant='primary' size='medium' disabled={!prompt.trim() || loading} onClick={handleSubmit}>
           Generate chat
         </Button>
       </div>

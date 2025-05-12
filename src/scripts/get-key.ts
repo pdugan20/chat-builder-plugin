@@ -15,6 +15,9 @@ export default async function getAnthropicKey() {
       });
     }
   } catch (err) {
-    figma.notify('Error retrieving API key.');
+    figma.notify('Error retrieving API key.', {
+      timeout: 5000,
+      error: true,
+    });
   }
 }

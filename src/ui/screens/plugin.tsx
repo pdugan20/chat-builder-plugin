@@ -156,13 +156,14 @@ function PluginScreen({
       };
 
       try {
-        const response = await createChatQuery({ apiKey: anthropicKey, queryInputs });
-        if (response) {
-          parent.postMessage(
-            { pluginMessage: { type: 'BUILD_CHAT_UI', data: cleanAndParseJson(response.content[0].text) } },
-            '*'
-          );
-        }
+        // const response = await createChatQuery({ apiKey: anthropicKey, queryInputs });
+        // if (response) {
+        //   parent.postMessage(
+        //     { pluginMessage: { type: 'BUILD_CHAT_UI', data: cleanAndParseJson(response.content[0].text) } },
+        //     '*'
+        //   );
+        // }
+        parent.postMessage({ pluginMessage: { type: 'BUILD_CHAT_UI', data: null } }, '*');
       } finally {
         setLoading(false);
       }

@@ -163,7 +163,7 @@ function PluginScreen({
         //     '*'
         //   );
         // }
-        parent.postMessage({ pluginMessage: { type: 'BUILD_CHAT_UI', data: null } }, '*');
+        parent.postMessage({ pluginMessage: { type: 'BUILD_CHAT_UI', data: '' } }, '*');
       } finally {
         setLoading(false);
       }

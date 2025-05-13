@@ -4,60 +4,60 @@ import componentKey from '../constants/keys';
 interface BuildChatUserInterfaceProps {
   data: string;
   width?: number;
+  itemSpacing?: number;
 }
 
-// Sender
-// 'First bubble#80:3'
-// 'Second bubble#80:4'
-// 'Third bubble#80:7'
-
-// Recipient
-// 'First bubble#41:2'
-// 'Second bubble#40:1'
-// 'Third bubble#45:0'
-
-export default async function buildChatUserInterface({ data, width = 402 }: BuildChatUserInterfaceProps) {
-  // eslint-disable-next-line no-console
-  // console.log(data);
-
+export default async function buildChatUserInterface({
+  data,
+  width = 402,
+  itemSpacing = 8,
+}: BuildChatUserInterfaceProps) {
   const senderSet = await figma.importComponentSetByKeyAsync(componentKey.senderBubble);
   const recipientSet = await figma.importComponentSetByKeyAsync(componentKey.recipientBubble);
+
+  // console.log(senderSet.componentPropertyDefinitions);
   // console.log(recipientSet.componentPropertyDefinitions);
 
+  const messages = [];
   const frame = figma.createFrame();
 
   frame.layoutMode = 'VERTICAL';
   frame.resize(width, frame.height);
-
-  // const recipientBubbleSet = await figma.importComponentSetByKeyAsync(componentKey.recipientBubble);
-  // console.log(recipientBubbleSet);
-
-  const messages = [];
+  frame.itemSpacing = itemSpacing;
 
   chatData.forEach((item, index) => {
     const { role, message, messagesInGroup } = item;
 
+    const bubbleKeys =
+      role === 'sender'
+        ? ['First bubble#80:3', 'Second bubble#80:4', 'Third bubble#80:7']
+        : ['First bubble#41:2', 'Second bubble#40:1', 'Third bubble#45:0'];
+
+    const bubble = bubbleKeys[0];
+
     if (!messages.includes(message)) {
       if (role === 'sender') {
         const senderInstance = senderSet.defaultVariant.createInstance();
-
-        messages.push(message);
 
         senderInstance.setProperties({
           Bubbles: messagesInGroup.toString(),
           Style: 'iOS',
           'Has reaction': 'No',
           'Has mustache text': 'No',
-          'First bubble#80:3': message,
+          [bubble]: message,
         });
 
-        if (messagesInGroup === 2) {
-          senderInstance.setProperties({
-            'Second bubble#80:4': chatData[index + 1].message,
-          });
-          messages.push(chatData[index + 1].message);
+        for (let i = 0; i < messagesInGroup; i += 1) {
+          const bubbleKey = bubbleKeys[i];
+          if (bubbleKey && chatData[index + i]) {
+            senderInstance.setProperties({
+              [bubbleKey]: chatData[index + i].message,
+            });
+            messages.push(chatData[index + i].message);
+          }
         }
 
+        messages.push(message);
         senderInstance.resize(width, senderInstance.height);
         frame.appendChild(senderInstance);
       }
@@ -70,14 +70,17 @@ export default async function buildChatUserInterface({ data, width = 402 }: Buil
           'Is group chat': 'No',
           'Has reaction': 'No',
           'Has mustache text': 'No',
-          'First bubble#41:2': message,
+          [bubble]: message,
         });
 
-        if (messagesInGroup === 2) {
-          recipientInstance.setProperties({
-            'Second bubble#40:1': chatData[index + 1].message,
-          });
-          messages.push(chatData[index + 1].message);
+        for (let i = 0; i < messagesInGroup; i += 1) {
+          const bubbleKey = bubbleKeys[i];
+          if (bubbleKey && chatData[index + i]) {
+            recipientInstance.setProperties({
+              [bubbleKey]: chatData[index + i].message,
+            });
+            messages.push(chatData[index + i].message);
+          }
         }
 
         const currentTransform = recipientInstance.relativeTransform;
@@ -86,6 +89,7 @@ export default async function buildChatUserInterface({ data, width = 402 }: Buil
           [0, 1, currentTransform[1][2]], // Ignore x-axis
         ];
 
+        messages.push(message);
         recipientInstance.resize(width, recipientInstance.height);
         frame.appendChild(recipientInstance);
       }

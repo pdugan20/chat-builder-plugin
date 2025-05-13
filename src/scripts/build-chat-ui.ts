@@ -37,8 +37,22 @@ async function resizeFrame(frame: FrameNode, width: number): Promise<void> {
   frame.resize(width, frame.height);
 }
 
+let lastFrameX: number = 0;
+const frameSpacing: number = 50;
+
+function positionFrame(frame: FrameNode, width: number): void {
+  const currentFrame = frame;
+
+  currentFrame.x = lastFrameX;
+  currentFrame.y = 0;
+
+  lastFrameX += width + frameSpacing;
+}
+
 async function buildFrame(theme: 'light' | 'dark', width: number, itemSpacing: number): Promise<FrameNode> {
   const frame: FrameNode = figma.createFrame();
+
+  positionFrame(frame, width);
 
   await setFrameStyle(frame, theme);
   await resizeFrame(frame, width);
@@ -85,12 +99,11 @@ export default async function buildChatUserInterface({
   const messages: string[] = [];
 
   const frame: FrameNode = await buildFrame(theme, width, itemSpacing);
-  const { senderSet, recipientSet }: { senderSet: ComponentSetNode; recipientSet: ComponentSetNode } =
-    await loadBubbleSets();
+  const { senderSet, recipientSet } = await loadBubbleSets();
 
   await updateEmojiKeyIds();
 
-  chatData.forEach(async (item: unknown, index: number): Promise<void> => {
+  const chatUserInterfaceDidDraw = chatData.map(async (item: unknown, index: number): Promise<void> => {
     const {
       role,
       message,
@@ -108,7 +121,7 @@ export default async function buildChatUserInterface({
     const bubble: string = bubbleKeys[0];
 
     if (!messages.includes(message)) {
-      const hasReaction: 'Yes' | 'No' = emojiReaction ? 'Yes' : 'No';
+      const hasReaction = emojiReaction ? 'Yes' : 'No';
 
       if (role === 'sender') {
         const senderInstance: InstanceNode = senderSet.defaultVariant.createInstance();
@@ -183,4 +196,7 @@ export default async function buildChatUserInterface({
       }
     }
   });
+
+  await Promise.all(chatUserInterfaceDidDraw);
+  figma.viewport.scrollAndZoomIntoView([frame]);
 }

@@ -32,7 +32,7 @@ const chatData = [
     role: 'sender',
     message: "Definitely! I'm free Saturday night. How about you?",
     time: '3:20 PM',
-    emojiReaction: 'thumbs up',
+    emojiReaction: 'thumbsUp',
     messagesInGroup: 2,
   },
   {

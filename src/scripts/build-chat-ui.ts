@@ -1,10 +1,11 @@
 import chatData from '../constants/test-data';
 import { componentKey, componentPropertyName } from '../constants/keys';
 import flipHorizontal from '../utils/transform';
-import { emojiKey } from '../constants/emojis';
+import emojiKey from '../constants/emojis';
 import { colorCollection, modeId } from '../constants/collections';
 
 interface BuildChatUserInterfaceProps {
+  theme?: string;
   data: string;
   width?: number;
   itemSpacing?: number;
@@ -12,7 +13,7 @@ interface BuildChatUserInterfaceProps {
 }
 
 export default async function buildChatUserInterface({
-  data,
+  theme = 'light',
   width = 402,
   itemSpacing = 8,
   bubbleStyle = 'iOS',
@@ -24,8 +25,26 @@ export default async function buildChatUserInterface({
   const frame = figma.createFrame();
 
   const collection = await figma.variables.getVariableCollectionByIdAsync(colorCollection.id);
-  frame.setExplicitVariableModeForCollection(collection, modeId.dark);
+  frame.setExplicitVariableModeForCollection(collection, modeId[theme]);
 
+  const threadBackground = await figma.variables.getVariableByIdAsync(
+    'VariableID:0598b50981ddea62d9f02f9fc0bfa2612cc9b539/600:7'
+  );
+
+  const resolvedValue = threadBackground.resolveForConsumer(frame);
+  const { r, g, b, a } = resolvedValue.value as RGBA;
+
+  const solidFill: SolidPaint = {
+    type: 'SOLID',
+    color: {
+      r,
+      g,
+      b,
+    },
+    opacity: a,
+  };
+
+  frame.fills = [solidFill];
   frame.layoutMode = 'VERTICAL';
   frame.resize(width, frame.height);
   frame.itemSpacing = itemSpacing;

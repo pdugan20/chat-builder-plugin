@@ -1,23 +1,4 @@
-export const emojiStyle = {
-  color: {
-    heart: '246:145',
-    thumbsUp: '443:2457',
-    thumbsDown: '443:2615',
-    haha: '246:1079',
-    exclamation: '246:1077',
-    question: '443:4024',
-  },
-  transparentBlue: {
-    heart: '246:145',
-    thumbsUp: '443:2774',
-    thumbsDown: '246:1640',
-    haha: '246:1642',
-    exclamation: '443:5002',
-    question: '443:5162',
-  },
-};
-
-export const emojiKey = {
+const emojiKey = {
   color: {
     heart: { key: '813b6a40ee554c44300f9235ee882143606fd3d0' },
     thumbsUp: { key: 'f017bd960d7d9852f3be68f6168cd8b0d53bf518' },
@@ -35,3 +16,5 @@ export const emojiKey = {
     question: { key: 'b1019ffdc9de4be59bb05494e74fc36bb970b5a9' },
   },
 };
+
+export default emojiKey;

@@ -31,6 +31,7 @@ module.exports = {
     'no-restricted-globals': ['off'],
     'react/require-default-props': ['off'],
     'import/no-extraneous-dependencies': ['off'],
+    '@typescript-eslint/consistent-type-definitions': ['error', 'interface'],
   },
   overrides: [
     {

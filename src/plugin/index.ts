@@ -11,7 +11,8 @@ figma.ui.onmessage = (msg) => {
       break;
 
     case 'BUILD_CHAT_UI':
-      buildChatUserInterface(msg.data);
+      // console.log(msg.data);
+      buildChatUserInterface({ data: msg.data, theme: msg.style });
       break;
 
     case 'POST_API_ERROR':

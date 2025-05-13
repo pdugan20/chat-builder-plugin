@@ -1,7 +1,7 @@
 import chatData from '../constants/test-data';
 import { componentKey, componentPropertyName } from '../constants/keys';
 import flipHorizontal from '../utils/transform';
-import emojiStyle from '../constants/emojis';
+import { emojiKey } from '../constants/emojis';
 import { colorCollection, modeId } from '../constants/collections';
 
 interface BuildChatUserInterfaceProps {
@@ -23,13 +23,23 @@ export default async function buildChatUserInterface({
   const messages = [];
   const frame = figma.createFrame();
 
-  frame.setExplicitVariableModeForCollection(colorCollection.id, modeId.dark);
+  const collection = await figma.variables.getVariableCollectionByIdAsync(colorCollection.id);
+  frame.setExplicitVariableModeForCollection(collection, modeId.dark);
 
   frame.layoutMode = 'VERTICAL';
   frame.resize(width, frame.height);
   frame.itemSpacing = itemSpacing;
 
-  chatData.forEach((item, index) => {
+  const emojiKeyUpdatePromises = Object.entries(emojiKey).flatMap(([style, emojis]) =>
+    Object.entries(emojis).map(async ([key, value]) => {
+      const component = await figma.importComponentByKeyAsync(value.key);
+      emojiKey[style][key].id = component.id;
+    })
+  );
+
+  await Promise.all(emojiKeyUpdatePromises);
+
+  chatData.forEach(async (item, index) => {
     const { role, message, emojiReaction, messagesInGroup } = item;
 
     const bubbleKeys = role === 'sender' ? componentPropertyName.senderBubble : componentPropertyName.recipientBubble;
@@ -61,8 +71,9 @@ export default async function buildChatUserInterface({
 
         if (senderInstance.exposedInstances.length > 0) {
           const emojiInstance = senderInstance.exposedInstances[0];
+
           emojiInstance.setProperties({
-            [componentPropertyName.emoji]: emojiStyle.color[emojiReaction],
+            [componentPropertyName.emoji]: emojiKey.color[emojiReaction].id,
           });
         }
 
@@ -94,9 +105,10 @@ export default async function buildChatUserInterface({
 
         if (recipientInstance.exposedInstances.length > 0) {
           const emojiInstance = recipientInstance.exposedInstances[0];
+
           emojiInstance.setProperties({
             Style: bubbleStyle,
-            [componentPropertyName.emoji]: emojiStyle.transparentBlue[emojiReaction],
+            [componentPropertyName.emoji]: emojiKey.transparentBlue[emojiReaction].id,
           });
         }
 

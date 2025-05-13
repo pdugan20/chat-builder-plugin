@@ -3,6 +3,7 @@ import { componentKey, componentPropertyName } from '../constants/keys';
 import flipHorizontal from '../utils/transform';
 import emojiKey from '../constants/emojis';
 import { colorCollection, modeId } from '../constants/collections';
+import colors from '../constants/colors';
 
 interface BuildChatUserInterfaceProps {
   theme?: string;
@@ -12,51 +13,76 @@ interface BuildChatUserInterfaceProps {
   bubbleStyle?: string;
 }
 
-export default async function buildChatUserInterface({
-  theme = 'light',
-  width = 402,
-  itemSpacing = 8,
-  bubbleStyle = 'iOS',
-}: BuildChatUserInterfaceProps) {
-  const senderSet = await figma.importComponentSetByKeyAsync(componentKey.senderBubble);
-  const recipientSet = await figma.importComponentSetByKeyAsync(componentKey.recipientBubble);
+async function getFrameBackgroundFill(frame) {
+  const threadBackgroundVar = await figma.variables.getVariableByIdAsync(colors['Background/General/Thread'].id);
 
-  const messages = [];
-  const frame = figma.createFrame();
-
-  const collection = await figma.variables.getVariableCollectionByIdAsync(colorCollection.id);
-  frame.setExplicitVariableModeForCollection(collection, modeId[theme]);
-
-  const threadBackground = await figma.variables.getVariableByIdAsync(
-    'VariableID:0598b50981ddea62d9f02f9fc0bfa2612cc9b539/600:7'
-  );
-
-  const resolvedValue = threadBackground.resolveForConsumer(frame);
+  const resolvedValue = threadBackgroundVar.resolveForConsumer(frame);
   const { r, g, b, a } = resolvedValue.value as RGBA;
 
-  const solidFill: SolidPaint = {
+  const backgroundFill: SolidPaint = {
     type: 'SOLID',
-    color: {
-      r,
-      g,
-      b,
-    },
+    color: { r, g, b },
     opacity: a,
   };
 
-  frame.fills = [solidFill];
-  frame.layoutMode = 'VERTICAL';
+  return backgroundFill;
+}
+
+async function setFrameStyle(frame, theme) {
+  const collection = await figma.variables.getVariableCollectionByIdAsync(colorCollection.id);
+  frame.setExplicitVariableModeForCollection(collection, modeId[theme]);
+}
+
+async function resizeFrame(frame, width) {
   frame.resize(width, frame.height);
+}
+
+async function buildFrame(theme, width, itemSpacing) {
+  const frame = figma.createFrame();
+
+  await setFrameStyle(frame, theme);
+  await resizeFrame(frame, width);
+
+  const backgroundFill = await getFrameBackgroundFill(frame);
+
+  frame.fills = [backgroundFill];
+  frame.layoutMode = 'VERTICAL';
   frame.itemSpacing = itemSpacing;
 
-  const emojiKeyUpdatePromises = Object.entries(emojiKey).flatMap(([style, emojis]) =>
+  return frame;
+}
+
+async function loadBubbleSets() {
+  const senderSetPromise = figma.importComponentSetByKeyAsync(componentKey.senderBubble);
+  const recipientSetPromise = figma.importComponentSetByKeyAsync(componentKey.recipientBubble);
+  const [senderSet, recipientSet] = await Promise.all([senderSetPromise, recipientSetPromise]);
+
+  return { senderSet, recipientSet };
+}
+
+async function updateEmojiKeyIds() {
+  const promises = Object.entries(emojiKey).flatMap(([style, emojis]) =>
     Object.entries(emojis).map(async ([key, value]) => {
       const component = await figma.importComponentByKeyAsync(value.key);
       emojiKey[style][key].id = component.id;
     })
   );
 
-  await Promise.all(emojiKeyUpdatePromises);
+  await Promise.all(promises);
+}
+
+export default async function buildChatUserInterface({
+  theme = 'light',
+  width = 402,
+  itemSpacing = 8,
+  bubbleStyle = 'iOS',
+}: BuildChatUserInterfaceProps) {
+  const messages = [];
+
+  const frame = await buildFrame(theme, width, itemSpacing);
+  const { senderSet, recipientSet } = await loadBubbleSets();
+
+  await updateEmojiKeyIds();
 
   chatData.forEach(async (item, index) => {
     const { role, message, emojiReaction, messagesInGroup } = item;

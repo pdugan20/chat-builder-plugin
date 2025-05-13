@@ -1,15 +1,6 @@
-export default async function loadFonts() {
-  const requiredFonts = [
-    {
-      family: 'SF Pro Text',
-      style: 'Medium',
-    },
-    {
-      family: 'SF Pro Text',
-      style: 'Regular',
-    },
-  ];
+import requiredFonts from '../constants/fonts';
 
+export default async function loadFonts() {
   let areRequiredFontsAvailable = false;
 
   try {

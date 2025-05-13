@@ -6,18 +6,18 @@ import { colorCollection, modeId } from '../constants/collections';
 import colors from '../constants/colors';
 
 interface BuildChatUserInterfaceProps {
-  theme?: string;
+  theme?: 'light' | 'dark';
   data: string;
   width?: number;
   itemSpacing?: number;
-  bubbleStyle?: string;
+  bubbleStyle?: 'iOS' | 'Android';
 }
 
-async function getFrameBackgroundFill(frame) {
-  const threadBackgroundVar = await figma.variables.getVariableByIdAsync(colors['Background/General/Thread'].id);
+async function getFrameBackgroundFill(frame: FrameNode): Promise<SolidPaint> {
+  const threadBackgroundVariable = await figma.variables.getVariableByIdAsync(colors['Background/General/Thread'].id);
 
-  const resolvedValue = threadBackgroundVar.resolveForConsumer(frame);
-  const { r, g, b, a } = resolvedValue.value as RGBA;
+  const resolvedValue = threadBackgroundVariable.resolveForConsumer(frame);
+  const { r, g, b, a }: RGBA = resolvedValue.value as RGBA;
 
   const backgroundFill: SolidPaint = {
     type: 'SOLID',
@@ -28,22 +28,22 @@ async function getFrameBackgroundFill(frame) {
   return backgroundFill;
 }
 
-async function setFrameStyle(frame, theme) {
+async function setFrameStyle(frame: FrameNode, theme: 'light' | 'dark'): Promise<void> {
   const collection = await figma.variables.getVariableCollectionByIdAsync(colorCollection.id);
   frame.setExplicitVariableModeForCollection(collection, modeId[theme]);
 }
 
-async function resizeFrame(frame, width) {
+async function resizeFrame(frame: FrameNode, width: number): Promise<void> {
   frame.resize(width, frame.height);
 }
 
-async function buildFrame(theme, width, itemSpacing) {
-  const frame = figma.createFrame();
+async function buildFrame(theme: 'light' | 'dark', width: number, itemSpacing: number): Promise<FrameNode> {
+  const frame: FrameNode = figma.createFrame();
 
   await setFrameStyle(frame, theme);
   await resizeFrame(frame, width);
 
-  const backgroundFill = await getFrameBackgroundFill(frame);
+  const backgroundFill: SolidPaint = await getFrameBackgroundFill(frame);
 
   frame.fills = [backgroundFill];
   frame.layoutMode = 'VERTICAL';
@@ -52,18 +52,23 @@ async function buildFrame(theme, width, itemSpacing) {
   return frame;
 }
 
-async function loadBubbleSets() {
-  const senderSetPromise = figma.importComponentSetByKeyAsync(componentKey.senderBubble);
-  const recipientSetPromise = figma.importComponentSetByKeyAsync(componentKey.recipientBubble);
-  const [senderSet, recipientSet] = await Promise.all([senderSetPromise, recipientSetPromise]);
+async function loadBubbleSets(): Promise<{ senderSet: ComponentSetNode; recipientSet: ComponentSetNode }> {
+  const senderSetPromise: Promise<ComponentSetNode> = figma.importComponentSetByKeyAsync(componentKey.senderBubble);
+  const recipientSetPromise: Promise<ComponentSetNode> = figma.importComponentSetByKeyAsync(
+    componentKey.recipientBubble
+  );
+  const [senderSet, recipientSet]: [ComponentSetNode, ComponentSetNode] = await Promise.all([
+    senderSetPromise,
+    recipientSetPromise,
+  ]);
 
   return { senderSet, recipientSet };
 }
 
-async function updateEmojiKeyIds() {
-  const promises = Object.entries(emojiKey).flatMap(([style, emojis]) =>
+async function updateEmojiKeyIds(): Promise<void> {
+  const promises: Promise<void>[] = Object.entries(emojiKey).flatMap(([style, emojis]) =>
     Object.entries(emojis).map(async ([key, value]) => {
-      const component = await figma.importComponentByKeyAsync(value.key);
+      const component: ComponentNode = await figma.importComponentByKeyAsync(value.key);
       emojiKey[style][key].id = component.id;
     })
   );
@@ -76,25 +81,37 @@ export default async function buildChatUserInterface({
   width = 402,
   itemSpacing = 8,
   bubbleStyle = 'iOS',
-}: BuildChatUserInterfaceProps) {
-  const messages = [];
+}: BuildChatUserInterfaceProps): Promise<void> {
+  const messages: string[] = [];
 
-  const frame = await buildFrame(theme, width, itemSpacing);
-  const { senderSet, recipientSet } = await loadBubbleSets();
+  const frame: FrameNode = await buildFrame(theme, width, itemSpacing);
+  const { senderSet, recipientSet }: { senderSet: ComponentSetNode; recipientSet: ComponentSetNode } =
+    await loadBubbleSets();
 
   await updateEmojiKeyIds();
 
-  chatData.forEach(async (item, index) => {
-    const { role, message, emojiReaction, messagesInGroup } = item;
+  chatData.forEach(async (item: unknown, index: number): Promise<void> => {
+    const {
+      role,
+      message,
+      emojiReaction,
+      messagesInGroup,
+    }: { role: string; message: string; emojiReaction: string | null; messagesInGroup: number } = item as {
+      role: string;
+      message: string;
+      emojiReaction: string | null;
+      messagesInGroup: number;
+    };
 
-    const bubbleKeys = role === 'sender' ? componentPropertyName.senderBubble : componentPropertyName.recipientBubble;
-    const bubble = bubbleKeys[0];
+    const bubbleKeys: string[] =
+      role === 'sender' ? componentPropertyName.senderBubble : componentPropertyName.recipientBubble;
+    const bubble: string = bubbleKeys[0];
 
     if (!messages.includes(message)) {
-      const hasReaction = emojiReaction ? 'Yes' : 'No';
+      const hasReaction: 'Yes' | 'No' = emojiReaction ? 'Yes' : 'No';
 
       if (role === 'sender') {
-        const senderInstance = senderSet.defaultVariant.createInstance();
+        const senderInstance: InstanceNode = senderSet.defaultVariant.createInstance();
 
         senderInstance.setProperties({
           Bubbles: messagesInGroup.toString(),
@@ -104,8 +121,8 @@ export default async function buildChatUserInterface({
           [bubble]: message,
         });
 
-        for (let i = 0; i < messagesInGroup; i += 1) {
-          const bubbleKey = bubbleKeys[i];
+        for (let i: number = 0; i < messagesInGroup; i += 1) {
+          const bubbleKey: string = bubbleKeys[i];
           if (bubbleKey && chatData[index + i]) {
             senderInstance.setProperties({
               [bubbleKey]: chatData[index + i].message,
@@ -115,7 +132,7 @@ export default async function buildChatUserInterface({
         }
 
         if (senderInstance.exposedInstances.length > 0) {
-          const emojiInstance = senderInstance.exposedInstances[0];
+          const emojiInstance: InstanceNode = senderInstance.exposedInstances[0];
 
           emojiInstance.setProperties({
             [componentPropertyName.emoji]: emojiKey.color[emojiReaction].id,
@@ -128,7 +145,7 @@ export default async function buildChatUserInterface({
       }
 
       if (role === 'recipient') {
-        const recipientInstance = recipientSet.defaultVariant.createInstance();
+        const recipientInstance: InstanceNode = recipientSet.defaultVariant.createInstance();
 
         recipientInstance.setProperties({
           Bubbles: messagesInGroup.toString(),
@@ -138,8 +155,8 @@ export default async function buildChatUserInterface({
           [bubble]: message,
         });
 
-        for (let i = 0; i < messagesInGroup; i += 1) {
-          const bubbleKey = bubbleKeys[i];
+        for (let i: number = 0; i < messagesInGroup; i += 1) {
+          const bubbleKey: string = bubbleKeys[i];
           if (bubbleKey && chatData[index + i]) {
             recipientInstance.setProperties({
               [bubbleKey]: chatData[index + i].message,
@@ -149,7 +166,7 @@ export default async function buildChatUserInterface({
         }
 
         if (recipientInstance.exposedInstances.length > 0) {
-          const emojiInstance = recipientInstance.exposedInstances[0];
+          const emojiInstance: InstanceNode = recipientInstance.exposedInstances[0];
 
           emojiInstance.setProperties({
             Style: bubbleStyle,
@@ -158,8 +175,10 @@ export default async function buildChatUserInterface({
         }
 
         messages.push(message);
+
         recipientInstance.relativeTransform = flipHorizontal(recipientInstance);
         recipientInstance.resize(width, recipientInstance.height);
+
         frame.appendChild(recipientInstance);
       }
     }

@@ -1,48 +1,50 @@
 import chatData from '../constants/test-data';
-import componentKey from '../constants/keys';
+import { componentKey, componentPropertyName } from '../constants/keys';
+import flipHorizontal from '../utils/transform';
+import emojiStyle from '../constants/emojis';
+import { colorCollection, modeId } from '../constants/collections';
 
 interface BuildChatUserInterfaceProps {
   data: string;
   width?: number;
   itemSpacing?: number;
+  bubbleStyle?: string;
 }
 
 export default async function buildChatUserInterface({
   data,
   width = 402,
   itemSpacing = 8,
+  bubbleStyle = 'iOS',
 }: BuildChatUserInterfaceProps) {
   const senderSet = await figma.importComponentSetByKeyAsync(componentKey.senderBubble);
   const recipientSet = await figma.importComponentSetByKeyAsync(componentKey.recipientBubble);
 
-  // console.log(senderSet.componentPropertyDefinitions);
-  // console.log(recipientSet.componentPropertyDefinitions);
-
   const messages = [];
   const frame = figma.createFrame();
+
+  frame.setExplicitVariableModeForCollection(colorCollection.id, modeId.dark);
 
   frame.layoutMode = 'VERTICAL';
   frame.resize(width, frame.height);
   frame.itemSpacing = itemSpacing;
 
   chatData.forEach((item, index) => {
-    const { role, message, messagesInGroup } = item;
+    const { role, message, emojiReaction, messagesInGroup } = item;
 
-    const bubbleKeys =
-      role === 'sender'
-        ? ['First bubble#80:3', 'Second bubble#80:4', 'Third bubble#80:7']
-        : ['First bubble#41:2', 'Second bubble#40:1', 'Third bubble#45:0'];
-
+    const bubbleKeys = role === 'sender' ? componentPropertyName.senderBubble : componentPropertyName.recipientBubble;
     const bubble = bubbleKeys[0];
 
     if (!messages.includes(message)) {
+      const hasReaction = emojiReaction ? 'Yes' : 'No';
+
       if (role === 'sender') {
         const senderInstance = senderSet.defaultVariant.createInstance();
 
         senderInstance.setProperties({
           Bubbles: messagesInGroup.toString(),
-          Style: 'iOS',
-          'Has reaction': 'No',
+          Style: bubbleStyle,
+          'Has reaction': hasReaction,
           'Has mustache text': 'No',
           [bubble]: message,
         });
@@ -57,6 +59,13 @@ export default async function buildChatUserInterface({
           }
         }
 
+        if (senderInstance.exposedInstances.length > 0) {
+          const emojiInstance = senderInstance.exposedInstances[0];
+          emojiInstance.setProperties({
+            [componentPropertyName.emoji]: emojiStyle.color[emojiReaction],
+          });
+        }
+
         messages.push(message);
         senderInstance.resize(width, senderInstance.height);
         frame.appendChild(senderInstance);
@@ -68,7 +77,7 @@ export default async function buildChatUserInterface({
         recipientInstance.setProperties({
           Bubbles: messagesInGroup.toString(),
           'Is group chat': 'No',
-          'Has reaction': 'No',
+          'Has reaction': hasReaction,
           'Has mustache text': 'No',
           [bubble]: message,
         });
@@ -83,13 +92,16 @@ export default async function buildChatUserInterface({
           }
         }
 
-        const currentTransform = recipientInstance.relativeTransform;
-        recipientInstance.relativeTransform = [
-          [-1, 0, currentTransform[0][2]], // Flip on y-axis
-          [0, 1, currentTransform[1][2]], // Ignore x-axis
-        ];
+        if (recipientInstance.exposedInstances.length > 0) {
+          const emojiInstance = recipientInstance.exposedInstances[0];
+          emojiInstance.setProperties({
+            Style: bubbleStyle,
+            [componentPropertyName.emoji]: emojiStyle.transparentBlue[emojiReaction],
+          });
+        }
 
         messages.push(message);
+        recipientInstance.relativeTransform = flipHorizontal(recipientInstance);
         recipientInstance.resize(width, recipientInstance.height);
         frame.appendChild(recipientInstance);
       }

@@ -118,7 +118,16 @@ function isLastChatItemSender(chatItems: unknown[]): boolean {
   if (lastChatItem.role === 'sender') {
     return true;
   }
+
   return false;
+}
+
+function getRecipientName(chatItems: unknown[]): string {
+  const recipientItem = chatItems.find((item: unknown) => (item as { role: string }).role === 'recipient') as {
+    participantName: string;
+  };
+
+  return recipientItem.participantName.split(' ')[0];
 }
 
 async function createTimestampInstance(timestampSet: ComponentSetNode): Promise<InstanceNode> {
@@ -147,11 +156,13 @@ async function createStatusInstance(statusSet: ComponentSetNode): Promise<Instan
   const statusInstance: InstanceNode = statusSet.defaultVariant.createInstance();
 
   const notificationNode = statusInstance.findOne(
-    (node: { type: string; name: string }) => node.type === 'TEXT' && node.name === 'Notification Status'
+    (node: { type: string; name: string }) => node.type === 'TEXT' && node.name === 'Notification Text'
   ) as TextNode;
 
+  const recipientName = getRecipientName(chatData);
+
   if (notificationNode) {
-    notificationNode.characters = 'Ruth has notifications silenced';
+    notificationNode.characters = `${recipientName} has notifications silenced`;
   }
 
   const hasAction = isLastChatItemSender(chatData);
@@ -234,7 +245,7 @@ export default async function buildChatUserInterface({
         if (index === chatData.length - 1) {
           senderInstance.setProperties({
             'Has mustache text': 'Yes',
-            'Mustache#129:16': 'Delivered quietly',
+            'Mustache#129:16': 'Delivered Quietly',
           });
         }
 
@@ -283,6 +294,8 @@ export default async function buildChatUserInterface({
   });
 
   frame.appendChild(statusInstance);
+  statusInstance.layoutSizingHorizontal = 'FILL';
+
   await Promise.all(chatUserInterfaceDidDraw);
   figma.viewport.scrollAndZoomIntoView([frame]);
 }

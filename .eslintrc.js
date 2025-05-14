@@ -26,6 +26,7 @@ module.exports = {
   },
   rules: {
     'react/prop-types': 'off',
+    'no-param-reassign': 'off',
     'tailwindcss/no-custom-classname': ['off'],
     'jsx-a11y/anchor-is-valid': ['off'],
     'no-restricted-globals': ['off'],

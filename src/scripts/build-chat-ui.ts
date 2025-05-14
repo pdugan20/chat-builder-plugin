@@ -69,17 +69,27 @@ async function buildFrame(
   return frame;
 }
 
-async function loadBubbleSets(): Promise<{ senderSet: ComponentSetNode; recipientSet: ComponentSetNode }> {
+async function loadComponentSets(): Promise<{
+  senderSet: ComponentSetNode;
+  recipientSet: ComponentSetNode;
+  statusSet: ComponentSetNode;
+  timestampSet: ComponentSetNode;
+}> {
   const senderSetPromise: Promise<ComponentSetNode> = figma.importComponentSetByKeyAsync(componentKey.senderBubble);
   const recipientSetPromise: Promise<ComponentSetNode> = figma.importComponentSetByKeyAsync(
     componentKey.recipientBubble
   );
-  const [senderSet, recipientSet]: [ComponentSetNode, ComponentSetNode] = await Promise.all([
-    senderSetPromise,
-    recipientSetPromise,
-  ]);
+  const statusSetPromise: Promise<ComponentSetNode> = figma.importComponentSetByKeyAsync(componentKey.statusBanner);
+  const timestampSetPromise: Promise<ComponentSetNode> = figma.importComponentSetByKeyAsync(componentKey.timestamp);
 
-  return { senderSet, recipientSet };
+  const [senderSet, recipientSet, statusSet, timestampSet]: [
+    ComponentSetNode,
+    ComponentSetNode,
+    ComponentSetNode,
+    ComponentSetNode,
+  ] = await Promise.all([senderSetPromise, recipientSetPromise, statusSetPromise, timestampSetPromise]);
+
+  return { senderSet, recipientSet, statusSet, timestampSet };
 }
 
 async function updateEmojiKeyIds(): Promise<void> {
@@ -93,6 +103,64 @@ async function updateEmojiKeyIds(): Promise<void> {
   await Promise.all(promises);
 }
 
+function getFirstChatItemDateTime(chatItems: unknown[]): { date: string; time: string } {
+  const firstChatItem = chatItems[0] as { time: string; date: string };
+  const time = firstChatItem ? `at ${firstChatItem.time}` : 'at 1:30 PM';
+  const date = 'Today';
+
+  return { date, time };
+}
+
+function isLastChatItemSender(chatItems: unknown[]): boolean {
+  const lastChatItem = chatItems[chatItems.length - 1] as { role: string };
+
+  if (lastChatItem.role === 'sender') {
+    return true;
+  }
+  return false;
+}
+
+async function createTimestampInstance(timestampSet: ComponentSetNode): Promise<InstanceNode> {
+  const timestampInstance: InstanceNode = timestampSet.defaultVariant.createInstance();
+  const { date, time } = getFirstChatItemDateTime(chatData);
+
+  const dateNode = timestampInstance.findOne(
+    (node: { type: string; name: string }) => node.type === 'TEXT' && node.name === 'Date'
+  ) as TextNode;
+  const timeNode = timestampInstance.findOne(
+    (node: { type: string; name: string }) => node.type === 'TEXT' && node.name === 'Time'
+  ) as TextNode;
+
+  if (dateNode) {
+    dateNode.characters = date;
+  }
+
+  if (timeNode) {
+    timeNode.characters = time;
+  }
+
+  return timestampInstance;
+}
+
+async function createStatusInstance(statusSet: ComponentSetNode): Promise<InstanceNode> {
+  const statusInstance: InstanceNode = statusSet.defaultVariant.createInstance();
+
+  const notificationNode = statusInstance.findOne(
+    (node: { type: string; name: string }) => node.type === 'TEXT' && node.name === 'Notification Status'
+  ) as TextNode;
+
+  if (notificationNode) {
+    notificationNode.characters = 'Ruth has notifications silenced';
+  }
+
+  const hasAction = isLastChatItemSender(chatData);
+  statusInstance.setProperties({
+    'Has action': hasAction ? 'Yes' : 'No',
+  });
+
+  return statusInstance;
+}
+
 export default async function buildChatUserInterface({
   theme = 'light',
   width = 402,
@@ -102,8 +170,13 @@ export default async function buildChatUserInterface({
 }: BuildChatUserInterfaceProps): Promise<void> {
   const messages: string[] = [];
 
+  const { senderSet, recipientSet, statusSet, timestampSet } = await loadComponentSets();
+
   const frame: FrameNode = await buildFrame(theme, width, itemSpacing, name);
-  const { senderSet, recipientSet } = await loadBubbleSets();
+  const timestampInstance: InstanceNode = await createTimestampInstance(timestampSet);
+  const statusInstance: InstanceNode = await createStatusInstance(statusSet);
+
+  frame.appendChild(timestampInstance);
 
   await updateEmojiKeyIds();
 
@@ -201,6 +274,7 @@ export default async function buildChatUserInterface({
     }
   });
 
+  frame.appendChild(statusInstance);
   await Promise.all(chatUserInterfaceDidDraw);
   figma.viewport.scrollAndZoomIntoView([frame]);
 }

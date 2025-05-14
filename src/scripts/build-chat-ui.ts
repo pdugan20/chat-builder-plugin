@@ -13,19 +13,16 @@ interface BuildChatUserInterfaceProps {
   bubbleStyle?: 'iOS' | 'Android';
 }
 
-async function getFrameBackgroundFill(frame: FrameNode): Promise<SolidPaint> {
+async function setFrameBackgroundFill(frame: FrameNode) {
   const threadBackgroundVariable = await figma.variables.getVariableByIdAsync(colors['Background/General/Thread'].id);
 
-  const resolvedValue = threadBackgroundVariable.resolveForConsumer(frame);
-  const { r, g, b, a }: RGBA = resolvedValue.value as RGBA;
-
-  const backgroundFill: SolidPaint = {
-    type: 'SOLID',
-    color: { r, g, b },
-    opacity: a,
-  };
-
-  return backgroundFill;
+  frame.fills = [
+    figma.variables.setBoundVariableForPaint(
+      { type: 'SOLID', color: { r: 1, g: 1, b: 1 } },
+      'color',
+      threadBackgroundVariable
+    ),
+  ];
 }
 
 async function setFrameStyle(frame: FrameNode, theme: 'light' | 'dark'): Promise<void> {
@@ -56,10 +53,8 @@ async function buildFrame(theme: 'light' | 'dark', width: number, itemSpacing: n
 
   await setFrameStyle(frame, theme);
   await resizeFrame(frame, width);
+  await setFrameBackgroundFill(frame);
 
-  const backgroundFill: SolidPaint = await getFrameBackgroundFill(frame);
-
-  frame.fills = [backgroundFill];
   frame.layoutMode = 'VERTICAL';
   frame.itemSpacing = itemSpacing;
 

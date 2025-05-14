@@ -11,17 +11,14 @@ interface BuildChatUserInterfaceProps {
   width?: number;
   itemSpacing?: number;
   bubbleStyle?: 'iOS' | 'Android';
+  name?: string;
 }
 
 async function setFrameBackgroundFill(frame: FrameNode) {
-  const threadBackgroundVariable = await figma.variables.getVariableByIdAsync(colors['Background/General/Thread'].id);
+  const threadBackground = await figma.variables.getVariableByIdAsync(colors['Background/General/Thread'].id);
 
   frame.fills = [
-    figma.variables.setBoundVariableForPaint(
-      { type: 'SOLID', color: { r: 1, g: 1, b: 1 } },
-      'color',
-      threadBackgroundVariable
-    ),
+    figma.variables.setBoundVariableForPaint({ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }, 'color', threadBackground),
   ];
 }
 
@@ -46,7 +43,12 @@ function positionFrame(frame: FrameNode, width: number): void {
   lastFrameX += width + frameSpacing;
 }
 
-async function buildFrame(theme: 'light' | 'dark', width: number, itemSpacing: number): Promise<FrameNode> {
+async function buildFrame(
+  theme: 'light' | 'dark',
+  width: number,
+  itemSpacing: number,
+  name: string
+): Promise<FrameNode> {
   const frame: FrameNode = figma.createFrame();
 
   positionFrame(frame, width);
@@ -55,6 +57,7 @@ async function buildFrame(theme: 'light' | 'dark', width: number, itemSpacing: n
   await resizeFrame(frame, width);
   await setFrameBackgroundFill(frame);
 
+  frame.name = `Chat thread: ${name}`;
   frame.layoutMode = 'VERTICAL';
   frame.itemSpacing = itemSpacing;
 
@@ -90,10 +93,11 @@ export default async function buildChatUserInterface({
   width = 402,
   itemSpacing = 8,
   bubbleStyle = 'iOS',
+  name,
 }: BuildChatUserInterfaceProps): Promise<void> {
   const messages: string[] = [];
 
-  const frame: FrameNode = await buildFrame(theme, width, itemSpacing);
+  const frame: FrameNode = await buildFrame(theme, width, itemSpacing, name);
   const { senderSet, recipientSet } = await loadBubbleSets();
 
   await updateEmojiKeyIds();

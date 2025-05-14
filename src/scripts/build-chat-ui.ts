@@ -24,6 +24,11 @@ async function setFrameBackgroundFill(frame: FrameNode) {
 
 async function setFrameStyle(frame: FrameNode, theme: 'light' | 'dark'): Promise<void> {
   const collection = await figma.variables.getVariableCollectionByIdAsync(colorCollection.id);
+
+  if (!collection) {
+    return;
+  }
+
   frame.setExplicitVariableModeForCollection(collection, modeId[theme]);
 }
 

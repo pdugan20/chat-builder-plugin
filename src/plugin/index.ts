@@ -1,5 +1,6 @@
 import getAnthropicKey from '../scripts/get-key';
 import loadFonts from '../scripts/load-fonts';
+import loadCollections from '../scripts/load-collections';
 import updateAnthropicKey from '../scripts/update-key';
 import notifyUser from '../scripts/api-error';
 import buildChatUserInterface from '../scripts/build-chat-ui';
@@ -11,7 +12,6 @@ figma.ui.onmessage = (msg) => {
       break;
 
     case 'BUILD_CHAT_UI':
-      // console.log(msg.data);
       buildChatUserInterface({ data: msg.data, theme: msg.style, name: msg.prompt });
       break;
 
@@ -27,6 +27,7 @@ figma.ui.onmessage = (msg) => {
 (async () => {
   await getAnthropicKey();
   await loadFonts();
+  await loadCollections();
 })();
 
 figma.showUI(__html__, { themeColors: true, width: 295, height: 375 });

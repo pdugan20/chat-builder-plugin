@@ -55,7 +55,6 @@ async function buildFrame(
   name: string
 ): Promise<FrameNode> {
   const frame: FrameNode = figma.createFrame();
-
   positionFrame(frame, width);
 
   await setFrameStyle(frame, theme);
@@ -63,6 +62,8 @@ async function buildFrame(
   await setFrameBackgroundFill(frame);
 
   frame.name = `Chat thread: ${name}`;
+  frame.paddingLeft = 16;
+  frame.paddingRight = 12;
   frame.layoutMode = 'VERTICAL';
   frame.itemSpacing = itemSpacing;
 
@@ -177,6 +178,7 @@ export default async function buildChatUserInterface({
   const statusInstance: InstanceNode = await createStatusInstance(statusSet);
 
   frame.appendChild(timestampInstance);
+  timestampInstance.layoutSizingHorizontal = 'FILL';
 
   await updateEmojiKeyIds();
 
@@ -229,9 +231,16 @@ export default async function buildChatUserInterface({
           });
         }
 
+        if (index === chatData.length - 1) {
+          senderInstance.setProperties({
+            'Has mustache text': 'Yes',
+            'Mustache#129:16': 'Delivered quietly',
+          });
+        }
+
         messages.push(message);
-        senderInstance.resize(width, senderInstance.height);
         frame.appendChild(senderInstance);
+        senderInstance.layoutSizingHorizontal = 'FILL';
       }
 
       if (role === 'recipient') {
@@ -267,9 +276,8 @@ export default async function buildChatUserInterface({
         messages.push(message);
 
         recipientInstance.relativeTransform = flipHorizontal(recipientInstance);
-        recipientInstance.resize(width, recipientInstance.height);
-
         frame.appendChild(recipientInstance);
+        recipientInstance.layoutSizingHorizontal = 'FILL';
       }
     }
   });

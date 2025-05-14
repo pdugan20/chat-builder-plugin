@@ -164,7 +164,7 @@ function PluginScreen({
         //   );
         // }
         const data = '';
-        parent.postMessage({ pluginMessage: { type: 'BUILD_CHAT_UI', data, style } }, '*');
+        parent.postMessage({ pluginMessage: { type: 'BUILD_CHAT_UI', data, style, prompt } }, '*');
       } finally {
         setLoading(false);
       }

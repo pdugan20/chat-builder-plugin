@@ -1,17 +1,6 @@
 import React, { useState } from 'react';
 import { AlertDialog, Button, Input, Link } from 'figma-kit';
-
-interface UpdateKeyDialogProps {
-  dialogTitle: string;
-  dialogDescription?: string;
-  actionLabel?: string;
-  anthropicKey: string;
-  keyLength?: number;
-}
-
-interface HandleInputChangeProps {
-  updatedKey: string;
-}
+import { UpdateKeyDialogProps, HandleInputChangeProps } from '../../../types/props';
 
 function UpdateKeyDialog({
   dialogTitle,

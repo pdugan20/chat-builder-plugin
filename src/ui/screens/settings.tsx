@@ -2,12 +2,7 @@ import React from 'react';
 import { Text, Link } from 'figma-kit';
 import Navigation from '../navigation';
 import UpdateKeyDialog from '../components/dialogs/update-key';
-
-interface SettingsScreenProps {
-  anthropicKey: string;
-  screen?: string;
-  pluginVersion?: string;
-}
+import { SettingsScreenProps } from '../../types/props';
 
 function SettingsScreen({
   anthropicKey,

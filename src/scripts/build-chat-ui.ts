@@ -1,156 +1,16 @@
 import chatData from '../constants/test-data';
-import { componentKey, componentPropertyName } from '../constants/keys';
+import { componentPropertyName } from '../constants/keys';
 import flipHorizontal from '../utils/transform';
 import emojiKey from '../constants/emojis';
-import { colorCollection, modeId } from '../constants/collections';
-import colors from '../constants/colors';
-import { ChatItem, BuildChatUserInterfaceProps, ComponentSets } from '../types/chat';
-
-async function setFrameBackgroundFill(frame: FrameNode): Promise<void> {
-  const threadBackground = await figma.variables.getVariableByIdAsync(colors['Background/General/Thread'].id);
-
-  frame.fills = [
-    figma.variables.setBoundVariableForPaint({ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }, 'color', threadBackground),
-  ];
-}
-
-async function setFrameStyle(frame: FrameNode, theme: 'light' | 'dark'): Promise<void> {
-  const collection = await figma.variables.getVariableCollectionByIdAsync(colorCollection.id);
-
-  if (!collection) {
-    return;
-  }
-
-  frame.setExplicitVariableModeForCollection(collection, modeId[theme]);
-}
-
-async function resizeFrame(frame: FrameNode, width: number): Promise<void> {
-  frame.resize(width, frame.height);
-}
-
-let lastFrameX: number = 0;
-const frameSpacing: number = 50;
-
-function positionFrame(frame: FrameNode, width: number): void {
-  frame.x = lastFrameX;
-  frame.y = 0;
-
-  lastFrameX += width + frameSpacing;
-}
-
-async function buildFrame(
-  theme: 'light' | 'dark',
-  width: number,
-  itemSpacing: number,
-  name: string
-): Promise<FrameNode> {
-  const frame: FrameNode = figma.createFrame();
-  positionFrame(frame, width);
-
-  await setFrameStyle(frame, theme);
-  await resizeFrame(frame, width);
-  await setFrameBackgroundFill(frame);
-
-  frame.name = `Chat thread: ${name}`;
-  frame.paddingLeft = 16;
-  frame.paddingRight = 12;
-  frame.layoutMode = 'VERTICAL';
-  frame.itemSpacing = itemSpacing;
-
-  return frame;
-}
-
-async function loadComponentSets(): Promise<ComponentSets> {
-  const componentKeys = [
-    componentKey.senderBubble,
-    componentKey.recipientBubble,
-    componentKey.statusBanner,
-    componentKey.timestamp,
-  ];
-
-  const [senderSet, recipientSet, statusSet, timestampSet] = await Promise.all(
-    componentKeys.map((key) => figma.importComponentSetByKeyAsync(key))
-  );
-
-  return { senderSet, recipientSet, statusSet, timestampSet };
-}
-
-async function updateEmojiKeyIds(): Promise<void> {
-  const promises: Promise<void>[] = Object.entries(emojiKey).flatMap(([style, emojis]) =>
-    Object.entries(emojis).map(async ([key, value]) => {
-      const component: ComponentNode = await figma.importComponentByKeyAsync(value.key);
-      emojiKey[style][key].id = component.id;
-    })
-  );
-
-  await Promise.all(promises);
-}
-
-function getFirstChatItemDateTime(chatItems: ChatItem[]): { date: string; time: string } {
-  const firstChatItem = chatItems[0];
-  const time = firstChatItem ? `at ${firstChatItem.time}` : 'at 1:30 PM';
-  const date = 'Today';
-
-  return { date, time };
-}
-
-function isLastChatItemSender(chatItems: ChatItem[]): boolean {
-  const lastChatItem = chatItems[chatItems.length - 1];
-  return lastChatItem?.role === 'sender';
-}
-
-function getRecipientName(chatItems: ChatItem[], isFirst = true): string {
-  const recipientItem = chatItems.find((item) => item.role === 'recipient');
-
-  if (isFirst) {
-    return recipientItem.participantName.split(' ')[0];
-  }
-
-  return recipientItem.participantName;
-}
-
-async function createTimestampInstance(timestampSet: ComponentSetNode): Promise<InstanceNode> {
-  const timestampInstance: InstanceNode = timestampSet.defaultVariant.createInstance();
-  const { date, time } = getFirstChatItemDateTime(chatData as ChatItem[]);
-
-  const dateLabel = timestampInstance.findOne(
-    (node: { type: string; name: string }) => node.type === 'TEXT' && node.name === 'Date'
-  ) as TextNode;
-  const timeLabel = timestampInstance.findOne(
-    (node: { type: string; name: string }) => node.type === 'TEXT' && node.name === 'Time'
-  ) as TextNode;
-
-  if (dateLabel) {
-    dateLabel.characters = date;
-  }
-
-  if (timeLabel) {
-    timeLabel.characters = time;
-  }
-
-  return timestampInstance;
-}
-
-async function createStatusInstance(statusSet: ComponentSetNode): Promise<InstanceNode> {
-  const statusInstance: InstanceNode = statusSet.defaultVariant.createInstance();
-
-  const notificationLabel = statusInstance.findOne(
-    (node: { type: string; name: string }) => node.type === 'TEXT' && node.name === 'Notification Text'
-  ) as TextNode;
-
-  const recipientName = getRecipientName(chatData as ChatItem[]);
-
-  if (notificationLabel) {
-    notificationLabel.characters = `${recipientName} has notifications silenced`;
-  }
-
-  const hasAction = isLastChatItemSender(chatData as ChatItem[]);
-  statusInstance.setProperties({
-    'Has action': hasAction ? 'Yes' : 'No',
-  });
-
-  return statusInstance;
-}
+import { ChatItem, BuildChatUserInterfaceProps } from '../types/chat';
+import { buildFrame } from '../utils/frame';
+import { getFirstChatItemDateTime, isLastChatItemSender, getRecipientName } from '../utils/chat';
+import {
+  loadComponentSets,
+  updateEmojiKeyIds,
+  createTimestampInstance,
+  createStatusInstance,
+} from '../services/component';
 
 export default async function buildChatUserInterface({
   theme = 'light',
@@ -164,8 +24,16 @@ export default async function buildChatUserInterface({
   const { senderSet, recipientSet, statusSet, timestampSet } = await loadComponentSets();
 
   const frame: FrameNode = await buildFrame(theme, width, itemSpacing, name);
-  const timestampInstance: InstanceNode = await createTimestampInstance(timestampSet);
-  const statusInstance: InstanceNode = await createStatusInstance(statusSet);
+  const { date, time } = getFirstChatItemDateTime(chatData as ChatItem[]);
+  const timestampInstance: InstanceNode = await createTimestampInstance(timestampSet, date, time);
+
+  const recipientName = getRecipientName(chatData as ChatItem[]);
+  const hasAction = isLastChatItemSender(chatData as ChatItem[]);
+  const statusInstance: InstanceNode = await createStatusInstance(
+    statusSet,
+    `${recipientName} has notifications silenced`,
+    hasAction
+  );
 
   frame.appendChild(timestampInstance);
   timestampInstance.layoutSizingHorizontal = 'FILL';

@@ -3,6 +3,7 @@ import { componentPropertyName } from '../constants/keys';
 import flipHorizontal from '../utils/transform';
 import emojiKey from '../constants/emojis';
 import { ChatItem, BuildChatUserInterfaceProps } from '../types/chat';
+import { MessageInstanceProps } from '../types/chat/components';
 import { buildFrame } from '../utils/frame';
 import { getFirstChatItemDateTime, isLastChatItemSender, getRecipientName } from '../utils/chat';
 import {
@@ -12,6 +13,116 @@ import {
   createStatusInstance,
 } from '../services/component';
 
+function handleEmojiReaction(instance: InstanceNode, props: MessageInstanceProps): void {
+  if (instance.exposedInstances.length > 0 && props.emojiReaction) {
+    const emojiInstance: InstanceNode = instance.exposedInstances[0];
+    const emojiStyle = props.role === 'sender' ? 'color' : 'transparentBlue';
+
+    if (props.role === 'recipient') {
+      emojiInstance.setProperties({ Style: props.bubbleStyle });
+    }
+
+    emojiInstance.setProperties({
+      [componentPropertyName.emoji]: emojiKey[emojiStyle][props.emojiReaction].id,
+    });
+  }
+}
+
+function setMessageGroupProperties(
+  instance: InstanceNode,
+  props: MessageInstanceProps,
+  bubbleKeys: string[],
+  chatItems: ChatItem[]
+): void {
+  for (let i: number = 0; i < props.messagesInGroup; i += 1) {
+    const bubbleKey: string = bubbleKeys[i];
+    if (bubbleKey && chatItems[props.index + i]) {
+      instance.setProperties({
+        [bubbleKey]: chatItems[props.index + i].message,
+      });
+      props.messages.push(chatItems[props.index + i].message);
+    }
+  }
+}
+
+function createSenderInstance(props: MessageInstanceProps, chatItems: ChatItem[]): InstanceNode {
+  const instance: InstanceNode = props.componentSet.defaultVariant.createInstance();
+  const bubbleKeys: string[] = componentPropertyName.senderBubble;
+  const bubble: string = bubbleKeys[0];
+
+  instance.setProperties({
+    Bubbles: props.messagesInGroup.toString(),
+    Style: props.bubbleStyle,
+    'Has reaction': props.emojiReaction ? 'Yes' : 'No',
+    'Has mustache text': 'No',
+    [bubble]: props.message,
+  });
+
+  setMessageGroupProperties(instance, props, bubbleKeys, chatItems);
+  handleEmojiReaction(instance, props);
+
+  if (props.index === chatItems.length - 1) {
+    instance.setProperties({
+      'Has mustache text': 'Yes',
+      'Mustache#129:16': 'Delivered Quietly',
+    });
+  }
+
+  return instance;
+}
+
+function createRecipientInstance(props: MessageInstanceProps, chatItems: ChatItem[]): InstanceNode {
+  const instance: InstanceNode = props.componentSet.defaultVariant.createInstance();
+  const bubbleKeys: string[] = componentPropertyName.recipientBubble;
+  const bubble: string = bubbleKeys[0];
+
+  instance.setProperties({
+    Bubbles: props.messagesInGroup.toString(),
+    'Is group chat': 'No',
+    'Has reaction': props.emojiReaction ? 'Yes' : 'No',
+    'Has mustache text': 'No',
+    [bubble]: props.message,
+  });
+
+  setMessageGroupProperties(instance, props, bubbleKeys, chatItems);
+  handleEmojiReaction(instance, props);
+  instance.relativeTransform = flipHorizontal(instance);
+
+  return instance;
+}
+
+async function createMessageInstance(
+  item: ChatItem,
+  index: number,
+  componentSet: ComponentSetNode,
+  bubbleStyle: string,
+  messages: string[],
+  chatItems: ChatItem[]
+): Promise<InstanceNode | null> {
+  const { role, message, emojiReaction, messagesInGroup } = item;
+
+  if (messages.includes(message)) {
+    return null;
+  }
+
+  const props: MessageInstanceProps = {
+    role,
+    message,
+    emojiReaction,
+    messagesInGroup,
+    bubbleStyle,
+    index,
+    componentSet,
+    messages,
+  };
+
+  const instance =
+    role === 'sender' ? createSenderInstance(props, chatItems) : createRecipientInstance(props, chatItems);
+
+  messages.push(message);
+  return instance;
+}
+
 export default async function buildChatUserInterface({
   theme = 'light',
   width = 402,
@@ -20,119 +131,43 @@ export default async function buildChatUserInterface({
   name,
 }: BuildChatUserInterfaceProps): Promise<void> {
   const messages: string[] = [];
-
+  const items = chatData as ChatItem[];
   const { senderSet, recipientSet, statusSet, timestampSet } = await loadComponentSets();
-
   const frame: FrameNode = await buildFrame(theme, width, itemSpacing, name);
-  const { date, time } = getFirstChatItemDateTime(chatData as ChatItem[]);
-  const timestampInstance: InstanceNode = await createTimestampInstance(timestampSet, date, time);
 
-  const recipientName = getRecipientName(chatData as ChatItem[]);
-  const hasAction = isLastChatItemSender(chatData as ChatItem[]);
-  const statusInstance: InstanceNode = await createStatusInstance(
+  // Create and append timestamp
+  const { date, time } = getFirstChatItemDateTime(items);
+  const timestampInstance = await createTimestampInstance(timestampSet, date, time);
+
+  frame.appendChild(timestampInstance);
+  timestampInstance.layoutSizingHorizontal = 'FILL';
+
+  // Update emoji IDs
+  await updateEmojiKeyIds();
+
+  // Create and append messages
+  const messagePromises = items.map(async (item: ChatItem, index: number) => {
+    const componentSet = item.role === 'sender' ? senderSet : recipientSet;
+    const messageInstance = await createMessageInstance(item, index, componentSet, bubbleStyle, messages, items);
+
+    if (messageInstance) {
+      frame.appendChild(messageInstance);
+      messageInstance.layoutSizingHorizontal = 'FILL';
+    }
+  });
+
+  // Create and append status
+  const recipientName = getRecipientName(items);
+  const hasAction = isLastChatItemSender(items);
+  const statusInstance = await createStatusInstance(
     statusSet,
     `${recipientName} has notifications silenced`,
     hasAction
   );
 
-  frame.appendChild(timestampInstance);
-  timestampInstance.layoutSizingHorizontal = 'FILL';
-
-  await updateEmojiKeyIds();
-
-  const chatUserInterfaceDidDraw = chatData.map(async (item: ChatItem, index: number): Promise<void> => {
-    const { role, message, emojiReaction, messagesInGroup } = item;
-
-    const bubbleKeys: string[] =
-      role === 'sender' ? componentPropertyName.senderBubble : componentPropertyName.recipientBubble;
-    const bubble: string = bubbleKeys[0];
-
-    if (!messages.includes(message)) {
-      const hasReaction = emojiReaction ? 'Yes' : 'No';
-
-      if (role === 'sender') {
-        const senderInstance: InstanceNode = senderSet.defaultVariant.createInstance();
-
-        senderInstance.setProperties({
-          Bubbles: messagesInGroup.toString(),
-          Style: bubbleStyle,
-          'Has reaction': hasReaction,
-          'Has mustache text': 'No',
-          [bubble]: message,
-        });
-
-        for (let i: number = 0; i < messagesInGroup; i += 1) {
-          const bubbleKey: string = bubbleKeys[i];
-          if (bubbleKey && chatData[index + i]) {
-            senderInstance.setProperties({
-              [bubbleKey]: chatData[index + i].message,
-            });
-            messages.push(chatData[index + i].message);
-          }
-        }
-
-        if (senderInstance.exposedInstances.length > 0) {
-          const emojiInstance: InstanceNode = senderInstance.exposedInstances[0];
-
-          emojiInstance.setProperties({
-            [componentPropertyName.emoji]: emojiKey.color[emojiReaction].id,
-          });
-        }
-
-        if (index === chatData.length - 1) {
-          senderInstance.setProperties({
-            'Has mustache text': 'Yes',
-            'Mustache#129:16': 'Delivered Quietly',
-          });
-        }
-
-        messages.push(message);
-        frame.appendChild(senderInstance);
-        senderInstance.layoutSizingHorizontal = 'FILL';
-      }
-
-      if (role === 'recipient') {
-        const recipientInstance: InstanceNode = recipientSet.defaultVariant.createInstance();
-
-        recipientInstance.setProperties({
-          Bubbles: messagesInGroup.toString(),
-          'Is group chat': 'No',
-          'Has reaction': hasReaction,
-          'Has mustache text': 'No',
-          [bubble]: message,
-        });
-
-        for (let i: number = 0; i < messagesInGroup; i += 1) {
-          const bubbleKey: string = bubbleKeys[i];
-          if (bubbleKey && chatData[index + i]) {
-            recipientInstance.setProperties({
-              [bubbleKey]: chatData[index + i].message,
-            });
-            messages.push(chatData[index + i].message);
-          }
-        }
-
-        if (recipientInstance.exposedInstances.length > 0) {
-          const emojiInstance: InstanceNode = recipientInstance.exposedInstances[0];
-
-          emojiInstance.setProperties({
-            Style: bubbleStyle,
-            [componentPropertyName.emoji]: emojiKey.transparentBlue[emojiReaction].id,
-          });
-        }
-
-        messages.push(message);
-
-        recipientInstance.relativeTransform = flipHorizontal(recipientInstance);
-        frame.appendChild(recipientInstance);
-        recipientInstance.layoutSizingHorizontal = 'FILL';
-      }
-    }
-  });
-
   frame.appendChild(statusInstance);
   statusInstance.layoutSizingHorizontal = 'FILL';
 
-  await Promise.all(chatUserInterfaceDidDraw);
+  await Promise.all(messagePromises);
   figma.viewport.scrollAndZoomIntoView([frame]);
 }

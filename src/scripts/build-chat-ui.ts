@@ -122,31 +122,37 @@ function isLastChatItemSender(chatItems: unknown[]): boolean {
   return false;
 }
 
-function getRecipientName(chatItems: unknown[]): string {
-  const recipientItem = chatItems.find((item: unknown) => (item as { role: string }).role === 'recipient') as {
+function getRecipientName({ chatItems, isFirst = true }: { chatItems: unknown[]; isFirst?: boolean }): string {
+  const chatItem = chatItems.find((item: unknown) => (item as { role: string }).role === 'recipient') as {
     participantName: string;
   };
 
-  return recipientItem.participantName.split(' ')[0];
+  let recipientName: string = chatItem.participantName;
+
+  if (isFirst) {
+    [recipientName] = recipientName.split(' ');
+  }
+
+  return recipientName;
 }
 
 async function createTimestampInstance(timestampSet: ComponentSetNode): Promise<InstanceNode> {
   const timestampInstance: InstanceNode = timestampSet.defaultVariant.createInstance();
   const { date, time } = getFirstChatItemDateTime(chatData);
 
-  const dateNode = timestampInstance.findOne(
+  const dateLabel = timestampInstance.findOne(
     (node: { type: string; name: string }) => node.type === 'TEXT' && node.name === 'Date'
   ) as TextNode;
-  const timeNode = timestampInstance.findOne(
+  const timeLabel = timestampInstance.findOne(
     (node: { type: string; name: string }) => node.type === 'TEXT' && node.name === 'Time'
   ) as TextNode;
 
-  if (dateNode) {
-    dateNode.characters = date;
+  if (dateLabel) {
+    dateLabel.characters = date;
   }
 
-  if (timeNode) {
-    timeNode.characters = time;
+  if (timeLabel) {
+    timeLabel.characters = time;
   }
 
   return timestampInstance;
@@ -155,14 +161,14 @@ async function createTimestampInstance(timestampSet: ComponentSetNode): Promise<
 async function createStatusInstance(statusSet: ComponentSetNode): Promise<InstanceNode> {
   const statusInstance: InstanceNode = statusSet.defaultVariant.createInstance();
 
-  const notificationNode = statusInstance.findOne(
+  const notificationLabel = statusInstance.findOne(
     (node: { type: string; name: string }) => node.type === 'TEXT' && node.name === 'Notification Text'
   ) as TextNode;
 
-  const recipientName = getRecipientName(chatData);
+  const recipientName = getRecipientName({ chatItems: chatData, isFirst: true });
 
-  if (notificationNode) {
-    notificationNode.characters = `${recipientName} has notifications silenced`;
+  if (notificationLabel) {
+    notificationLabel.characters = `${recipientName} has notifications silenced`;
   }
 
   const hasAction = isLastChatItemSender(chatData);

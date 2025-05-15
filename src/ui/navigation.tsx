@@ -1,10 +1,7 @@
 import { Tabs } from 'figma-kit';
 import React from 'react';
 import { NavLink } from 'react-router';
-
-interface NavigationProps {
-  screen?: string;
-}
+import { NavigationProps } from '../types/props';
 
 function Navigation({ screen }: NavigationProps): React.JSX.Element {
   return (

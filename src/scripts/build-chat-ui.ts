@@ -5,6 +5,17 @@ import emojiKey from '../constants/emojis';
 import { colorCollection, modeId } from '../constants/collections';
 import colors from '../constants/colors';
 
+interface ChatItem {
+  participantName: string;
+  gender: string;
+  role: 'sender' | 'recipient';
+  message: string;
+  time: string;
+  date?: string;
+  emojiReaction: string | null;
+  messagesInGroup: number;
+}
+
 interface BuildChatUserInterfaceProps {
   theme?: 'light' | 'dark';
   data: string;
@@ -14,7 +25,14 @@ interface BuildChatUserInterfaceProps {
   name?: string;
 }
 
-async function setFrameBackgroundFill(frame: FrameNode) {
+interface ComponentSets {
+  senderSet: ComponentSetNode;
+  recipientSet: ComponentSetNode;
+  statusSet: ComponentSetNode;
+  timestampSet: ComponentSetNode;
+}
+
+async function setFrameBackgroundFill(frame: FrameNode): Promise<void> {
   const threadBackground = await figma.variables.getVariableByIdAsync(colors['Background/General/Thread'].id);
 
   frame.fills = [
@@ -40,10 +58,8 @@ let lastFrameX: number = 0;
 const frameSpacing: number = 50;
 
 function positionFrame(frame: FrameNode, width: number): void {
-  const currentFrame = frame;
-
-  currentFrame.x = lastFrameX;
-  currentFrame.y = 0;
+  frame.x = lastFrameX;
+  frame.y = 0;
 
   lastFrameX += width + frameSpacing;
 }
@@ -70,25 +86,17 @@ async function buildFrame(
   return frame;
 }
 
-async function loadComponentSets(): Promise<{
-  senderSet: ComponentSetNode;
-  recipientSet: ComponentSetNode;
-  statusSet: ComponentSetNode;
-  timestampSet: ComponentSetNode;
-}> {
-  const senderSetPromise: Promise<ComponentSetNode> = figma.importComponentSetByKeyAsync(componentKey.senderBubble);
-  const recipientSetPromise: Promise<ComponentSetNode> = figma.importComponentSetByKeyAsync(
-    componentKey.recipientBubble
-  );
-  const statusSetPromise: Promise<ComponentSetNode> = figma.importComponentSetByKeyAsync(componentKey.statusBanner);
-  const timestampSetPromise: Promise<ComponentSetNode> = figma.importComponentSetByKeyAsync(componentKey.timestamp);
+async function loadComponentSets(): Promise<ComponentSets> {
+  const componentKeys = [
+    componentKey.senderBubble,
+    componentKey.recipientBubble,
+    componentKey.statusBanner,
+    componentKey.timestamp,
+  ];
 
-  const [senderSet, recipientSet, statusSet, timestampSet]: [
-    ComponentSetNode,
-    ComponentSetNode,
-    ComponentSetNode,
-    ComponentSetNode,
-  ] = await Promise.all([senderSetPromise, recipientSetPromise, statusSetPromise, timestampSetPromise]);
+  const [senderSet, recipientSet, statusSet, timestampSet] = await Promise.all(
+    componentKeys.map((key) => figma.importComponentSetByKeyAsync(key))
+  );
 
   return { senderSet, recipientSet, statusSet, timestampSet };
 }
@@ -104,41 +112,32 @@ async function updateEmojiKeyIds(): Promise<void> {
   await Promise.all(promises);
 }
 
-function getFirstChatItemDateTime(chatItems: unknown[]): { date: string; time: string } {
-  const firstChatItem = chatItems[0] as { time: string; date: string };
+function getFirstChatItemDateTime(chatItems: ChatItem[]): { date: string; time: string } {
+  const firstChatItem = chatItems[0];
   const time = firstChatItem ? `at ${firstChatItem.time}` : 'at 1:30 PM';
   const date = 'Today';
 
   return { date, time };
 }
 
-function isLastChatItemSender(chatItems: unknown[]): boolean {
-  const lastChatItem = chatItems[chatItems.length - 1] as { role: string };
-
-  if (lastChatItem.role === 'sender') {
-    return true;
-  }
-
-  return false;
+function isLastChatItemSender(chatItems: ChatItem[]): boolean {
+  const lastChatItem = chatItems[chatItems.length - 1];
+  return lastChatItem?.role === 'sender';
 }
 
-function getRecipientName({ chatItems, isFirst = true }: { chatItems: unknown[]; isFirst?: boolean }): string {
-  const chatItem = chatItems.find((item: unknown) => (item as { role: string }).role === 'recipient') as {
-    participantName: string;
-  };
-
-  let recipientName: string = chatItem.participantName;
+function getRecipientName(chatItems: ChatItem[], isFirst = true): string {
+  const recipientItem = chatItems.find((item) => item.role === 'recipient');
 
   if (isFirst) {
-    [recipientName] = recipientName.split(' ');
+    return recipientItem.participantName.split(' ')[0];
   }
 
-  return recipientName;
+  return recipientItem.participantName;
 }
 
 async function createTimestampInstance(timestampSet: ComponentSetNode): Promise<InstanceNode> {
   const timestampInstance: InstanceNode = timestampSet.defaultVariant.createInstance();
-  const { date, time } = getFirstChatItemDateTime(chatData);
+  const { date, time } = getFirstChatItemDateTime(chatData as ChatItem[]);
 
   const dateLabel = timestampInstance.findOne(
     (node: { type: string; name: string }) => node.type === 'TEXT' && node.name === 'Date'
@@ -165,13 +164,13 @@ async function createStatusInstance(statusSet: ComponentSetNode): Promise<Instan
     (node: { type: string; name: string }) => node.type === 'TEXT' && node.name === 'Notification Text'
   ) as TextNode;
 
-  const recipientName = getRecipientName({ chatItems: chatData, isFirst: true });
+  const recipientName = getRecipientName(chatData as ChatItem[]);
 
   if (notificationLabel) {
     notificationLabel.characters = `${recipientName} has notifications silenced`;
   }
 
-  const hasAction = isLastChatItemSender(chatData);
+  const hasAction = isLastChatItemSender(chatData as ChatItem[]);
   statusInstance.setProperties({
     'Has action': hasAction ? 'Yes' : 'No',
   });
@@ -199,18 +198,8 @@ export default async function buildChatUserInterface({
 
   await updateEmojiKeyIds();
 
-  const chatUserInterfaceDidDraw = chatData.map(async (item: unknown, index: number): Promise<void> => {
-    const {
-      role,
-      message,
-      emojiReaction,
-      messagesInGroup,
-    }: { role: string; message: string; emojiReaction: string | null; messagesInGroup: number } = item as {
-      role: string;
-      message: string;
-      emojiReaction: string | null;
-      messagesInGroup: number;
-    };
+  const chatUserInterfaceDidDraw = chatData.map(async (item: ChatItem, index: number): Promise<void> => {
+    const { role, message, emojiReaction, messagesInGroup } = item;
 
     const bubbleKeys: string[] =
       role === 'sender' ? componentPropertyName.senderBubble : componentPropertyName.recipientBubble;

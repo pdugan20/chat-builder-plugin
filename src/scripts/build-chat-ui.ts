@@ -4,33 +4,7 @@ import flipHorizontal from '../utils/transform';
 import emojiKey from '../constants/emojis';
 import { colorCollection, modeId } from '../constants/collections';
 import colors from '../constants/colors';
-
-interface ChatItem {
-  participantName: string;
-  gender: string;
-  role: 'sender' | 'recipient';
-  message: string;
-  time: string;
-  date?: string;
-  emojiReaction: string | null;
-  messagesInGroup: number;
-}
-
-interface BuildChatUserInterfaceProps {
-  theme?: 'light' | 'dark';
-  data: string;
-  width?: number;
-  itemSpacing?: number;
-  bubbleStyle?: 'iOS' | 'Android';
-  name?: string;
-}
-
-interface ComponentSets {
-  senderSet: ComponentSetNode;
-  recipientSet: ComponentSetNode;
-  statusSet: ComponentSetNode;
-  timestampSet: ComponentSetNode;
-}
+import { ChatItem, BuildChatUserInterfaceProps, ComponentSets } from '../types/chat';
 
 async function setFrameBackgroundFill(frame: FrameNode): Promise<void> {
   const threadBackground = await figma.variables.getVariableByIdAsync(colors['Background/General/Thread'].id);

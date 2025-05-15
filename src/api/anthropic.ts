@@ -1,18 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk';
-
-interface QueryInputs {
-  participants: string;
-  maxMessages: string;
-  prompt: string;
-}
-
-interface QueryResponse {
-  id: string;
-  type: string;
-  role: string;
-  model: string;
-  content: unknown;
-}
+import { QueryInputs, QueryResponse } from '../types/api';
 
 export default async function createChatQuery({
   apiKey,

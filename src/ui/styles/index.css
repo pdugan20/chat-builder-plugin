@@ -1,0 +1,8 @@
+@import './variables.css';
+@import './components/input.css';
+@import './components/text.css';
+@import './components/select.css';
+@import './components/tabs.css';
+@import './components/dialog.css';
+@import './components/layout.css';
+@import './components/button.css';

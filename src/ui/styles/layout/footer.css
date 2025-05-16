@@ -1,6 +1,0 @@
-.footer {
-  border-top: var(--border-width-default) var(--border-style-default) var(--border-color-default);
-  padding: var(--layout-spacing-medium);
-  display: flex;
-  flex-direction: row-reverse;
-}

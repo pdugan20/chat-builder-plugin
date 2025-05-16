@@ -6,10 +6,18 @@ import promptExamples from '../../constants/prompts';
 import createChatQuery from '../../api/anthropic';
 import cleanAndParseJson from '../../utils/json';
 import chatData from '../../constants/test-data';
-import { PluginScreenProps } from '../../types/props';
+import { useAnthropic } from '../context/anthropic';
+
+interface PluginScreenProps {
+  screen?: string;
+  defaultStyle?: string;
+  defaultParticipants?: string;
+  defaultMaxMessages?: string;
+  formVisibility?: string;
+  useTestData?: boolean;
+}
 
 function PluginScreen({
-  anthropicKey,
   screen = 'home',
   defaultStyle = 'light',
   defaultParticipants = '2',
@@ -17,6 +25,7 @@ function PluginScreen({
   formVisibility = 'invisible',
   useTestData = false,
 }: PluginScreenProps): React.JSX.Element {
+  const { anthropicKey } = useAnthropic();
   const [style, setStyle] = useState(defaultStyle);
   const [participants, setParticipants] = useState(defaultParticipants);
   const [maxMessages, setMaxMessages] = useState(defaultMaxMessages);

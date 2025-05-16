@@ -1,0 +1,41 @@
+.body {
+  padding: var(--space-4);
+}
+
+nav {
+  padding: var(--space-2);
+  border-bottom: 1px solid var(--figma-color-border);
+}
+
+.footer {
+  border-top: 1px solid var(--figma-color-border);
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: row-reverse;
+}
+
+.row-item {
+  padding-bottom: var(--space-3);
+
+  &:last-child {
+    padding-bottom: 0;
+  }
+}
+
+.heading-parent {
+  display: flex;
+
+  .fp-Link {
+    display: flex;
+    margin-left: auto;
+  }
+
+  .actionGroup {
+    display: flex;
+    margin-left: auto;
+  }
+
+  .clearActionGroup {
+    display: flex;
+  }
+}

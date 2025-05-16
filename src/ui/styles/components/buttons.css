@@ -1,0 +1,28 @@
+button {
+  cursor: default;
+
+  &:hover {
+    cursor: default;
+  }
+}
+
+.fp-TabsTrigger {
+  cursor: default;
+  padding: 0 !important;
+
+  a {
+    height: 100%;
+    cursor: default;
+    padding: var(--space-1) var(--space-2);
+
+    &:hover {
+      cursor: default;
+    }
+  }
+
+  &:hover:where([data-state='inactive']) {
+    --color-icon: var(--figma-color-icon);
+    background: var(--figma-color-bg-secondary);
+    border-radius: var(--radius-medium);
+  }
+}

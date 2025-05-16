@@ -1,0 +1,63 @@
+/* Base input styles */
+.input-base {
+  all: unset;
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  height: var(--space-6);
+  background-color: var(--figma-color-bg-secondary);
+  border-radius: var(--radius-medium);
+  font-family: var(--font-family-default);
+  font-size: var(--font-size-default);
+  font-weight: var(--font-weight-default);
+  letter-spacing: var(--letter-spacing-default);
+  line-height: var(--line-height-default);
+  color: var(--figma-color-text);
+  outline: var(--border-width-default) var(--border-style-default) transparent;
+  outline-offset: -1px;
+}
+
+/* Textarea styles */
+textarea.fp-textarea {
+  @extend .input-base;
+  padding: var(--space-1) var(--space-2);
+  resize: none;
+  word-break: break-word;
+
+  &:hover:not(:disabled, :focus) {
+    outline-color: var(--border-color-default);
+  }
+
+  &:focus {
+    outline-color: var(--figma-color-border-selected);
+  }
+
+  &:disabled {
+    background-color: var(--figma-color-bg);
+    outline-color: var(--figma-color-border-disabled);
+    color: var(--figma-color-text-disabled);
+  }
+
+  &::placeholder {
+    color: var(--figma-color-text-tertiary);
+  }
+}
+
+/* Input styles */
+input.fp-Input {
+  @extend .input-base;
+  padding: var(--space-1) 0 var(--space-1) var(--space-2);
+
+  &:focus {
+    outline-color: var(--figma-color-border-selected);
+  }
+}
+
+/* Select styles */
+.fp-SelectTrigger {
+  width: auto !important;
+
+  &.fp-SelectTrigger {
+    min-width: 65px;
+  }
+}

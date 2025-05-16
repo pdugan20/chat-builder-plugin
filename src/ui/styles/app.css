@@ -2,5 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Import external dependencies */
 @import 'figma-kit/styles.css';
-@import './overrides.css';
+
+/* Import local styles */
+@import './base/variables.css';
+@import './base/reset.css';
+@import './components/inputs.css';
+@import './components/text.css';
+@import './components/buttons.css';
+@import './components/dialogs.css';
+@import './layout/navigation.css';
+@import './layout/footer.css';
+@import './layout/containers.css';

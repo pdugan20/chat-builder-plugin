@@ -1,0 +1,42 @@
+.fp-Text {
+  font-weight: var(--font-weight-default);
+  cursor: default;
+
+  &.fp-weight-strong {
+    font-weight: var(--font-weight-strong);
+  }
+
+  &.linkSeparator {
+    display: flex;
+    margin: 0 var(--space-0_5);
+  }
+
+  &.heading {
+    font-weight: var(--font-weight-strong);
+    padding-bottom: var(--space-1);
+    display: flex;
+  }
+
+  &.subtitle {
+    display: flex;
+
+    &.truncated {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+}
+
+.fp-AlertDialogTitle {
+  font-weight: var(--font-weight-strong);
+}
+
+.fp-Link {
+  cursor: default;
+
+  &:hover {
+    cursor: default;
+  }
+}

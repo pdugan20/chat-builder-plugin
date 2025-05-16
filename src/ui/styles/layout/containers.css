@@ -1,0 +1,29 @@
+.body {
+  padding: var(--layout-spacing-large);
+}
+
+.row-item {
+  padding-bottom: var(--layout-spacing-medium);
+
+  &:last-child {
+    padding-bottom: 0;
+  }
+}
+
+.heading-parent {
+  display: flex;
+
+  .fp-Link {
+    display: flex;
+    margin-left: auto;
+  }
+
+  .actionGroup {
+    display: flex;
+    margin-left: auto;
+  }
+
+  .clearActionGroup {
+    display: flex;
+  }
+}

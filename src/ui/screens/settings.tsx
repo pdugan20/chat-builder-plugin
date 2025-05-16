@@ -2,13 +2,16 @@ import React from 'react';
 import { Text, Link } from 'figma-kit';
 import Navigation from '../navigation';
 import UpdateKeyDialog from '../components/dialogs/update-key';
-import { SettingsScreenProps } from '../../types/props';
+import { useAnthropic } from '../context/anthropic';
 
-function SettingsScreen({
-  anthropicKey,
-  screen = 'settings',
-  pluginVersion = '1.0',
-}: SettingsScreenProps): React.JSX.Element {
+interface SettingsScreenProps {
+  screen?: string;
+  pluginVersion?: string;
+}
+
+function SettingsScreen({ screen = 'settings', pluginVersion = '1.0' }: SettingsScreenProps): React.JSX.Element {
+  const { anthropicKey } = useAnthropic();
+
   function renderNav(): React.JSX.Element {
     return <Navigation screen={screen} />;
   }

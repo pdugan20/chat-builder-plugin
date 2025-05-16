@@ -1,21 +1,23 @@
-export default function updateAnthropicKey(apiKey: string): void {
-  (async () => {
-    await figma.clientStorage
-      .setAsync('anthropicKey', apiKey)
-      .catch(() => {
-        figma.ui.postMessage({
-          type: 'UPDATE_ANTHROPIC_KEY',
-          keyDidUpdate: false,
-        });
-        figma.notify('Your API key could not be saved. Please try again.');
-      })
-      .finally(() => {
-        figma.ui.postMessage({
-          type: 'UPDATE_ANTHROPIC_KEY',
-          keyDidUpdate: true,
-          key: apiKey,
-        });
-        figma.notify('Your API key was saved.');
-      });
-  })();
+import { UpdateKeyMessage } from '../types/plugin/messages';
+
+export default async function updateAnthropicKey(key: string): Promise<void> {
+  try {
+    await figma.clientStorage.setAsync('anthropicKey', key);
+    const message: UpdateKeyMessage = {
+      type: 'UPDATE_ANTHROPIC_KEY',
+      keyDidUpdate: true,
+      key,
+    };
+
+    figma.ui.postMessage(message);
+    figma.notify('Your API key was saved.');
+  } catch (error) {
+    const message: UpdateKeyMessage = {
+      type: 'UPDATE_ANTHROPIC_KEY',
+      keyDidUpdate: false,
+    };
+
+    figma.ui.postMessage(message);
+    figma.notify('Your API key could not be saved. Please try again.', { error: true, timeout: 5000 });
+  }
 }

@@ -1,23 +1,23 @@
-export default async function getAnthropicKey() {
-  try {
-    const anthropicKey = await figma.clientStorage.getAsync('anthropicKey');
+import { HasKeyMessage } from '../types/plugin/messages';
 
-    if (anthropicKey) {
-      figma.ui.postMessage({
-        type: 'HAS_ANTHROPIC_KEY',
-        hasKey: true,
-        key: anthropicKey,
-      });
-    } else {
-      figma.ui.postMessage({
-        type: 'HAS_ANTHROPIC_KEY',
-        hasKey: false,
-      });
-    }
-  } catch (err) {
-    figma.notify('Error retrieving API key.', {
-      timeout: 5000,
-      error: true,
-    });
+export default async function getAnthropicKey(): Promise<void> {
+  try {
+    const key = await figma.clientStorage.getAsync('anthropicKey');
+    const message: HasKeyMessage = {
+      type: 'HAS_ANTHROPIC_KEY',
+      hasKey: Boolean(key),
+      ...(key && { key }),
+    };
+
+    figma.ui.postMessage(message);
+  } catch (error) {
+    figma.notify('Error retrieving API key.', { error: true, timeout: 5000 });
+
+    const message: HasKeyMessage = {
+      type: 'HAS_ANTHROPIC_KEY',
+      hasKey: false,
+    };
+
+    figma.ui.postMessage(message);
   }
 }

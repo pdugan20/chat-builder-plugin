@@ -6,7 +6,7 @@ import { AnthropicProvider } from './context/anthropic';
 
 import './styles/app.css';
 
-const USE_TEST_DATA = true;
+const USE_TEST_DATA = false;
 
 function App(): React.JSX.Element {
   return (

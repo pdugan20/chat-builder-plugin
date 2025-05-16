@@ -9,6 +9,10 @@ import chatData from '../../constants/test-data';
 import { useAnthropic } from '../context/anthropic';
 import LoadingOverlay from '../components/loading-overlay';
 
+const MESSAGE_COUNT_OPTIONS = ['5', '10', '15', '20'];
+const STYLE_OPTIONS = ['light', 'dark'];
+const PARTICIPANT_OPTIONS = ['2', '3'];
+
 interface PluginScreenProps {
   screen?: string;
   defaultStyle?: string;
@@ -44,8 +48,11 @@ function PluginScreen({
         <Select.Root value={style} onValueChange={setStyle}>
           <Select.Trigger />
           <Select.Content>
-            <Select.Item value='light'>Light</Select.Item>
-            <Select.Item value='dark'>Dark</Select.Item>
+            {STYLE_OPTIONS.map((value) => (
+              <Select.Item key={value} value={value}>
+                {value.charAt(0).toUpperCase() + value.slice(1)}
+              </Select.Item>
+            ))}
           </Select.Content>
         </Select.Root>
       </div>
@@ -59,10 +66,11 @@ function PluginScreen({
         <Select.Root value={participants} onValueChange={setParticipants}>
           <Select.Trigger />
           <Select.Content>
-            <Select.Item value='2'>2</Select.Item>
-            <Select.Item disabled value='3'>
-              3
-            </Select.Item>
+            {PARTICIPANT_OPTIONS.map((value) => (
+              <Select.Item key={value} value={value} disabled={value === '3'}>
+                {value}
+              </Select.Item>
+            ))}
           </Select.Content>
         </Select.Root>
       </div>
@@ -76,10 +84,11 @@ function PluginScreen({
         <Select.Root value={maxMessages} onValueChange={setMaxMessages}>
           <Select.Trigger />
           <Select.Content>
-            <Select.Item value='5'>5</Select.Item>
-            <Select.Item value='10'>10</Select.Item>
-            <Select.Item value='15'>15</Select.Item>
-            <Select.Item value='20'>20</Select.Item>
+            {MESSAGE_COUNT_OPTIONS.map((value) => (
+              <Select.Item key={value} value={value}>
+                {value}
+              </Select.Item>
+            ))}
           </Select.Content>
         </Select.Root>
       </div>

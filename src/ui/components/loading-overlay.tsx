@@ -11,8 +11,8 @@ function LoadingOverlay({
   return (
     <div className='loading-overlay fixed inset-0 z-50 flex items-center justify-center'>
       <div className='flex flex-col items-center gap-3'>
-        <div className='size-5 animate-spin rounded-full border-2 border-[var(--figma-color-border-selected)] border-t-transparent' />
-        <Text className='px-4 text-center'>{message}</Text>
+        <div className='size-5 animate-spin rounded-full border-2 border-[var(--figma-color-icon-brand)] border-t-transparent' />
+        <Text className='whitespace-pre-line px-10 text-center'>{message}</Text>
       </div>
     </div>
   );

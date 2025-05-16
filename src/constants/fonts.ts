@@ -1,10 +1,10 @@
 const requiredFonts = [
   {
-    family: 'SF Pro Text',
+    family: 'SF Pro',
     style: 'Medium',
   },
   {
-    family: 'SF Pro Text',
+    family: 'SF Pro',
     style: 'Regular',
   },
 ];

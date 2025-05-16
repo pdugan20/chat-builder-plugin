@@ -11,4 +11,5 @@ export interface PluginScreenProps {
   defaultParticipants?: string;
   defaultMaxMessages?: string;
   formVisibility?: string;
+  useTestData?: boolean;
 }

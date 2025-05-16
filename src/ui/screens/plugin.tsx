@@ -7,6 +7,7 @@ import createChatQuery from '../../api/anthropic';
 import cleanAndParseJson from '../../utils/json';
 import chatData from '../../constants/test-data';
 import { useAnthropic } from '../context/anthropic';
+import LoadingOverlay from '../components/loading-overlay';
 
 interface PluginScreenProps {
   screen?: string;
@@ -196,10 +197,11 @@ function PluginScreen({
   const visibility = anthropicKey ? 'visible' : formVisibility;
 
   return (
-    <div className={`${visibility}`}>
+    <div className={`${visibility} relative`}>
       {renderNav()}
       {renderBody()}
       {renderFooter()}
+      {loading && <LoadingOverlay />}
     </div>
   );
 }

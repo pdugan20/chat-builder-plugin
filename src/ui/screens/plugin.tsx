@@ -5,15 +5,8 @@ import Navigation from '../navigation';
 import promptExamples from '../../constants/prompts';
 import createChatQuery from '../../api/anthropic';
 import cleanAndParseJson from '../../utils/json';
-
-interface PluginScreenProps {
-  anthropicKey: string;
-  screen?: string;
-  defaultStyle?: string;
-  defaultParticipants?: string;
-  defaultMaxMessages?: string;
-  formVisibility?: string;
-}
+import chatData from '../../constants/test-data';
+import { PluginScreenProps } from '../../types/props';
 
 function PluginScreen({
   anthropicKey,
@@ -22,6 +15,7 @@ function PluginScreen({
   defaultParticipants = '2',
   defaultMaxMessages = '15',
   formVisibility = 'invisible',
+  useTestData = false,
 }: PluginScreenProps): React.JSX.Element {
   const [style, setStyle] = useState(defaultStyle);
   const [participants, setParticipants] = useState(defaultParticipants);
@@ -148,23 +142,34 @@ function PluginScreen({
     const handleSubmit = async () => {
       setLoading(true);
 
-      const queryInputs = {
-        style,
-        participants,
-        maxMessages,
-        prompt,
-      };
-
       try {
-        // const response = await createChatQuery({ apiKey: anthropicKey, queryInputs });
-        // if (response) {
-        //   parent.postMessage(
-        //     { pluginMessage: { type: 'BUILD_CHAT_UI', data: cleanAndParseJson(response.content[0].text) } },
-        //     '*'
-        //   );
-        // }
-        const data = '';
-        parent.postMessage({ pluginMessage: { type: 'BUILD_CHAT_UI', data, style, prompt } }, '*');
+        if (useTestData) {
+          const data = chatData;
+          parent.postMessage(
+            {
+              pluginMessage: { type: 'BUILD_CHAT_UI', data, style, prompt },
+            },
+            '*'
+          );
+          return;
+        }
+
+        const response = await createChatQuery({
+          apiKey: anthropicKey,
+          queryInputs: { participants, maxMessages, prompt },
+        });
+
+        if (!response?.content?.[0]?.text) {
+          return;
+        }
+
+        const data = cleanAndParseJson(response.content[0].text);
+        parent.postMessage(
+          {
+            pluginMessage: { type: 'BUILD_CHAT_UI', data, style, prompt },
+          },
+          '*'
+        );
       } finally {
         setLoading(false);
       }

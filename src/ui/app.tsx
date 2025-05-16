@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { MemoryRouter, Routes, Route } from 'react-router';
-
 import PluginScreen from './screens/plugin';
 import SettingsScreen from './screens/settings';
 
 import './styles/app.css';
+
+const USE_TEST_DATA = true;
 
 function App(): React.JSX.Element {
   const [key, setKey] = useState(null);
@@ -35,7 +36,7 @@ function App(): React.JSX.Element {
   return (
     <MemoryRouter initialEntries={['/PluginScreen']}>
       <Routes>
-        <Route path='PluginScreen' element={<PluginScreen anthropicKey={key} />} />
+        <Route path='PluginScreen' element={<PluginScreen anthropicKey={key} useTestData={USE_TEST_DATA} />} />
         <Route path='SettingsScreen' element={<SettingsScreen anthropicKey={key} />} />
       </Routes>
     </MemoryRouter>

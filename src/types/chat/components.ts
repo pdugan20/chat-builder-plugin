@@ -7,7 +7,7 @@ export interface ComponentSets {
 
 export interface BuildChatUserInterfaceProps {
   theme?: 'light' | 'dark';
-  data: string;
+  data: ChatItem[];
   width?: number;
   itemSpacing?: number;
   bubbleStyle?: 'iOS' | 'Android';

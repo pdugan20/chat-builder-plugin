@@ -1,0 +1,15 @@
+.fp-AlertDialogContent {
+  gap: 0 !important;
+
+  .fp-AlertDialogDescription {
+    padding-top: var(--space-1);
+  }
+
+  .fp-Input {
+    margin: var(--space-2) 0 var(--space-1);
+  }
+}
+
+.fp-AlertDialogTitle {
+  display: flex;
+}

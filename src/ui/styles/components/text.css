@@ -1,6 +1,6 @@
 .fp-Text {
-  font-weight: var(--font-weight-default);
   cursor: default;
+  font-weight: var(--font-weight-default);
 
   &.fp-weight-strong {
     font-weight: var(--font-weight-strong);
@@ -9,6 +9,10 @@
   &.linkSeparator {
     display: flex;
     margin: 0 var(--space-0_5);
+  }
+
+  &:hover {
+    cursor: default;
   }
 
   &.heading {
@@ -26,17 +30,5 @@
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-  }
-}
-
-.fp-AlertDialogTitle {
-  font-weight: var(--font-weight-strong);
-}
-
-.fp-Link {
-  cursor: default;
-
-  &:hover {
-    cursor: default;
   }
 }

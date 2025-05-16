@@ -1,11 +1,3 @@
-button {
-  cursor: default;
-
-  &:hover {
-    cursor: default;
-  }
-}
-
 .fp-TabsTrigger {
   cursor: default;
   padding: 0 !important;

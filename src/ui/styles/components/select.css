@@ -1,0 +1,8 @@
+.fp-SelectTrigger {
+  width: auto !important;
+  font-weight: var(--font-weight-default);
+}
+
+button.fp-SelectTrigger {
+  min-width: 65px;
+}

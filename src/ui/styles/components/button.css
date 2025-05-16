@@ -1,0 +1,13 @@
+button {
+  &:hover {
+    cursor: default;
+  }
+}
+
+.fp-Link {
+  cursor: default !important;
+
+  &:hover {
+    cursor: default !important;
+  }
+}

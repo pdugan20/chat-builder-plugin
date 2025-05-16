@@ -1,0 +1,11 @@
+.fp-AlertDialogContent {
+  max-width: 400px;
+
+  .fp-AlertDialogDescription {
+    margin: var(--space-3) 0;
+  }
+
+  .fp-Input {
+    margin: var(--space-2) 0;
+  }
+}

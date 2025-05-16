@@ -1,0 +1,13 @@
+/* Reset Tailwind ring styles */
+*:where([class*='fp-']) {
+  --tw-ring-color: transparent !important;
+  --tw-ring-offset-width: 0 !important;
+}
+
+/* Global focus styles */
+*:focus {
+  outline-color: var(--figma-color-border-selected);
+  outline-width: var(--border-width-default);
+  outline-style: var(--border-style-default);
+  outline-offset: -1px;
+}

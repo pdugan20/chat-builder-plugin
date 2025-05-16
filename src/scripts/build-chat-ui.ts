@@ -1,4 +1,3 @@
-import chatData from '../constants/test-data';
 import { componentPropertyName } from '../constants/keys';
 import flipHorizontal from '../utils/transform';
 import emojiKey from '../constants/emojis';
@@ -129,9 +128,10 @@ export default async function buildChatUserInterface({
   itemSpacing = 8,
   bubbleStyle = 'iOS',
   name,
+  data,
 }: BuildChatUserInterfaceProps): Promise<void> {
   const messages: string[] = [];
-  const items = chatData as ChatItem[];
+  const items = data;
   const { senderSet, recipientSet, statusSet, timestampSet } = await loadComponentSets();
   const frame: FrameNode = await buildFrame(theme, width, itemSpacing, name);
 

@@ -17,8 +17,8 @@ export function getRecipientName(chatItems: ChatItem[], isFirst = true): string 
   const recipientItem = chatItems.find((item) => item.role === 'recipient');
 
   if (isFirst) {
-    return recipientItem.participantName.split(' ')[0];
+    return recipientItem.name.split(' ')[0];
   }
 
-  return recipientItem.participantName;
+  return recipientItem.name;
 }

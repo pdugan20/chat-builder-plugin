@@ -1,6 +1,6 @@
 const chatData = [
   {
-    participantName: 'Mike Johnson',
+    name: 'Mike Johnson',
     gender: 'male',
     role: 'sender',
     message: 'Hey, have you heard about that new horror movie Sinners that just came out?',
@@ -9,7 +9,7 @@ const chatData = [
     messagesInGroup: 1,
   },
   {
-    participantName: 'Amanda Chen',
+    name: 'Amanda Chen',
     gender: 'female',
     role: 'recipient',
     message: "OMG yes! I've been dying to see it. The reviews are saying it's the scariest movie of the year!",
@@ -18,7 +18,7 @@ const chatData = [
     messagesInGroup: 2,
   },
   {
-    participantName: 'Amanda Chen',
+    name: 'Amanda Chen',
     gender: 'female',
     role: 'recipient',
     message: 'Do you want to go see it this weekend?',
@@ -27,7 +27,7 @@ const chatData = [
     messagesInGroup: 2,
   },
   {
-    participantName: 'Mike Johnson',
+    name: 'Mike Johnson',
     gender: 'male',
     role: 'sender',
     message: "Definitely! I'm free Saturday night. How about you?",
@@ -36,7 +36,7 @@ const chatData = [
     messagesInGroup: 2,
   },
   {
-    participantName: 'Mike Johnson',
+    name: 'Mike Johnson',
     gender: 'male',
     role: 'sender',
     message: 'We could check out the 7:30 show at the Regal downtown',
@@ -45,7 +45,7 @@ const chatData = [
     messagesInGroup: 2,
   },
   {
-    participantName: 'Amanda Chen',
+    name: 'Amanda Chen',
     gender: 'female',
     role: 'recipient',
     message: 'Saturday at 7:30 works perfect for me! Should we grab dinner before?',
@@ -54,7 +54,7 @@ const chatData = [
     messagesInGroup: 1,
   },
   {
-    participantName: 'Mike Johnson',
+    name: 'Mike Johnson',
     gender: 'male',
     role: 'sender',
     message: 'Great idea! That Italian place next to the theater is pretty good. Wanna try that?',
@@ -63,7 +63,7 @@ const chatData = [
     messagesInGroup: 1,
   },
   {
-    participantName: 'Amanda Chen',
+    name: 'Amanda Chen',
     gender: 'female',
     role: 'recipient',
     message: "Perfect! Let's meet there at 5:30? That should give us plenty of time before the movie.",
@@ -72,7 +72,7 @@ const chatData = [
     messagesInGroup: 2,
   },
   {
-    participantName: 'Amanda Chen',
+    name: 'Amanda Chen',
     gender: 'female',
     role: 'recipient',
     message: "I heard the ending of Sinners is absolutely wild. I'm so excited!",
@@ -81,7 +81,7 @@ const chatData = [
     messagesInGroup: 2,
   },
   {
-    participantName: 'Mike Johnson',
+    name: 'Mike Johnson',
     gender: 'male',
     role: 'sender',
     message:

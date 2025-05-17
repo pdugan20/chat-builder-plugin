@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { AlertDialog, Button, Input, Link } from 'figma-kit';
-import { HandleInputChangeProps } from '../../../types/props';
+import { HandleInputChangeProps } from '../../types/props';
 
 interface UpdateKeyDialogProps {
   dialogTitle: string;

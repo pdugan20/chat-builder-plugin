@@ -7,8 +7,8 @@ import createChatQuery from '../../api/anthropic';
 import cleanAndParseJson from '../../utils/json';
 import chatData from '../../constants/test-data';
 import { useAnthropic } from '../context/anthropic';
-import LoadingOverlay from '../components/loading-overlay';
-import ApiKeyOverlay from '../components/api-key-overlay';
+import LoadingOverlay from '../components/overlays/loading';
+import ApiKeyOverlay from '../components/overlays/api-key';
 
 const MESSAGE_COUNT_OPTIONS = ['5', '10', '15', '20'];
 const STYLE_OPTIONS = ['light', 'dark'];

@@ -26,7 +26,7 @@ export interface MessageInstanceProps {
 }
 
 export interface ChatItem {
-  participantName: string;
+  name: string;
   gender: string;
   role: 'sender' | 'recipient';
   message: string;

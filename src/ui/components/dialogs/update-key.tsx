@@ -1,6 +1,15 @@
 import React, { useState } from 'react';
 import { AlertDialog, Button, Input, Link } from 'figma-kit';
-import { UpdateKeyDialogProps, HandleInputChangeProps } from '../../../types/props';
+import { HandleInputChangeProps } from '../../../types/props';
+
+interface UpdateKeyDialogProps {
+  dialogTitle: string;
+  dialogDescription?: string;
+  actionLabel?: string;
+  anthropicKey: string;
+  keyLength?: number;
+  buttonVariant?: 'link' | 'primary';
+}
 
 function UpdateKeyDialog({
   dialogTitle,
@@ -8,6 +17,7 @@ function UpdateKeyDialog({
   actionLabel = 'Add key',
   anthropicKey,
   keyLength = 108,
+  buttonVariant = 'link',
 }: UpdateKeyDialogProps): React.JSX.Element {
   const [apiKey, setKey] = useState(anthropicKey);
   const [keyIsValid, setKeyIsValid] = useState(false);
@@ -20,22 +30,30 @@ function UpdateKeyDialog({
   function renderTrigger(): React.JSX.Element {
     return (
       <AlertDialog.Trigger>
-        <Link href='#'>{actionLabel}</Link>
+        {buttonVariant === 'primary' ? (
+          <Button variant='primary' size='medium'>
+            {actionLabel}
+          </Button>
+        ) : (
+          <Link href='#'>{actionLabel}</Link>
+        )}
       </AlertDialog.Trigger>
     );
   }
 
   const handleCancelClick = () => {
     setKey(anthropicKey);
+    setKeyIsValid(false);
   };
 
   const handleSaveClick = () => {
     parent.postMessage({ pluginMessage: { type: 'UPDATE_ANTHROPIC_KEY', apiKey } }, '*');
+    setKeyIsValid(false);
   };
 
   function renderBody(): React.JSX.Element {
     return (
-      <div>
+      <div className='text-left'>
         <AlertDialog.Title>{dialogTitle}</AlertDialog.Title>
         <AlertDialog.Description>{dialogDescription}</AlertDialog.Description>
         <Input

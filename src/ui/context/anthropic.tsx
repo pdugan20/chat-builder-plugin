@@ -3,12 +3,14 @@ import React, { createContext, useContext, useState, useEffect, ReactNode, useMe
 interface AnthropicContextType {
   anthropicKey: string | null;
   setAnthropicKey: (key: string | null) => void;
+  isLoading: boolean;
 }
 
 const AnthropicContext = createContext<AnthropicContextType | undefined>(undefined);
 
 export function AnthropicProvider({ children }: { children: ReactNode }) {
   const [anthropicKey, setAnthropicKey] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     onmessage = (event) => {
@@ -19,6 +21,7 @@ export function AnthropicProvider({ children }: { children: ReactNode }) {
           if (event.data.pluginMessage.hasKey) {
             setAnthropicKey(event.data.pluginMessage.key);
           }
+          setIsLoading(false);
           break;
 
         case 'UPDATE_ANTHROPIC_KEY':
@@ -33,7 +36,7 @@ export function AnthropicProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const value = useMemo(() => ({ anthropicKey, setAnthropicKey }), [anthropicKey]);
+  const value = useMemo(() => ({ anthropicKey, setAnthropicKey, isLoading }), [anthropicKey, isLoading]);
 
   return <AnthropicContext.Provider value={value}>{children}</AnthropicContext.Provider>;
 }

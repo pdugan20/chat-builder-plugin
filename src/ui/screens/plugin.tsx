@@ -8,6 +8,7 @@ import cleanAndParseJson from '../../utils/json';
 import chatData from '../../constants/test-data';
 import { useAnthropic } from '../context/anthropic';
 import LoadingOverlay from '../components/loading-overlay';
+import ApiKeyOverlay from '../components/api-key-overlay';
 
 const MESSAGE_COUNT_OPTIONS = ['5', '10', '15', '20'];
 const STYLE_OPTIONS = ['light', 'dark'];
@@ -18,7 +19,6 @@ interface PluginScreenProps {
   defaultStyle?: string;
   defaultParticipants?: string;
   defaultMaxMessages?: string;
-  formVisibility?: string;
   useTestData?: boolean;
 }
 
@@ -27,10 +27,9 @@ function PluginScreen({
   defaultStyle = 'light',
   defaultParticipants = '2',
   defaultMaxMessages = '15',
-  formVisibility = 'invisible',
   useTestData = false,
 }: PluginScreenProps): React.JSX.Element {
-  const { anthropicKey } = useAnthropic();
+  const { anthropicKey, isLoading } = useAnthropic();
   const [style, setStyle] = useState(defaultStyle);
   const [participants, setParticipants] = useState(defaultParticipants);
   const [maxMessages, setMaxMessages] = useState(defaultMaxMessages);
@@ -203,15 +202,20 @@ function PluginScreen({
     );
   }
 
-  const visibility = anthropicKey ? 'visible' : formVisibility;
+  if (isLoading) {
+    return null;
+  }
 
   return (
-    <div className={`${visibility} relative`}>
-      {renderNav()}
-      {renderBody()}
-      {renderFooter()}
-      {loading && <LoadingOverlay />}
-    </div>
+    <>
+      <div className={`${anthropicKey ? 'visible' : 'invisible'} relative`}>
+        {renderNav()}
+        {renderBody()}
+        {renderFooter()}
+        {loading && <LoadingOverlay />}
+      </div>
+      {!anthropicKey && <ApiKeyOverlay />}
+    </>
   );
 }
 

@@ -1,14 +1,20 @@
 import React from 'react';
 import { Text, Link, AlertDialog } from 'figma-kit';
-import UpdateKeyDialog from './dialogs/update-key';
+import UpdateKeyDialog from './update-key-dialog';
 import { useAnthropic } from '../context/anthropic';
+import AnthropicLogo from './icons/anthropic-logo';
 
-function ApiKeyOverlay(): React.JSX.Element {
+interface ApiKeyOverlayProps {
+  showLogo?: boolean;
+}
+
+function ApiKeyOverlay({ showLogo = false }: ApiKeyOverlayProps): React.JSX.Element {
   const { anthropicKey } = useAnthropic();
 
   return (
     <div className='fixed inset-0 z-50 flex items-center justify-center bg-[var(--figma-color-bg)]'>
       <div className='flex flex-col items-center px-4 text-center'>
+        {showLogo && <AnthropicLogo className='mb size-9 text-[var(--figma-color-icon)]' />}
         <Text size='large' className='text-lg font-bold mb-1 text-[var(--figma-color-text)]'>
           Get started
         </Text>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Text, Link } from 'figma-kit';
 import Navigation from '../navigation';
-import UpdateKeyDialog from '../components/update-key-dialog';
+import UpdateKeyDialog from '../components/dialogs/update-key';
 import { useAnthropic } from '../context/anthropic';
 
 interface SettingsScreenProps {

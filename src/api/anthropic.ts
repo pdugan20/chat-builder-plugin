@@ -1,6 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { QueryInputs, QueryResponse } from '../types/api';
 import { getExamplePrompt, getInstructionsPrompt } from '../utils/prompts';
+import { MESSAGE_TYPE } from '../constants/messages';
 
 interface ErrorDetails {
   type: string;
@@ -92,7 +93,7 @@ export default async function createChatQuery({
     parent.postMessage(
       {
         pluginMessage: {
-          type: 'POST_API_ERROR',
+          type: MESSAGE_TYPE.POST_API_ERROR,
           errorType: errorDetails.type,
           errorMessage: errorDetails.message,
           retryable: errorDetails.retryable,

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { AlertDialog, Button, Input, Link } from 'figma-kit';
 import { HandleInputChangeProps } from '../../../types/props/dialogs';
+import { MESSAGE_TYPE } from '../../../constants/messages';
 
 interface UpdateKeyDialogProps {
   dialogTitle: string;
@@ -46,8 +47,9 @@ function UpdateKeyDialog({
     setKeyIsValid(false);
   };
 
-  const handleSaveClick = () => {
-    parent.postMessage({ pluginMessage: { type: 'UPDATE_ANTHROPIC_KEY', apiKey } }, '*');
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    parent.postMessage({ pluginMessage: { type: MESSAGE_TYPE.UPDATE_ANTHROPIC_KEY, apiKey } }, '*');
     setKeyIsValid(false);
   };
 
@@ -75,7 +77,7 @@ function UpdateKeyDialog({
           <Button onClick={handleCancelClick}>Cancel</Button>
         </AlertDialog.Cancel>
         <AlertDialog.Action>
-          <Button variant='primary' disabled={!keyIsValid} onClick={handleSaveClick}>
+          <Button variant='primary' disabled={!keyIsValid} onClick={handleSubmit}>
             Save
           </Button>
         </AlertDialog.Action>

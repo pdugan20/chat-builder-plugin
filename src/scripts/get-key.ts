@@ -1,10 +1,11 @@
 import { HasKeyMessage } from '../types/plugin/messages';
+import { MESSAGE_TYPE } from '../constants/messages';
 
 export default async function getAnthropicKey(): Promise<void> {
   try {
     const key = await figma.clientStorage.getAsync('anthropicKey');
     const message: HasKeyMessage = {
-      type: 'HAS_ANTHROPIC_KEY',
+      type: MESSAGE_TYPE.HAS_ANTHROPIC_KEY,
       hasKey: Boolean(key),
       ...(key && { key }),
     };
@@ -14,7 +15,7 @@ export default async function getAnthropicKey(): Promise<void> {
     figma.notify('Error retrieving API key.', { error: true, timeout: 5000 });
 
     const message: HasKeyMessage = {
-      type: 'HAS_ANTHROPIC_KEY',
+      type: MESSAGE_TYPE.HAS_ANTHROPIC_KEY,
       hasKey: false,
     };
 

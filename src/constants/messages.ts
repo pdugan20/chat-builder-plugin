@@ -1,0 +1,20 @@
+export const MESSAGE_TYPE = {
+  // Authentication & API related
+  HAS_ANTHROPIC_KEY: 'HAS_ANTHROPIC_KEY',
+  UPDATE_ANTHROPIC_KEY: 'UPDATE_ANTHROPIC_KEY',
+  POST_API_ERROR: 'POST_API_ERROR',
+  RETRY_GENERATION: 'RETRY_GENERATION',
+
+  // UI & Component related
+  BUILD_CHAT_UI: 'BUILD_CHAT_UI',
+  LOAD_REQUIRED_FONTS: 'LOAD_REQUIRED_FONTS',
+  HAS_COMPONENT_LIBRARY: 'HAS_COMPONENT_LIBRARY',
+} as const;
+
+// Type for all possible message types
+export type MessageType = (typeof MESSAGE_TYPE)[keyof typeof MESSAGE_TYPE];
+
+// Helper function to type-check message types
+export function isValidMessageType(type: string): type is MessageType {
+  return Object.values(MESSAGE_TYPE).includes(type as MessageType);
+}

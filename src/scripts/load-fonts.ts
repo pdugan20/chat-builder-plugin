@@ -1,4 +1,5 @@
 import requiredFonts from '../constants/fonts';
+import { MESSAGE_TYPE } from '../constants/messages';
 
 export default async function loadFonts() {
   let areRequiredFontsAvailable = false;
@@ -21,11 +22,12 @@ export default async function loadFonts() {
         })
       );
     }
+    console.log('areRequiredFontsAvailable', areRequiredFontsAvailable);
   } catch (err) {
     //
   }
   figma.ui.postMessage({
-    type: 'LOAD_REQUIRED_FONTS',
+    type: MESSAGE_TYPE.LOAD_REQUIRED_FONTS,
     hasFonts: areRequiredFontsAvailable,
   });
 }

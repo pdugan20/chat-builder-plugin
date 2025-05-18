@@ -1,3 +1,5 @@
+import { MESSAGE_TYPE } from '../constants/messages';
+
 interface ErrorNotification {
   errorType: string;
   errorMessage: string;
@@ -9,7 +11,7 @@ export default async function notifyUser({ errorMessage, retryable }: ErrorNotif
     ? {
         text: 'Try Again',
         action: () => {
-          parent.postMessage({ pluginMessage: { type: 'RETRY_GENERATION' } }, '*');
+          parent.postMessage({ pluginMessage: { type: MESSAGE_TYPE.RETRY_GENERATION } }, '*');
         },
       }
     : undefined;

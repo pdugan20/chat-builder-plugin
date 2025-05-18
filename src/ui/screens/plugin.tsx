@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Text, Button, Select, Link } from 'figma-kit';
 import TextareaAutosize from 'react-textarea-autosize';
 import Navigation from '../navigation';
@@ -9,6 +9,7 @@ import chatData from '../../constants/test-data';
 import { useAnthropic } from '../context/anthropic';
 import LoadingOverlay from '../components/overlays/loading';
 import ApiKeyOverlay from '../components/overlays/api-key';
+import { MESSAGE_TYPE } from '../../constants/messages';
 
 const MESSAGE_COUNT_OPTIONS = ['5', '10', '15', '20'];
 const STYLE_OPTIONS = ['light', 'dark'];
@@ -35,6 +36,28 @@ function PluginScreen({
   const [maxMessages, setMaxMessages] = useState(defaultMaxMessages);
   const [prompt, setPrompt] = useState('');
   const [loading, setLoading] = useState(false);
+  const [hasFonts, setHasFonts] = useState(false);
+  const [hasComponentLibrary, setHasComponentLibrary] = useState(false);
+
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      const { type } = event.data.pluginMessage;
+
+      switch (type) {
+        case MESSAGE_TYPE.LOAD_REQUIRED_FONTS:
+          setHasFonts(event.data.pluginMessage.hasFonts);
+          break;
+        case MESSAGE_TYPE.HAS_COMPONENT_LIBRARY:
+          setHasComponentLibrary(event.data.pluginMessage.hasLibrary);
+          break;
+        default:
+          break;
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
 
   function renderNav(): React.JSX.Element {
     return <Navigation screen={screen} />;
@@ -165,10 +188,11 @@ function PluginScreen({
           const data = chatData;
           parent.postMessage(
             {
-              pluginMessage: { type: 'BUILD_CHAT_UI', data, style, prompt },
+              pluginMessage: { type: MESSAGE_TYPE.BUILD_CHAT_UI, data, style, prompt },
             },
             '*'
           );
+          setLoading(false);
           return;
         }
 
@@ -184,7 +208,7 @@ function PluginScreen({
         const data = cleanAndParseJson(response.content[0].text);
         parent.postMessage(
           {
-            pluginMessage: { type: 'BUILD_CHAT_UI', data, style, prompt },
+            pluginMessage: { type: MESSAGE_TYPE.BUILD_CHAT_UI, data, style, prompt },
           },
           '*'
         );
@@ -202,8 +226,26 @@ function PluginScreen({
     );
   }
 
+  console.log('hasFonts', hasFonts);
+  console.log('hasComponentLibrary', hasComponentLibrary);
+
   if (isLoading) {
     return null;
+  }
+
+  if (!hasComponentLibrary) {
+    return (
+      <div className='fixed inset-0 z-50 flex items-center justify-center bg-[var(--figma-color-bg)]'>
+        <div className='flex flex-col items-center px-4 text-center'>
+          <Text size='large' className='text-lg font-bold mb-1 text-[var(--figma-color-text)]'>
+            Missing Component Library
+          </Text>
+          <Text className='text-sm text-[var(--figma-color-text-secondary)]'>
+            Please make sure you have the iMessage Chat Builder library installed.
+          </Text>
+        </div>
+      </div>
+    );
   }
 
   return (

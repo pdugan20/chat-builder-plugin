@@ -25,9 +25,14 @@ figma.ui.onmessage = (msg) => {
 };
 
 (async () => {
+  figma.showUI(__html__, { themeColors: true, width: 295, height: 375 });
+
+  // Give the UI a moment to initialize
+  await new Promise<void>((resolve) => {
+    setTimeout(resolve, 100);
+  });
+
   await getAnthropicKey();
   await loadFonts();
   await loadCollections();
 })();
-
-figma.showUI(__html__, { themeColors: true, width: 295, height: 375 });

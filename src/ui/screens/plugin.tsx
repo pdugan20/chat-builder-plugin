@@ -47,7 +47,7 @@ function PluginScreen({
         case MESSAGE_TYPE.LOAD_REQUIRED_FONTS:
           setHasFonts(event.data.pluginMessage.hasFonts);
           break;
-        case MESSAGE_TYPE.HAS_COMPONENT_LIBRARY:
+        case MESSAGE_TYPE.LOAD_COMPONENT_LIBRARY:
           setHasComponentLibrary(event.data.pluginMessage.hasLibrary);
           break;
         default:
@@ -56,7 +56,9 @@ function PluginScreen({
     };
 
     window.addEventListener('message', handleMessage);
-    return () => window.removeEventListener('message', handleMessage);
+    return () => {
+      window.removeEventListener('message', handleMessage);
+    };
   }, []);
 
   function renderNav(): React.JSX.Element {
@@ -226,26 +228,8 @@ function PluginScreen({
     );
   }
 
-  console.log('hasFonts', hasFonts);
-  console.log('hasComponentLibrary', hasComponentLibrary);
-
   if (isLoading) {
     return null;
-  }
-
-  if (!hasComponentLibrary) {
-    return (
-      <div className='fixed inset-0 z-50 flex items-center justify-center bg-[var(--figma-color-bg)]'>
-        <div className='flex flex-col items-center px-4 text-center'>
-          <Text size='large' className='text-lg font-bold mb-1 text-[var(--figma-color-text)]'>
-            Missing Component Library
-          </Text>
-          <Text className='text-sm text-[var(--figma-color-text-secondary)]'>
-            Please make sure you have the iMessage Chat Builder library installed.
-          </Text>
-        </div>
-      </div>
-    );
   }
 
   return (

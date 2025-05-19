@@ -17,15 +17,19 @@ export default async function loadFonts() {
             (font) => font.fontName.family === requiredFont.family && font.fontName.style === requiredFont.style
           );
           if (fontToLoad) {
-            await figma.loadFontAsync(fontToLoad.fontName);
+            try {
+              await figma.loadFontAsync(fontToLoad.fontName);
+            } catch (fontError) {
+              areRequiredFontsAvailable = false;
+            }
           }
         })
       );
     }
-    console.log('areRequiredFontsAvailable', areRequiredFontsAvailable);
   } catch (err) {
-    //
+    areRequiredFontsAvailable = false;
   }
+
   figma.ui.postMessage({
     type: MESSAGE_TYPE.LOAD_REQUIRED_FONTS,
     hasFonts: areRequiredFontsAvailable,

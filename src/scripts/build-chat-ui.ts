@@ -15,18 +15,11 @@ import {
 function handleEmojiReaction(instance: InstanceNode, props: MessageInstanceProps): void {
   if (instance.exposedInstances.length > 0 && props.emojiReaction) {
     const emojiInstance: InstanceNode = instance.exposedInstances[0];
-
-    // console.log('Emoji instance:', emojiInstance.componentProperties);
-
     const emojiStyle = props.role === 'sender' ? 'color' : 'transparentBlue';
 
     if (props.role === 'recipient') {
       emojiInstance.setProperties({ Style: props.bubbleStyle });
     }
-    // console.log('Emoji id:', emojiKey[emojiStyle][props.emojiReaction].id);
-    // console.log('Emoji id:', emojiKey[emojiStyle][props.emojiReaction].id);
-
-    // console.log(emojiKey[emojiStyle][props.emojiReaction]);
 
     console.log(emojiKey);
 

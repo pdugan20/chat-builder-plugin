@@ -1,30 +1,11 @@
 import { libraryComponentKey } from '../constants/keys';
 import { ComponentSets } from '../types/chat';
 import emojiKey from '../constants/emojis';
+import { findColorHeart, addHeartToStyles, processComponent } from '../utils/components';
 
 export async function loadComponentSets(): Promise<ComponentSets> {
   const allNodes = figma.root.findAll();
   const localComponentSets = allNodes.filter((node) => node.type === 'COMPONENT_SET');
-
-  // console.log(
-  //   'Local components:',
-  //   allNodes
-  //     .filter((node) => node.type === 'COMPONENT')
-  //     .map((node) => ({
-  //       type: node.type,
-  //       name: node.name,
-  //       key: 'key' in node ? node.key : undefined,
-  //     }))
-  // );
-
-  // console.log(
-  //   'Local component sets:',
-  //   localComponentSets.map((set) => ({
-  //     name: set.name,
-  //     key: set.key,
-  //     description: set.description,
-  //   }))
-  // );
 
   const componentKeys = [
     libraryComponentKey.senderBubble.key,
@@ -36,7 +17,7 @@ export async function loadComponentSets(): Promise<ComponentSets> {
   const collections = await figma.teamLibrary.getAvailableLibraryVariableCollectionsAsync();
   const hasChatBuilderLibrary = collections.some((collection) => collection.libraryName === 'iMessage Chat Builder');
 
-  if (!hasChatBuilderLibrary) {
+  if (hasChatBuilderLibrary) {
     const localComponentKeys = componentKeys.map((key) => {
       const componentInfo = Object.values(libraryComponentKey).find((info) => info.key === key);
       if (!componentInfo) return key;
@@ -63,86 +44,31 @@ export async function updateEmojiKeyIds(): Promise<void> {
   const collections = await figma.teamLibrary.getAvailableLibraryVariableCollectionsAsync();
   const hasChatBuilderLibrary = collections.some((collection) => collection.libraryName === 'iMessage Chat Builder');
 
-  console.log(hasChatBuilderLibrary);
-
   if (!hasChatBuilderLibrary) {
-    console.log('run');
     const allNodes = figma.root.findAll();
     const localComponents = allNodes.filter(
-      (node) =>
+      (node): node is ComponentNode | ComponentSetNode =>
         (node.type === 'COMPONENT' || node.type === 'COMPONENT_SET') &&
         (node.name.startsWith('System') || node.name.startsWith('iMessage'))
     );
 
-    // First, find the color heart component to use as reference
-    const colorHeart = localComponents.find((component) => component.name.includes('/Color/Heart'));
-    const colorHeartKey = colorHeart && 'key' in colorHeart ? colorHeart.key : undefined;
-    const colorHeartId = colorHeart?.id;
-
-    // If we found the color heart, add it to all three styles
-    if (colorHeartKey && colorHeartId) {
-      ['color', 'transparentBlue', 'transparentGreen'].forEach((style) => {
-        if (!emojiKey[style]) {
-          emojiKey[style] = {};
-        }
-        emojiKey[style].heart = {
-          key: colorHeartKey,
-          id: colorHeartId,
-        };
-      });
+    const colorHeartInfo = findColorHeart(localComponents);
+    if (colorHeartInfo) {
+      addHeartToStyles(colorHeartInfo);
     }
 
-    const promises: Promise<void>[] = localComponents.map(async (component) => {
-      if (!('key' in component)) return;
-
-      // Transform name from 'iMessage/Color/Heart' to 'color.heart'
-      const nameParts = component.name.split('/');
-      if (nameParts.length < 3) return;
-
-      let style = nameParts[1].toLowerCase(); // 'Color' -> 'color'
-      // Transform specific style names
-      if (style === 'transparent android') style = 'transparentGreen';
-      if (style === 'transparent ios') style = 'transparentBlue';
-
-      let emojiName = nameParts[2].toLowerCase(); // 'Heart' -> 'heart'
-      // Transform specific emoji names
-      if (emojiName === 'thumbs up') emojiName = 'thumbsUp';
-      if (emojiName === 'thumbs down') emojiName = 'thumbsDown';
-
-      // Skip heart as it's already been added
-      if (emojiName === 'heart') return;
-
-      if (!emojiKey[style]) {
-        emojiKey[style] = {};
-      }
-
-      try {
-        const importedComponent = await figma.importComponentByKeyAsync(component.key);
-        emojiKey[style][emojiName] = {
-          key: component.key,
-          id: importedComponent.id || component.id, // Use imported ID if available, otherwise use original ID
-        };
-      } catch (error) {
-        // If import fails, use the original component's ID
-        emojiKey[style][emojiName] = {
-          key: component.key,
-          id: component.id,
-        };
-      }
-    });
-
+    const promises = localComponents.map((component) => processComponent(component));
     await Promise.all(promises);
     return;
   }
 
-  // Original library-based logic
   const promises: Promise<void>[] = Object.entries(emojiKey).flatMap(([style, emojis]) =>
     Object.entries(emojis).map(async ([key, value]) => {
       try {
         const component: ComponentNode = await figma.importComponentByKeyAsync(value.key);
         emojiKey[style][key].id = component.id;
       } catch (error) {
-        console.error(`Failed to import component for ${style}.${key}`);
+        //
       }
     })
   );

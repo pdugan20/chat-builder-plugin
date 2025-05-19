@@ -21,8 +21,6 @@ function handleEmojiReaction(instance: InstanceNode, props: MessageInstanceProps
       emojiInstance.setProperties({ Style: props.bubbleStyle });
     }
 
-    console.log(emojiKey);
-
     emojiInstance.setProperties({
       [componentPropertyName.emoji]: emojiKey[emojiStyle][props.emojiReaction].id,
     });

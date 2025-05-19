@@ -1,25 +1,72 @@
-import { colorCollection, modeId } from '../constants/collections';
+import { colorCollection as importedColorCollection, modeId } from '../constants/collections';
 import colors from '../constants/colors';
 
-let lastFrameX: number = 0;
-const frameSpacing: number = 50;
+// Constants
+const FRAME_SPACING = 50;
+const DEFAULT_PADDING = {
+  left: 16,
+  right: 12,
+};
 
+// State
+let lastFrameX = 0;
+
+// Helper functions
+async function getThreadBackgroundVariable(): Promise<Variable | null> {
+  try {
+    const threadBackground = await figma.variables.getVariableByIdAsync(colors['Background/General/Thread'].id);
+    if (threadBackground) return threadBackground;
+  } catch (error) {
+    //
+  }
+
+  const localCollections = figma.variables.getLocalVariableCollections();
+  const localColorCollection = localCollections.find((c) => c.name === 'Color');
+
+  if (localColorCollection) {
+    const variables = localColorCollection.variableIds.map((id) => figma.variables.getVariableById(id));
+    return variables.find((v) => v.name === 'Background/General/Thread') || null;
+  }
+
+  return null;
+}
+
+async function getColorCollection(): Promise<VariableCollection | null> {
+  try {
+    const collection = await figma.variables.getVariableCollectionByIdAsync(importedColorCollection.id);
+    if (collection) return collection;
+  } catch (error) {
+    //
+  }
+
+  const localCollections = figma.variables.getLocalVariableCollections();
+  return localCollections.find((c) => c.name === 'Color') || null;
+}
+
+// Frame styling functions
 export async function setFrameBackgroundFill(frame: FrameNode): Promise<void> {
-  const threadBackground = await figma.variables.getVariableByIdAsync(colors['Background/General/Thread'].id);
+  const threadBackground = await getThreadBackgroundVariable();
 
-  frame.fills = [
-    figma.variables.setBoundVariableForPaint({ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }, 'color', threadBackground),
-  ];
+  if (threadBackground) {
+    frame.fills = [
+      figma.variables.setBoundVariableForPaint(
+        { type: 'SOLID', color: { r: 1, g: 1, b: 1 } },
+        'color',
+        threadBackground
+      ),
+    ];
+  }
 }
 
 export async function setFrameStyle(frame: FrameNode, theme: 'light' | 'dark'): Promise<void> {
-  const collection = await figma.variables.getVariableCollectionByIdAsync(colorCollection.id);
-  if (!collection) {
-    return;
+  const collection = await getColorCollection();
+
+  if (collection) {
+    frame.setExplicitVariableModeForCollection(collection, modeId[theme]);
   }
-  frame.setExplicitVariableModeForCollection(collection, modeId[theme]);
 }
 
+// Frame layout functions
 export async function resizeFrame(frame: FrameNode, width: number): Promise<void> {
   frame.resize(width, frame.height);
 }
@@ -27,25 +74,30 @@ export async function resizeFrame(frame: FrameNode, width: number): Promise<void
 export function positionFrame(frame: FrameNode, width: number): void {
   frame.x = lastFrameX;
   frame.y = 0;
-  lastFrameX += width + frameSpacing;
+  lastFrameX += width + FRAME_SPACING;
 }
 
+// Main frame creation function
 export async function buildFrame(
   theme: 'light' | 'dark',
   width: number,
   itemSpacing: number,
   name: string
 ): Promise<FrameNode> {
-  const frame: FrameNode = figma.createFrame();
+  const frame = figma.createFrame();
+
+  // Set frame position
   positionFrame(frame, width);
 
+  // Apply styles
   await setFrameStyle(frame, theme);
   await resizeFrame(frame, width);
   await setFrameBackgroundFill(frame);
 
+  // Set frame properties
   frame.name = `Chat thread: ${name}`;
-  frame.paddingLeft = 16;
-  frame.paddingRight = 12;
+  frame.paddingLeft = DEFAULT_PADDING.left;
+  frame.paddingRight = DEFAULT_PADDING.right;
   frame.layoutMode = 'VERTICAL';
   frame.itemSpacing = itemSpacing;
 

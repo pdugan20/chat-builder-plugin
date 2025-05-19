@@ -26,22 +26,6 @@ export async function loadComponentSets(): Promise<ComponentSets> {
   //   }))
   // );
 
-  // Find and log components that start with System or iMessage
-  const systemComponents = allNodes.filter(
-    (node) =>
-      (node.type === 'COMPONENT' || node.type === 'COMPONENT_SET') &&
-      (node.name.startsWith('System') || node.name.startsWith('iMessage'))
-  );
-  console.log(
-    'System/iMessage components:',
-    systemComponents.map((component) => ({
-      type: component.type,
-      name: component.name,
-      key: 'key' in component ? component.key : undefined,
-      id: component.id,
-    }))
-  );
-
   const componentKeys = [
     libraryComponentKey.senderBubble.key,
     libraryComponentKey.recipientBubble.key,
@@ -79,7 +63,10 @@ export async function updateEmojiKeyIds(): Promise<void> {
   const collections = await figma.teamLibrary.getAvailableLibraryVariableCollectionsAsync();
   const hasChatBuilderLibrary = collections.some((collection) => collection.libraryName === 'iMessage Chat Builder');
 
-  if (hasChatBuilderLibrary) {
+  console.log(hasChatBuilderLibrary);
+
+  if (!hasChatBuilderLibrary) {
+    console.log('run');
     const allNodes = figma.root.findAll();
     const localComponents = allNodes.filter(
       (node) =>

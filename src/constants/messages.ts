@@ -8,7 +8,7 @@ export const MESSAGE_TYPE = {
   // UI & Component related
   BUILD_CHAT_UI: 'BUILD_CHAT_UI',
   LOAD_REQUIRED_FONTS: 'LOAD_REQUIRED_FONTS',
-  LOAD_COMPONENT_LIBRARY: 'LOAD_COMPONENT_LIBRARY',
+  HAS_COMPONENT_LIBRARY: 'HAS_COMPONENT_LIBRARY',
 } as const;
 
 export type MessageType = (typeof MESSAGE_TYPE)[keyof typeof MESSAGE_TYPE];

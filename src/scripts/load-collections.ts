@@ -6,7 +6,7 @@ export default async function loadCollections() {
     const hasLibrary = collections.some((collection) => collection.libraryName === 'iMessage Chat Builder');
 
     figma.ui.postMessage({
-      type: MESSAGE_TYPE.LOAD_COMPONENT_LIBRARY,
+      type: MESSAGE_TYPE.HAS_COMPONENT_LIBRARY,
       hasLibrary,
     });
 
@@ -17,7 +17,7 @@ export default async function loadCollections() {
     }
   } catch (error) {
     figma.ui.postMessage({
-      type: MESSAGE_TYPE.LOAD_COMPONENT_LIBRARY,
+      type: MESSAGE_TYPE.HAS_COMPONENT_LIBRARY,
       hasLibrary: false,
     });
   }

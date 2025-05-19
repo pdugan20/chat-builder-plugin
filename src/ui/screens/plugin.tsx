@@ -47,7 +47,7 @@ function PluginScreen({
         case MESSAGE_TYPE.LOAD_REQUIRED_FONTS:
           setHasFonts(event.data.pluginMessage.hasFonts);
           break;
-        case MESSAGE_TYPE.LOAD_COMPONENT_LIBRARY:
+        case MESSAGE_TYPE.HAS_COMPONENT_LIBRARY:
           setHasComponentLibrary(event.data.pluginMessage.hasLibrary);
           break;
         default:

@@ -13,7 +13,7 @@ export function AnthropicProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    onmessage = (event) => {
+    const handleMessage = (event: MessageEvent) => {
       const { type } = event.data.pluginMessage;
 
       switch (type) {
@@ -34,6 +34,9 @@ export function AnthropicProvider({ children }: { children: ReactNode }) {
           break;
       }
     };
+
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
   }, []);
 
   const value = useMemo(() => ({ anthropicKey, setAnthropicKey, isLoading }), [anthropicKey, isLoading]);

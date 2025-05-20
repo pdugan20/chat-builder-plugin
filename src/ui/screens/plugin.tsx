@@ -1,15 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Text, Button, Select, Link } from 'figma-kit';
 import TextareaAutosize from 'react-textarea-autosize';
 import Navigation from '../navigation';
 import promptExamples from '../../constants/prompts';
-import createChatQuery from '../../api/anthropic';
-import cleanAndParseJson from '../../utils/json';
-import chatData from '../../constants/test-data';
 import { useAnthropic } from '../context/anthropic';
 import LoadingOverlay from '../components/overlays/loading';
 import ApiKeyOverlay from '../components/overlays/api-key';
-import { MESSAGE_TYPE } from '../../constants/messages';
+import usePluginMessages from '../hooks/use-plugin-messages';
+import useChatGeneration from '../hooks/use-chat-generation';
 
 const MESSAGE_COUNT_OPTIONS = ['5', '10', '15', '20'];
 const STYLE_OPTIONS = ['light', 'dark'];
@@ -20,6 +18,7 @@ interface PluginScreenProps {
   defaultStyle?: string;
   defaultParticipants?: string;
   defaultMaxMessages?: string;
+  defaultPrompt?: string;
   useTestData?: boolean;
 }
 
@@ -28,42 +27,16 @@ function PluginScreen({
   defaultStyle = 'light',
   defaultParticipants = '2',
   defaultMaxMessages = '15',
+  defaultPrompt = '',
   useTestData = false,
 }: PluginScreenProps): React.JSX.Element {
   const { anthropicKey, isLoading } = useAnthropic();
+  const { hasFonts, hasComponentLibrary, hasLocalComponents } = usePluginMessages();
+  const { loading, generateChat } = useChatGeneration({ anthropicKey, useTestData });
   const [style, setStyle] = useState(defaultStyle);
   const [participants, setParticipants] = useState(defaultParticipants);
   const [maxMessages, setMaxMessages] = useState(defaultMaxMessages);
-  const [prompt, setPrompt] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [hasFonts, setHasFonts] = useState(false);
-  const [hasComponentLibrary, setHasComponentLibrary] = useState(false);
-  const [hasLocalComponents, setHasLocalComponents] = useState(false);
-
-  useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {
-      const { type } = event.data.pluginMessage;
-
-      switch (type) {
-        case MESSAGE_TYPE.LOAD_REQUIRED_FONTS:
-          setHasFonts(event.data.pluginMessage.hasFonts);
-          break;
-        case MESSAGE_TYPE.HAS_COMPONENT_LIBRARY:
-          setHasComponentLibrary(event.data.pluginMessage.hasLibrary);
-          break;
-        case MESSAGE_TYPE.HAS_LOCAL_COMPONENTS:
-          setHasLocalComponents(event.data.pluginMessage.hasLocalComponents);
-          break;
-        default:
-          break;
-      }
-    };
-
-    window.addEventListener('message', handleMessage);
-    return () => {
-      window.removeEventListener('message', handleMessage);
-    };
-  }, []);
+  const [prompt, setPrompt] = useState(defaultPrompt);
 
   function renderNav(): React.JSX.Element {
     return <Navigation screen={screen} />;
@@ -186,54 +159,19 @@ function PluginScreen({
   }
 
   function renderFooter(): React.JSX.Element {
-    const handleSubmit = async () => {
-      setLoading(true);
-
-      try {
-        if (useTestData) {
-          const data = chatData;
-          parent.postMessage(
-            {
-              pluginMessage: { type: MESSAGE_TYPE.BUILD_CHAT_UI, data, style, prompt },
-            },
-            '*'
-          );
-          setLoading(false);
-          return;
-        }
-
-        const response = await createChatQuery({
-          apiKey: anthropicKey,
-          queryInputs: { participants, maxMessages, prompt },
-        });
-
-        if (!response?.content?.[0]?.text) {
-          return;
-        }
-
-        const data = cleanAndParseJson(response.content[0].text);
-        parent.postMessage(
-          {
-            pluginMessage: { type: MESSAGE_TYPE.BUILD_CHAT_UI, data, style, prompt },
-          },
-          '*'
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
-
     return (
       <div className='footer'>
-        <Button variant='primary' size='medium' disabled={!prompt.trim() || loading} onClick={handleSubmit}>
+        <Button
+          variant='primary'
+          size='medium'
+          disabled={!prompt.trim() || loading}
+          onClick={() => generateChat({ participants, maxMessages, prompt, style })}
+        >
           Generate chat
         </Button>
       </div>
     );
   }
-
-  // console.log(hasLocalComponents);
-  // console.log(hasComponentLibrary);
 
   if (isLoading) {
     return null;

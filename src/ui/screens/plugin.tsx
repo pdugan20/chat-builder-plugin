@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import { Text, Button, Select, Link } from 'figma-kit';
 import TextareaAutosize from 'react-textarea-autosize';
 import Navigation from '../navigation';
+import AlertBanner from '../components/banners/alert';
 import promptExamples from '../../constants/prompts';
+import { MESSAGE_TYPE } from '../../constants/messages';
 import { useAnthropic } from '../context/anthropic';
 import LoadingOverlay from '../components/overlays/loading';
 import ApiKeyOverlay from '../components/overlays/api-key';
@@ -37,6 +39,10 @@ function PluginScreen({
   const [participants, setParticipants] = useState(defaultParticipants);
   const [maxMessages, setMaxMessages] = useState(defaultMaxMessages);
   const [prompt, setPrompt] = useState(defaultPrompt);
+
+  function handleReload(): void {
+    parent.postMessage({ pluginMessage: { type: MESSAGE_TYPE.RELOAD } }, '*');
+  }
 
   function renderNav(): React.JSX.Element {
     return <Navigation screen={screen} />;
@@ -181,6 +187,7 @@ function PluginScreen({
     <>
       <div className={`${anthropicKey ? 'visible' : 'invisible'} relative`}>
         {renderNav()}
+        {hasComponentLibrary && <AlertBanner onReload={handleReload} />}
         {renderBody()}
         {renderFooter()}
         {loading && <LoadingOverlay />}

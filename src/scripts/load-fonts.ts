@@ -31,7 +31,7 @@ export default async function loadFonts() {
   }
 
   figma.ui.postMessage({
-    type: MESSAGE_TYPE.LOAD_REQUIRED_FONTS,
+    type: MESSAGE_TYPE.HAS_FONTS,
     hasFonts: areRequiredFontsAvailable,
   });
 }

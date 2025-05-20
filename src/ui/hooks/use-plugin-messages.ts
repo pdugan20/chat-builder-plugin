@@ -3,43 +3,48 @@ import { MESSAGE_TYPE } from '../../constants/messages';
 
 interface PluginMessageState {
   hasFonts: boolean;
-  hasComponentLibrary: boolean;
-  hasLocalComponents: boolean;
+  hasComponentLibrary: boolean | undefined;
+  hasLocalComponents: boolean | undefined;
+  isLoading: boolean;
 }
 
 export default function usePluginMessages(): PluginMessageState {
   const [hasFonts, setHasFonts] = useState(false);
-  const [hasComponentLibrary, setHasComponentLibrary] = useState(false);
-  const [hasLocalComponents, setHasLocalComponents] = useState(false);
+  const [hasComponentLibrary, setHasComponentLibrary] = useState<boolean | undefined>(undefined);
+  const [hasLocalComponents, setHasLocalComponents] = useState<boolean | undefined>(undefined);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {
-      const { type } = event.data.pluginMessage;
+    function handleMessage(event: MessageEvent) {
+      const { type, hasFonts: fonts, hasLibrary, hasLocalComponents: localComponents } = event.data.pluginMessage;
 
       switch (type) {
         case MESSAGE_TYPE.HAS_FONTS:
-          setHasFonts(event.data.pluginMessage.hasFonts);
+          setHasFonts(fonts);
           break;
+
         case MESSAGE_TYPE.HAS_COMPONENT_LIBRARY:
-          setHasComponentLibrary(event.data.pluginMessage.hasLibrary);
+          setHasComponentLibrary(hasLibrary);
+          setIsLoading(false);
           break;
+
         case MESSAGE_TYPE.HAS_LOCAL_COMPONENTS:
-          setHasLocalComponents(event.data.pluginMessage.hasLocalComponents);
+          setHasLocalComponents(localComponents);
           break;
+
         default:
           break;
       }
-    };
+    }
 
     window.addEventListener('message', handleMessage);
-    return () => {
-      window.removeEventListener('message', handleMessage);
-    };
+    return () => window.removeEventListener('message', handleMessage);
   }, []);
 
   return {
     hasFonts,
     hasComponentLibrary,
     hasLocalComponents,
+    isLoading,
   };
 }

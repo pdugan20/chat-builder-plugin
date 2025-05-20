@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Text, Button, Select, Link } from 'figma-kit';
 import TextareaAutosize from 'react-textarea-autosize';
 import Navigation from '../navigation';
@@ -6,9 +6,9 @@ import AlertBanner from '../components/banners/alert';
 import promptExamples from '../../constants/prompts';
 import { MESSAGE_TYPE } from '../../constants/messages';
 import { useAnthropic } from '../context/anthropic';
+import { usePlugin } from '../context/plugin';
 import LoadingOverlay from '../components/overlays/loading';
 import ApiKeyOverlay from '../components/overlays/api-key';
-import usePluginMessages from '../hooks/use-plugin-messages';
 import useChatGeneration from '../hooks/use-chat-generation';
 
 const MESSAGE_COUNT_OPTIONS = ['5', '10', '15', '20'];
@@ -32,17 +32,19 @@ function PluginScreen({
   defaultPrompt = '',
   useTestData = false,
 }: PluginScreenProps): React.JSX.Element {
-  const { anthropicKey, isLoading } = useAnthropic();
-  const { hasFonts, hasComponentLibrary, hasLocalComponents } = usePluginMessages();
+  const { anthropicKey, isLoading: isAnthropicLoading } = useAnthropic();
+  const {
+    state: { hasComponentLibrary, hasLocalComponents, isLoading: isPluginLoading },
+  } = usePlugin();
   const { loading, generateChat } = useChatGeneration({ anthropicKey, useTestData });
   const [style, setStyle] = useState(defaultStyle);
   const [participants, setParticipants] = useState(defaultParticipants);
   const [maxMessages, setMaxMessages] = useState(defaultMaxMessages);
   const [prompt, setPrompt] = useState(defaultPrompt);
 
-  function handleReload(): void {
+  const handleReload = useCallback((): void => {
     parent.postMessage({ pluginMessage: { type: MESSAGE_TYPE.RELOAD } }, '*');
-  }
+  }, []);
 
   function renderNav(): React.JSX.Element {
     return <Navigation screen={screen} />;
@@ -179,17 +181,19 @@ function PluginScreen({
     );
   }
 
-  if (isLoading) {
+  if (isAnthropicLoading) {
     return null;
   }
 
   return (
     <>
-      <div className={`${anthropicKey ? 'visible' : 'invisible'} relative`}>
-        {renderNav()}
-        {hasComponentLibrary && <AlertBanner onReload={handleReload} />}
-        {renderBody()}
-        {renderFooter()}
+      <div className={`${anthropicKey && !isPluginLoading ? 'visible' : 'invisible'} relative`}>
+        <div className='fixed inset-x-0 top-0 z-10 bg-[var(--figma-color-bg)]'>{renderNav()}</div>
+        <div className='mt-10'>
+          {hasComponentLibrary === true && hasLocalComponents === false && <AlertBanner onReload={handleReload} />}
+          {renderBody()}
+          {renderFooter()}
+        </div>
         {loading && <LoadingOverlay />}
       </div>
       {!anthropicKey && <ApiKeyOverlay />}

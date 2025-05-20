@@ -2,7 +2,7 @@ import React from 'react';
 import { Text, Link, AlertDialog } from 'figma-kit';
 import UpdateKeyDialog from '../dialogs/update-key';
 import { useAnthropic } from '../../context/anthropic';
-import AnthropicLogo from '../icons/anthropic-logo';
+import AnthropicLogo from '../logos/anthropic';
 
 interface ApiKeyOverlayProps {
   showLogo?: boolean;

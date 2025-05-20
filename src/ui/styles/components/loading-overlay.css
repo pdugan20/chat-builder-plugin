@@ -1,6 +1,6 @@
 .loading-overlay {
   background-color: var(--figma-color-bg);
-  opacity: 0.95;
+  opacity: 1;
   backdrop-filter: blur(4px);
 }
 

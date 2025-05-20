@@ -7,10 +7,10 @@ interface LoadingOverlayProps {
 
 const loadingStages = [
   'Initializing chat generation',
-  'Analyzing conversation parameters',
-  'Crafting messages and reactions',
+  'Analyzing conversation inputs',
+  'Authoring messages and reactions',
   'Formatting conversation data',
-  'Almost there',
+  'Finishing up',
 ];
 
 const TIMEOUT_DURATION = 30000;

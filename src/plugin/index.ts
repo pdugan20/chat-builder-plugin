@@ -1,6 +1,6 @@
 import getAnthropicKey from '../scripts/get-key';
 import loadFonts from '../scripts/load-fonts';
-import loadCollections from '../scripts/load-collections';
+import { checkIfHasLibrary, checkIfHasLocalComponents } from '../scripts/check-components';
 import updateAnthropicKey from '../scripts/update-key';
 import notifyUser from '../scripts/api-error';
 import buildChatUserInterface from '../scripts/build-chat-ui';
@@ -34,5 +34,6 @@ figma.ui.onmessage = (msg) => {
 
   await getAnthropicKey();
   await loadFonts();
-  await loadCollections();
+  await checkIfHasLibrary();
+  await checkIfHasLocalComponents();
 })();

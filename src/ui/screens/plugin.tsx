@@ -38,6 +38,7 @@ function PluginScreen({
   const [loading, setLoading] = useState(false);
   const [hasFonts, setHasFonts] = useState(false);
   const [hasComponentLibrary, setHasComponentLibrary] = useState(false);
+  const [hasLocalComponents, setHasLocalComponents] = useState(false);
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
@@ -49,6 +50,9 @@ function PluginScreen({
           break;
         case MESSAGE_TYPE.HAS_COMPONENT_LIBRARY:
           setHasComponentLibrary(event.data.pluginMessage.hasLibrary);
+          break;
+        case MESSAGE_TYPE.HAS_LOCAL_COMPONENTS:
+          setHasLocalComponents(event.data.pluginMessage.hasLocalComponents);
           break;
         default:
           break;
@@ -227,6 +231,9 @@ function PluginScreen({
       </div>
     );
   }
+
+  // console.log(hasLocalComponents);
+  // console.log(hasComponentLibrary);
 
   if (isLoading) {
     return null;

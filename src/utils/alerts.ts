@@ -15,7 +15,7 @@ export function getAlertData(state: PluginState): AlertData | null {
     return ALERT_DATA.missingComponent;
   }
 
-  if (!showMissingFontBanner(state)) {
+  if (showMissingFontBanner(state)) {
     return ALERT_DATA.missingFont;
   }
 

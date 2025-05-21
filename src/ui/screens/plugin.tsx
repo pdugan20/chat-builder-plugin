@@ -46,6 +46,52 @@ function PluginScreen({
     return <Navigation screen={screen} />;
   }
 
+  function renderAlertBannerAndOverlay(): { banner: React.JSX.Element | null; showOverlay: boolean } {
+    const state = {
+      hasComponentLibrary,
+      hasLocalComponents,
+      hasFonts,
+      isLoading: isPluginLoading,
+    };
+
+    if (showMissingComponentBanner(state)) {
+      return {
+        banner: (
+          <AlertBanner
+            text={
+              <>
+                This plugin requires use of the <Link href='#'>iMessage Chat Builder UI Kit</Link>.{' '}
+              </>
+            }
+            buttonText='Get UI kit'
+            onButtonClick={handleGetUIKit}
+          />
+        ),
+        showOverlay: true,
+      };
+    }
+
+    if (showMissingFontBanner(state)) {
+      return {
+        banner: (
+          <AlertBanner
+            text={
+              <>
+                This plugin requires use of the{' '}
+                <Link href='https://developer.apple.com/fonts/'>SF Pro font family</Link>.{' '}
+              </>
+            }
+            buttonText='Get font'
+            onButtonClick={handleGetFont}
+          />
+        ),
+        showOverlay: true,
+      };
+    }
+
+    return { banner: null, showOverlay: false };
+  }
+
   function renderStyleSelect(): React.JSX.Element {
     return (
       <div className='row-item'>
@@ -110,6 +156,8 @@ function PluginScreen({
       setPrompt('');
     };
 
+    const { showOverlay } = renderAlertBannerAndOverlay();
+
     return (
       <div className='row-item'>
         <div className='heading-parent'>
@@ -123,6 +171,7 @@ function PluginScreen({
                     e.preventDefault();
                     clearPrompt();
                   }}
+                  className={showOverlay ? 'text-[var(--figma-color-text-disabled)]' : ''}
                 >
                   Clear
                 </Link>
@@ -135,6 +184,7 @@ function PluginScreen({
                 e.preventDefault();
                 shufflePrompt();
               }}
+              className={showOverlay ? 'text-[var(--figma-color-text-disabled)]' : ''}
             >
               Shuffle prompt
             </Link>
@@ -177,46 +227,6 @@ function PluginScreen({
     );
   }
 
-  function maybeRenderAlertBanner(): React.JSX.Element | null {
-    const state = {
-      hasComponentLibrary,
-      hasLocalComponents,
-      hasFonts,
-      isLoading: isPluginLoading,
-    };
-
-    if (showMissingComponentBanner(state)) {
-      return (
-        <AlertBanner
-          text={
-            <>
-              This plugin requires use of the <Link href='#'>iMessage Chat Builder UI Kit</Link>.{' '}
-            </>
-          }
-          buttonText='Get UI kit'
-          onButtonClick={handleGetUIKit}
-        />
-      );
-    }
-
-    if (showMissingFontBanner(state)) {
-      return (
-        <AlertBanner
-          text={
-            <>
-              This plugin requires use of the <Link href='https://developer.apple.com/fonts/'>SF Pro font family</Link>
-              .{' '}
-            </>
-          }
-          buttonText='Get font'
-          onButtonClick={handleGetFont}
-        />
-      );
-    }
-
-    return null;
-  }
-
   if (isAnthropicLoading) {
     return null;
   }
@@ -225,10 +235,22 @@ function PluginScreen({
     <>
       <div className={`${anthropicKey && !isPluginLoading ? 'visible' : 'invisible'} relative`}>
         <div className='fixed inset-x-0 top-0 z-10 bg-[var(--figma-color-bg)]'>{renderNav()}</div>
-        <div className='scrollable mt-10'>
-          {maybeRenderAlertBanner()}
-          {renderBody()}
-          {renderFooter()}
+        <div className='scrollable relative mt-10'>
+          {(() => {
+            const { banner, showOverlay } = renderAlertBannerAndOverlay();
+            return (
+              <>
+                {banner}
+                <div className='relative'>
+                  {showOverlay && <div className='absolute inset-0 z-10 bg-[var(--figma-color-bg)] opacity-60' />}
+                  <div className={showOverlay ? 'pointer-events-none' : ''}>
+                    {renderBody()}
+                    {renderFooter()}
+                  </div>
+                </div>
+              </>
+            );
+          })()}
         </div>
         {loading && <LoadingOverlay />}
       </div>

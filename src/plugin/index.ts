@@ -33,10 +33,6 @@ figma.ui.onmessage = (msg) => {
       notifyUser(msg.errorType);
       break;
 
-    case MESSAGE_TYPE.RESIZE:
-      figma.ui.resize(PLUGIN_WIDTH, msg.height);
-      break;
-
     case MESSAGE_TYPE.RELOAD:
       figma.showUI(__html__, { themeColors: true, width: PLUGIN_WIDTH, height: PLUGIN_HEIGHT.DEFAULT });
       initializePlugin();

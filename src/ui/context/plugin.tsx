@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { MESSAGE_TYPE } from '../../constants/messages';
 
-interface PluginState {
+export interface PluginState {
   hasFonts: boolean;
   hasComponentLibrary: boolean | undefined;
   hasLocalComponents: boolean | undefined;

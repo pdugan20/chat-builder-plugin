@@ -1,15 +1,15 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { Text, Button, Select, Link } from 'figma-kit';
 import TextareaAutosize from 'react-textarea-autosize';
 import Navigation from '../navigation';
 import AlertBanner from '../components/banners/alert';
 import promptExamples from '../../constants/prompts';
-import { MESSAGE_TYPE } from '../../constants/messages';
 import { useAnthropic } from '../context/anthropic';
 import { usePlugin } from '../context/plugin';
 import LoadingOverlay from '../components/overlays/loading';
 import ApiKeyOverlay from '../components/overlays/api-key';
 import useChatGeneration from '../hooks/use-chat-generation';
+import { showMissingComponentBanner, showMissingFontBanner, handleGetFont, handleGetUIKit } from '../../utils/alerts';
 
 const MESSAGE_COUNT_OPTIONS = ['5', '10', '15', '20'];
 const STYLE_OPTIONS = ['light', 'dark'];
@@ -34,17 +34,13 @@ function PluginScreen({
 }: PluginScreenProps): React.JSX.Element {
   const { anthropicKey, isLoading: isAnthropicLoading } = useAnthropic();
   const {
-    state: { hasComponentLibrary, hasLocalComponents, isLoading: isPluginLoading },
+    state: { hasComponentLibrary, hasLocalComponents, isLoading: isPluginLoading, hasFonts },
   } = usePlugin();
   const { loading, generateChat } = useChatGeneration({ anthropicKey, useTestData });
   const [style, setStyle] = useState(defaultStyle);
   const [participants, setParticipants] = useState(defaultParticipants);
   const [maxMessages, setMaxMessages] = useState(defaultMaxMessages);
   const [prompt, setPrompt] = useState(defaultPrompt);
-
-  const handleReload = useCallback((): void => {
-    parent.postMessage({ pluginMessage: { type: MESSAGE_TYPE.RELOAD } }, '*');
-  }, []);
 
   function renderNav(): React.JSX.Element {
     return <Navigation screen={screen} />;
@@ -181,6 +177,46 @@ function PluginScreen({
     );
   }
 
+  function maybeRenderAlertBanner(): React.JSX.Element | null {
+    const state = {
+      hasComponentLibrary,
+      hasLocalComponents,
+      hasFonts,
+      isLoading: isPluginLoading,
+    };
+
+    if (showMissingComponentBanner(state)) {
+      return (
+        <AlertBanner
+          text={
+            <>
+              This plugin requires use of the <Link href='#'>iMessage Chat Builder UI Kit</Link>.{' '}
+            </>
+          }
+          buttonText='Get UI kit'
+          onButtonClick={handleGetUIKit}
+        />
+      );
+    }
+
+    if (showMissingFontBanner(state)) {
+      return (
+        <AlertBanner
+          text={
+            <>
+              This plugin requires use of the <Link href='https://developer.apple.com/fonts/'>SF Pro font family</Link>
+              .{' '}
+            </>
+          }
+          buttonText='Get font'
+          onButtonClick={handleGetFont}
+        />
+      );
+    }
+
+    return null;
+  }
+
   if (isAnthropicLoading) {
     return null;
   }
@@ -189,8 +225,8 @@ function PluginScreen({
     <>
       <div className={`${anthropicKey && !isPluginLoading ? 'visible' : 'invisible'} relative`}>
         <div className='fixed inset-x-0 top-0 z-10 bg-[var(--figma-color-bg)]'>{renderNav()}</div>
-        <div className='mt-10'>
-          {hasComponentLibrary === true && hasLocalComponents === false && <AlertBanner onReload={handleReload} />}
+        <div className='scrollable mt-10'>
+          {maybeRenderAlertBanner()}
           {renderBody()}
           {renderFooter()}
         </div>

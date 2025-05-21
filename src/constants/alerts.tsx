@@ -13,7 +13,7 @@ export const ALERT_DATA = {
     text: (
       <>
         This plugin requires use of the{' '}
-        <Link href={URLS.UI_KIT} target='_blank'>
+        <Link href={URLS.UI_KIT} target='_blank' rel='noopener noreferrer'>
           iMessage Chat Builder UI Kit
         </Link>
         .{' '}
@@ -26,7 +26,7 @@ export const ALERT_DATA = {
     text: (
       <>
         This plugin requires use of the{' '}
-        <Link href={URLS.SF_PRO_FONTS} target='_blank'>
+        <Link href={URLS.SF_PRO_FONTS} target='_blank' rel='noopener noreferrer'>
           SF Pro font family
         </Link>
         .{' '}

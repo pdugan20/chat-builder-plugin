@@ -1,0 +1,32 @@
+.scrollable {
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--figma-color-bg-disabled) transparent;
+  position: relative;
+}
+
+.scrollable::-webkit-scrollbar {
+  width: 8px;
+}
+
+.scrollable::-webkit-scrollbar-track {
+  background: transparent;
+  width: 8px !important;
+}
+
+.scrollable::-webkit-scrollbar-thumb {
+  background-color: transparent;
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  width: 8px !important;
+
+  &:hover {
+    width: 8px !important;
+  }
+}
+
+.scrollable:hover::-webkit-scrollbar-thumb {
+  background-color: var(--figma-color-bg-disabled);
+  border: 2px solid transparent;
+}

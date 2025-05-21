@@ -27,7 +27,7 @@ function AlertBanner({
         )}
         <Text className='text-sm text-[var(--figma-color-text)]'>{text}</Text>
       </div>
-      {showButton && (
+      {showButton && onButtonClick && (
         <Button variant='secondary' size='small' onClick={onButtonClick}>
           {buttonText}
         </Button>

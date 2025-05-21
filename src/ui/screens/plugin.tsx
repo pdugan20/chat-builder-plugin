@@ -8,8 +8,9 @@ import { useAnthropic } from '../context/anthropic';
 import { usePlugin } from '../context/plugin';
 import LoadingOverlay from '../components/overlays/loading';
 import ApiKeyOverlay from '../components/overlays/api-key';
+import DisabledOverlay from '../components/overlays/disabled';
 import useChatGeneration from '../hooks/use-chat-generation';
-import { showMissingComponentBanner, showMissingFontBanner, handleGetFont, handleGetUIKit } from '../../utils/alerts';
+import { getAlertData, getDisabledLinkClass } from '../../utils/alerts';
 
 const MESSAGE_COUNT_OPTIONS = ['5', '10', '15', '20'];
 const STYLE_OPTIONS = ['light', 'dark'];
@@ -46,7 +47,7 @@ function PluginScreen({
     return <Navigation screen={screen} />;
   }
 
-  function renderAlertBannerAndOverlay(): { banner: React.JSX.Element | null; showOverlay: boolean } {
+  function renderAlertBannerAndOverlay(): { banner: React.JSX.Element | null; showDisabledOverlay: boolean } {
     const state = {
       hasComponentLibrary,
       hasLocalComponents,
@@ -54,42 +55,17 @@ function PluginScreen({
       isLoading: isPluginLoading,
     };
 
-    if (showMissingComponentBanner(state)) {
-      return {
-        banner: (
-          <AlertBanner
-            text={
-              <>
-                This plugin requires use of the <Link href='#'>iMessage Chat Builder UI Kit</Link>.{' '}
-              </>
-            }
-            buttonText='Get UI kit'
-            onButtonClick={handleGetUIKit}
-          />
-        ),
-        showOverlay: true,
-      };
+    const alertData = getAlertData(state);
+    if (!alertData) {
+      return { banner: null, showDisabledOverlay: false };
     }
 
-    if (showMissingFontBanner(state)) {
-      return {
-        banner: (
-          <AlertBanner
-            text={
-              <>
-                This plugin requires use of the{' '}
-                <Link href='https://developer.apple.com/fonts/'>SF Pro font family</Link>.{' '}
-              </>
-            }
-            buttonText='Get font'
-            onButtonClick={handleGetFont}
-          />
-        ),
-        showOverlay: true,
-      };
-    }
-
-    return { banner: null, showOverlay: false };
+    return {
+      banner: (
+        <AlertBanner text={alertData.text} buttonText={alertData.buttonText} onButtonClick={alertData.onButtonClick} />
+      ),
+      showDisabledOverlay: true,
+    };
   }
 
   function renderStyleSelect(): React.JSX.Element {
@@ -156,7 +132,7 @@ function PluginScreen({
       setPrompt('');
     };
 
-    const { showOverlay } = renderAlertBannerAndOverlay();
+    const { showDisabledOverlay } = renderAlertBannerAndOverlay();
 
     return (
       <div className='row-item'>
@@ -171,7 +147,7 @@ function PluginScreen({
                     e.preventDefault();
                     clearPrompt();
                   }}
-                  className={showOverlay ? 'text-[var(--figma-color-text-disabled)]' : ''}
+                  className={getDisabledLinkClass(showDisabledOverlay)}
                 >
                   Clear
                 </Link>
@@ -184,7 +160,7 @@ function PluginScreen({
                 e.preventDefault();
                 shufflePrompt();
               }}
-              className={showOverlay ? 'text-[var(--figma-color-text-disabled)]' : ''}
+              className={getDisabledLinkClass(showDisabledOverlay)}
             >
               Shuffle prompt
             </Link>
@@ -237,13 +213,13 @@ function PluginScreen({
         <div className='fixed inset-x-0 top-0 z-10 bg-[var(--figma-color-bg)]'>{renderNav()}</div>
         <div className='scrollable relative mt-10'>
           {(() => {
-            const { banner, showOverlay } = renderAlertBannerAndOverlay();
+            const { banner, showDisabledOverlay } = renderAlertBannerAndOverlay();
             return (
               <>
                 {banner}
                 <div className='relative'>
-                  {showOverlay && <div className='absolute inset-0 z-10 bg-[var(--figma-color-bg)] opacity-60' />}
-                  <div className={showOverlay ? 'pointer-events-none' : ''}>
+                  {showDisabledOverlay && <DisabledOverlay />}
+                  <div className={showDisabledOverlay ? 'pointer-events-none' : ''}>
                     {renderBody()}
                     {renderFooter()}
                   </div>

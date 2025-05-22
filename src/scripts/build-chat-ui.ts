@@ -11,6 +11,7 @@ import {
   createTimestampInstance,
   createStatusInstance,
 } from '../services/component';
+import { modeId } from '../constants/collections';
 
 // Track the original x position
 let originalX = 0;
@@ -49,7 +50,6 @@ function createFrameComponent(tempFrame: FrameNode): ComponentNode {
   frameComponent.paddingTop = tempFrame.paddingTop;
   frameComponent.paddingBottom = tempFrame.paddingBottom;
   frameComponent.itemSpacing = tempFrame.itemSpacing;
-  frameComponent.fills = tempFrame.fills;
 
   return frameComponent;
 }
@@ -217,6 +217,30 @@ async function createMessageInstance(
   return instance;
 }
 
+function setFrameThemeAndBackground(frame: FrameNode | ComponentNode, theme: 'light' | 'dark'): void {
+  const localCollections = figma.variables.getLocalVariableCollections();
+  const localColorCollection = localCollections.find((c) => c.name === 'Color');
+
+  if (localColorCollection) {
+    // Set the variable mode
+    frame.setExplicitVariableModeForCollection(localColorCollection, modeId[theme]);
+
+    // Get and set the background color
+    const variables = localColorCollection.variableIds.map((id) => figma.variables.getVariableById(id));
+    const threadBackground = variables.find((v) => v.name === 'Background/General/Thread');
+
+    if (threadBackground) {
+      frame.fills = [
+        figma.variables.setBoundVariableForPaint(
+          { type: 'SOLID', color: { r: 1, g: 1, b: 1 } },
+          'color',
+          threadBackground
+        ),
+      ];
+    }
+  }
+}
+
 export default async function buildChatUserInterface({
   theme = 'light',
   width = 402,
@@ -278,13 +302,31 @@ export default async function buildChatUserInterface({
   frameComponent.x = originalX;
   originalX += 1104;
 
+  // Set theme and background on the frame component
+  setFrameThemeAndBackground(frameComponent, theme);
+
   // Create the thread component
   const tempThreadComponent = createThreadComponent(threadVariant, recipientName, items);
 
   // Create and position the prototype frame
   const prototypeFrame = createPrototypeFrame(tempThreadComponent, frameComponent);
+  setFrameThemeAndBackground(prototypeFrame, theme);
   const threadInstance = tempThreadComponent.createInstance();
   prototypeFrame.appendChild(threadInstance);
+
+  // Find the placeholder in the component
+  const placeholder = tempThreadComponent.findOne((node) => node.name === 'PLACEHOLDER_THREAD');
+  if (placeholder) {
+    // Create instance of the component
+    const frameInstance = frameComponent.createInstance();
+    frameInstance.paddingTop = 142;
+    frameInstance.paddingBottom = 82;
+
+    // Insert the frame instance into the component
+    placeholder.parent?.insertChild(placeholder.parent.children.indexOf(placeholder), frameInstance);
+    placeholder.remove();
+    frameInstance.y = 0;
+  }
 
   // Clean up temporary components
   tempFrame.remove();

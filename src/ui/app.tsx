@@ -7,7 +7,7 @@ import { PluginProvider } from './context/plugin';
 
 import './styles/app.css';
 
-const USE_TEST_DATA = false;
+const USE_TEST_DATA = true;
 
 function App(): React.JSX.Element {
   return (

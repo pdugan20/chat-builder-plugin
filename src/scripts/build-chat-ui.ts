@@ -15,6 +15,98 @@ import {
 // Track the original x position
 let originalX = 0;
 
+function findThreadComponentSet(): ComponentSetNode | undefined {
+  const allNodes = figma.root.findAll();
+  return allNodes.find((node) => node.type === 'COMPONENT_SET' && node.name === 'Thread') as
+    | ComponentSetNode
+    | undefined;
+}
+
+function findType11Variant(threadComponentSet: ComponentSetNode): ComponentNode | undefined {
+  const variants = threadComponentSet.children as ComponentNode[];
+  return variants.find((variant) => variant.name === 'Type=1:1');
+}
+
+function createFrameComponent(tempFrame: FrameNode): ComponentNode {
+  const frameComponent = figma.createComponent();
+  frameComponent.name = tempFrame.name;
+  frameComponent.resize(tempFrame.width, tempFrame.height);
+
+  // Clone children
+  tempFrame.children.forEach((child) => {
+    if ('clone' in child) {
+      const childClone = child.clone();
+      frameComponent.appendChild(childClone);
+    }
+  });
+
+  // Copy properties
+  frameComponent.layoutMode = tempFrame.layoutMode;
+  frameComponent.primaryAxisSizingMode = tempFrame.primaryAxisSizingMode;
+  frameComponent.counterAxisSizingMode = tempFrame.counterAxisSizingMode;
+  frameComponent.paddingLeft = tempFrame.paddingLeft;
+  frameComponent.paddingRight = tempFrame.paddingRight;
+  frameComponent.paddingTop = tempFrame.paddingTop;
+  frameComponent.paddingBottom = tempFrame.paddingBottom;
+  frameComponent.itemSpacing = tempFrame.itemSpacing;
+  frameComponent.fills = tempFrame.fills;
+
+  return frameComponent;
+}
+
+function setPersonaProperties(tempThreadComponent: ComponentNode, items: ChatItem[]): void {
+  const persona = tempThreadComponent.findOne((node) => node.name === 'Persona');
+  const rootNodes = figma.root.findAll();
+  const personaSet = rootNodes.find((node) => node.type === 'COMPONENT_SET' && node.name === 'Persona');
+
+  if (personaSet && persona && 'setProperties' in persona) {
+    const recipientGender = getRecipientGender(items).charAt(0).toUpperCase() + getRecipientGender(items).slice(1);
+    const personaVariants = (personaSet as ComponentSetNode).children as ComponentNode[];
+    const matchingVariants = personaVariants.filter((variant) => variant.name.includes(recipientGender));
+
+    if (matchingVariants.length > 0) {
+      const randomVariant = matchingVariants[Math.floor(Math.random() * matchingVariants.length)];
+      (persona as InstanceNode).mainComponent = randomVariant;
+    }
+  }
+}
+
+function createThreadComponent(threadVariant: ComponentNode, recipientName: string, items: ChatItem[]): ComponentNode {
+  const tempThreadComponent = figma.createComponent();
+  tempThreadComponent.name = 'Thread';
+  tempThreadComponent.resize(threadVariant.width, threadVariant.height);
+
+  // Clone variant children
+  threadVariant.children.forEach((child) => {
+    if ('clone' in child) {
+      const childClone = child.clone();
+      tempThreadComponent.appendChild(childClone);
+    }
+  });
+
+  // Set navigation bar properties
+  const navBar = tempThreadComponent.findOne((node) => node.name === 'Thread Navigation Bar');
+  if (navBar && 'setProperties' in navBar) {
+    (navBar as InstanceNode).setProperties({ 'Chat name#424:0': recipientName });
+  }
+
+  // Set persona properties
+  setPersonaProperties(tempThreadComponent, items);
+
+  return tempThreadComponent;
+}
+
+function createPrototypeFrame(tempThreadComponent: ComponentNode, frameComponent: ComponentNode): FrameNode {
+  const prototypeFrame = figma.createFrame();
+  prototypeFrame.name = 'Prototype';
+  prototypeFrame.resize(tempThreadComponent.width, tempThreadComponent.height);
+  prototypeFrame.x = frameComponent.x + frameComponent.width + 50;
+  prototypeFrame.y = frameComponent.y;
+  prototypeFrame.cornerRadius = 40;
+
+  return prototypeFrame;
+}
+
 function handleEmojiReaction(instance: InstanceNode, props: MessageInstanceProps): void {
   if (instance.exposedInstances.length > 0 && props.emojiReaction) {
     const emojiInstance: InstanceNode = instance.exposedInstances[0];
@@ -136,13 +228,13 @@ export default async function buildChatUserInterface({
   const messages: string[] = [];
   const items = data;
   const { senderSet, recipientSet, statusSet, timestampSet } = await loadComponentSets();
-  const frame: FrameNode = await buildFrame(theme, width, itemSpacing, name);
+  const tempFrame: FrameNode = await buildFrame(theme, width, itemSpacing, name);
 
   // Create and append timestamp
   const { date, time } = getFirstChatItemDateTime(items);
   const timestampInstance = await createTimestampInstance(timestampSet, date, time);
 
-  frame.appendChild(timestampInstance);
+  tempFrame.appendChild(timestampInstance);
   timestampInstance.layoutSizingHorizontal = 'FILL';
 
   // Update emoji IDs
@@ -154,7 +246,7 @@ export default async function buildChatUserInterface({
     const messageInstance = await createMessageInstance(item, index, componentSet, bubbleStyle, messages, items);
 
     if (messageInstance) {
-      frame.appendChild(messageInstance);
+      tempFrame.appendChild(messageInstance);
       messageInstance.layoutSizingHorizontal = 'FILL';
     }
   });
@@ -168,121 +260,36 @@ export default async function buildChatUserInterface({
     hasAction
   );
 
-  frame.appendChild(statusInstance);
+  tempFrame.appendChild(statusInstance);
   statusInstance.layoutSizingHorizontal = 'FILL';
 
   await Promise.all(messagePromises);
-  figma.viewport.scrollAndZoomIntoView([frame]);
 
-  // Search for Thread component set
-  const allNodes = figma.root.findAll();
-  const threadComponentSet = allNodes.find((node) => node.type === 'COMPONENT_SET' && node.name === 'Thread');
+  // Find the Thread component set
+  const threadComponentSet = findThreadComponentSet();
+  if (!threadComponentSet) return;
 
-  if (threadComponentSet) {
-    const variants = (threadComponentSet as ComponentSetNode).children as ComponentNode[];
-    variants.map((variant) => ({
-      name: variant.name,
-      key: variant.key,
-      description: variant.description,
-    }));
+  // Get the Type=1:1 variant
+  const threadVariant = findType11Variant(threadComponentSet);
+  if (!threadVariant) return;
 
-    // Find and create instance of Type=1:1 variant
-    const type11Variant = variants.find((variant) => variant.name === 'Type=1:1');
-    if (type11Variant) {
-      // Create a component from the frame
-      const frameComponent = figma.createComponent();
-      frameComponent.name = frame.name;
-      frameComponent.resize(frame.width, frame.height);
-      frameComponent.x = originalX;
-      originalX += 1104;
+  // Create the frame component
+  const frameComponent = createFrameComponent(tempFrame);
+  frameComponent.x = originalX;
+  originalX += 1104;
 
-      // Clone the frame's children to the component
-      frame.children.forEach((child) => {
-        if ('clone' in child) {
-          const childClone = child.clone();
-          frameComponent.appendChild(childClone);
-        }
-      });
+  // Create the thread component
+  const tempThreadComponent = createThreadComponent(threadVariant, recipientName, items);
 
-      // Copy the frame's properties to the component
-      frameComponent.layoutMode = frame.layoutMode;
-      frameComponent.primaryAxisSizingMode = frame.primaryAxisSizingMode;
-      frameComponent.counterAxisSizingMode = frame.counterAxisSizingMode;
-      frameComponent.paddingLeft = frame.paddingLeft;
-      frameComponent.paddingRight = frame.paddingRight;
-      frameComponent.paddingTop = frame.paddingTop;
-      frameComponent.paddingBottom = frame.paddingBottom;
-      frameComponent.itemSpacing = frame.itemSpacing;
+  // Create and position the prototype frame
+  const prototypeFrame = createPrototypeFrame(tempThreadComponent, frameComponent);
+  const threadInstance = tempThreadComponent.createInstance();
+  prototypeFrame.appendChild(threadInstance);
 
-      // Set the background color
-      frameComponent.fills = frame.fills;
+  // Clean up temporary components
+  tempFrame.remove();
+  tempThreadComponent.remove();
 
-      // Create instance of the component
-      const frameInstance = frameComponent.createInstance();
-      frameInstance.paddingTop = 142;
-      frameInstance.paddingBottom = 82;
-
-      // Create a new component from the Thread variant
-      const threadComponent = figma.createComponent();
-      threadComponent.name = 'Thread';
-      threadComponent.resize(type11Variant.width, type11Variant.height);
-
-      // Clone the variant's children to the component
-      type11Variant.children.forEach((child) => {
-        if ('clone' in child) {
-          const childClone = child.clone();
-          threadComponent.appendChild(childClone);
-        }
-      });
-
-      const navBar = threadComponent.findOne((node) => node.name === 'Thread Navigation Bar');
-      if (navBar && 'setProperties' in navBar) {
-        (navBar as InstanceNode).setProperties({ 'Chat name#424:0': recipientName });
-      }
-
-      const persona = threadComponent.findOne((node) => node.name === 'Persona');
-      const rootNodes = figma.root.findAll();
-      const personaSet = rootNodes.find((node) => node.type === 'COMPONENT_SET' && node.name === 'Persona');
-      if (personaSet) {
-        const recipientGender = getRecipientGender(items).charAt(0).toUpperCase() + getRecipientGender(items).slice(1);
-        const personaVariants = (personaSet as ComponentSetNode).children as ComponentNode[];
-        const matchingVariants = personaVariants.filter((variant) => variant.name.includes(recipientGender));
-
-        if (matchingVariants.length > 0) {
-          const randomVariant = matchingVariants[Math.floor(Math.random() * matchingVariants.length)];
-          if (persona && 'setProperties' in persona) {
-            (persona as InstanceNode).mainComponent = randomVariant;
-          }
-        }
-      }
-
-      // Find the placeholder in the component
-      const placeholder = threadComponent.findOne((node) => node.name === 'PLACEHOLDER_THREAD');
-      if (placeholder) {
-        // Insert the frame instance into the component
-        placeholder.parent?.insertChild(placeholder.parent.children.indexOf(placeholder), frameInstance);
-        placeholder.remove();
-        frameInstance.y = 0;
-      }
-
-      // Create a frame to contain the thread instance
-      const prototypeFrame = figma.createFrame();
-      prototypeFrame.name = 'Prototype';
-      prototypeFrame.resize(threadComponent.width, threadComponent.height);
-      prototypeFrame.x = frameComponent.x + frameComponent.width + 50;
-      prototypeFrame.y = frameComponent.y;
-      prototypeFrame.cornerRadius = 40;
-
-      // Create and add the thread instance to the prototype frame
-      const threadInstance = threadComponent.createInstance();
-      prototypeFrame.appendChild(threadInstance);
-
-      // Remove the original frame and the Thread component
-      frame.remove();
-      threadComponent.remove();
-
-      // Resize and zoom viewport to show both frames
-      figma.viewport.scrollAndZoomIntoView([frameComponent, prototypeFrame]);
-    }
-  }
+  // Focus viewport on the new components
+  figma.viewport.scrollAndZoomIntoView([frameComponent, prototypeFrame]);
 }

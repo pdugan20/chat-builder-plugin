@@ -12,6 +12,9 @@ import {
   createStatusInstance,
 } from '../services/component';
 
+// Track the original x position
+let originalX = 0;
+
 function handleEmojiReaction(instance: InstanceNode, props: MessageInstanceProps): void {
   if (instance.exposedInstances.length > 0 && props.emojiReaction) {
     const emojiInstance: InstanceNode = instance.exposedInstances[0];
@@ -190,6 +193,8 @@ export default async function buildChatUserInterface({
       const frameComponent = figma.createComponent();
       frameComponent.name = frame.name;
       frameComponent.resize(frame.width, frame.height);
+      frameComponent.x = originalX;
+      originalX += 1104;
 
       // Clone the frame's children to the component
       frame.children.forEach((child) => {
@@ -260,14 +265,24 @@ export default async function buildChatUserInterface({
         frameInstance.y = 0;
       }
 
-      // Create and position the Thread instance
+      // Create a frame to contain the thread instance
+      const prototypeFrame = figma.createFrame();
+      prototypeFrame.name = 'Prototype';
+      prototypeFrame.resize(threadComponent.width, threadComponent.height);
+      prototypeFrame.x = frameComponent.x + frameComponent.width + 50;
+      prototypeFrame.y = frameComponent.y;
+      prototypeFrame.cornerRadius = 40;
+
+      // Create and add the thread instance to the prototype frame
       const threadInstance = threadComponent.createInstance();
-      threadInstance.x = frame.x + frame.width + 50;
-      threadInstance.y = frame.y;
+      prototypeFrame.appendChild(threadInstance);
 
       // Remove the original frame and the Thread component
       frame.remove();
       threadComponent.remove();
+
+      // Resize and zoom viewport to show both frames
+      figma.viewport.scrollAndZoomIntoView([frameComponent, prototypeFrame]);
     }
   }
 }

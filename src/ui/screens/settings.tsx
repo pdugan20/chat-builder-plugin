@@ -3,6 +3,7 @@ import { Text, Link } from 'figma-kit';
 import Navigation from '../navigation';
 import UpdateKeyDialog from '../components/dialogs/update-key';
 import { useAnthropic } from '../context/anthropic';
+import URLS from '../../constants/urls';
 
 interface SettingsScreenProps {
   screen?: string;
@@ -57,7 +58,9 @@ function SettingsScreen({ screen = 'settings', pluginVersion = '1.0' }: Settings
     return (
       <div className='row-item'>
         <Text className='heading'>Feedback</Text>
-        <Link href='#'>Report a bug</Link>
+        <Link href={URLS.GITHUB_ISSUES} target='_blank' rel='noopener noreferrer'>
+          Report a bug
+        </Link>
       </div>
     );
   }

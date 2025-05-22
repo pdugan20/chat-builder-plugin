@@ -22,3 +22,8 @@ export function getRecipientName(chatItems: ChatItem[], isFirst = true): string 
 
   return recipientItem.name;
 }
+
+export function getRecipientGender(items: ChatItem[]): string {
+  const recipientItem = items.find((item) => item.role === 'recipient');
+  return recipientItem?.gender || 'Unknown';
+}

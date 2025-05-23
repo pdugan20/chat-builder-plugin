@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Text, Button, Select, Link } from 'figma-kit';
+import { Text, Button, Select, Link, Checkbox } from 'figma-kit';
 import TextareaAutosize from 'react-textarea-autosize';
 import Navigation from '../navigation';
 import AlertBanner from '../components/banners/alert';
@@ -42,6 +42,7 @@ function PluginScreen({
   const [participants, setParticipants] = useState(defaultParticipants);
   const [maxMessages, setMaxMessages] = useState(defaultMaxMessages);
   const [prompt, setPrompt] = useState(defaultPrompt);
+  const [includePrototype, setIncludePrototype] = useState(false);
 
   function renderNav(): React.JSX.Element {
     return <Navigation screen={screen} />;
@@ -177,6 +178,21 @@ function PluginScreen({
     );
   }
 
+  function renderMoreOptions(): React.JSX.Element {
+    return (
+      <div className='row-item'>
+        <Text className='heading'>More options</Text>
+        <Checkbox.Root
+          defaultChecked={includePrototype}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setIncludePrototype(e.target.checked)}
+        >
+          <Checkbox.Input />
+          <Checkbox.Label>Include prototype</Checkbox.Label>
+        </Checkbox.Root>
+      </div>
+    );
+  }
+
   function renderBody(): React.JSX.Element {
     return (
       <div className='body'>
@@ -184,6 +200,7 @@ function PluginScreen({
         {renderMaxMessagesSelect()}
         {renderStyleSelect()}
         {renderPromptTextarea()}
+        {renderMoreOptions()}
       </div>
     );
   }
@@ -195,7 +212,7 @@ function PluginScreen({
           variant='primary'
           size='medium'
           disabled={!prompt.trim() || loading}
-          onClick={() => generateChat({ participants, maxMessages, prompt, style })}
+          onClick={() => generateChat({ participants, maxMessages, prompt, style, includePrototype })}
         >
           Generate chat
         </Button>

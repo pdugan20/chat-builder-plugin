@@ -11,7 +11,13 @@ interface UseChatGenerationProps {
 
 interface UseChatGenerationReturn {
   loading: boolean;
-  generateChat: (params: { participants: string; maxMessages: string; prompt: string; style: string }) => Promise<void>;
+  generateChat: (params: {
+    participants: string;
+    maxMessages: string;
+    prompt: string;
+    style: string;
+    includePrototype: boolean;
+  }) => Promise<void>;
 }
 
 export default function useChatGeneration({
@@ -25,11 +31,13 @@ export default function useChatGeneration({
     maxMessages,
     prompt,
     style,
+    includePrototype,
   }: {
     participants: string;
     maxMessages: string;
     prompt: string;
     style: string;
+    includePrototype: boolean;
   }) => {
     setLoading(true);
 
@@ -38,7 +46,7 @@ export default function useChatGeneration({
         const data = chatData;
         parent.postMessage(
           {
-            pluginMessage: { type: MESSAGE_TYPE.BUILD_CHAT_UI, data, style, prompt },
+            pluginMessage: { type: MESSAGE_TYPE.BUILD_CHAT_UI, data, style, prompt, includePrototype },
           },
           '*'
         );
@@ -57,7 +65,7 @@ export default function useChatGeneration({
       const data = cleanAndParseJson(response.content[0].text);
       parent.postMessage(
         {
-          pluginMessage: { type: MESSAGE_TYPE.BUILD_CHAT_UI, data, style, prompt },
+          pluginMessage: { type: MESSAGE_TYPE.BUILD_CHAT_UI, data, style, prompt, includePrototype },
         },
         '*'
       );

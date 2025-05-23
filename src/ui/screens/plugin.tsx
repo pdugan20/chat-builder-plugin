@@ -210,7 +210,7 @@ function PluginScreen({
       <div className='footer'>
         <Button
           variant='primary'
-          size='medium'
+          size='small'
           disabled={!prompt.trim() || loading}
           onClick={() => generateChat({ participants, maxMessages, prompt, style, includePrototype })}
         >

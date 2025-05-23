@@ -314,6 +314,9 @@ export default async function buildChatUserInterface({
   const threadInstance = tempThreadComponent.createInstance();
   prototypeFrame.appendChild(threadInstance);
 
+  // Make prototype frame invisible
+  prototypeFrame.visible = false;
+
   // Find the placeholder in the component
   const placeholder = tempThreadComponent.findOne((node) => node.name === 'PLACEHOLDER_THREAD');
   if (placeholder) {
@@ -322,15 +325,24 @@ export default async function buildChatUserInterface({
     frameInstance.paddingTop = 142;
     frameInstance.paddingBottom = 82;
 
-    // Insert the frame instance into the component
-    placeholder.parent?.insertChild(placeholder.parent.children.indexOf(placeholder), frameInstance);
-    placeholder.remove();
+    // Set the frame instance position before inserting
+    frameInstance.x = placeholder.x;
     frameInstance.y = 0;
+
+    // Insert the frame instance at the placeholder's index
+    const placeholderIndex = placeholder.parent?.children.indexOf(placeholder) ?? 0;
+    placeholder.parent?.insertChild(placeholderIndex, frameInstance);
+
+    // Remove the placeholder
+    placeholder.remove();
   }
 
   // Clean up temporary components
   tempFrame.remove();
   tempThreadComponent.remove();
+
+  // Make prototype frame visible again
+  prototypeFrame.visible = true;
 
   // Focus viewport on the new components
   figma.viewport.scrollAndZoomIntoView([frameComponent, prototypeFrame]);

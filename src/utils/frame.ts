@@ -47,8 +47,6 @@ async function getColorCollection(): Promise<VariableCollection | null> {
 export async function setFrameBackgroundFill(frame: FrameNode): Promise<void> {
   const threadBackground = await getThreadBackgroundVariable();
 
-  console.log(threadBackground);
-
   if (threadBackground) {
     frame.fills = [
       figma.variables.setBoundVariableForPaint(

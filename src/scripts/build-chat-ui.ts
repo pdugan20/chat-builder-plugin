@@ -12,6 +12,8 @@ import {
   createStatusInstance,
 } from '../services/component';
 import { modeId } from '../constants/collections';
+import { DEVICE_WIDTH, FRAME_PADDING, FRAME_OFFSETS } from '../constants/dimensions';
+import { THREAD, VARIABLES } from '../constants/strings';
 
 // Track the original x position
 let originalX = 0;
@@ -23,9 +25,9 @@ function findThreadComponentSet(): ComponentSetNode | undefined {
     | undefined;
 }
 
-function findType11Variant(threadComponentSet: ComponentSetNode): ComponentNode | undefined {
+function findThreadVariant(threadComponentSet: ComponentSetNode): ComponentNode | undefined {
   const variants = threadComponentSet.children as ComponentNode[];
-  return variants.find((variant) => variant.name === 'Type=1:1');
+  return variants.find((variant) => variant.name === THREAD.VARIANT);
 }
 
 function createFrameComponent(tempFrame: FrameNode): ComponentNode {
@@ -55,7 +57,7 @@ function createFrameComponent(tempFrame: FrameNode): ComponentNode {
 }
 
 function setPersonaProperties(tempThreadComponent: ComponentNode, items: ChatItem[]): void {
-  const persona = tempThreadComponent.findOne((node) => node.name === 'Persona');
+  const persona = tempThreadComponent.findOne((node) => node.name === THREAD.PERSONA);
   const rootNodes = figma.root.findAll();
   const personaSet = rootNodes.find((node) => node.type === 'COMPONENT_SET' && node.name === 'Persona');
 
@@ -85,9 +87,9 @@ function createThreadComponent(threadVariant: ComponentNode, recipientName: stri
   });
 
   // Set navigation bar properties
-  const navBar = tempThreadComponent.findOne((node) => node.name === 'Thread Navigation Bar');
+  const navBar = tempThreadComponent.findOne((node) => node.name === THREAD.NAV_BAR);
   if (navBar && 'setProperties' in navBar) {
-    (navBar as InstanceNode).setProperties({ 'Chat name#424:0': recipientName });
+    (navBar as InstanceNode).setProperties({ [THREAD.CHAT_NAME]: recipientName });
   }
 
   // Set persona properties
@@ -227,7 +229,7 @@ function setFrameThemeAndBackground(frame: FrameNode | ComponentNode, theme: 'li
 
     // Get and set the background color
     const variables = localColorCollection.variableIds.map((id) => figma.variables.getVariableById(id));
-    const threadBackground = variables.find((v) => v.name === 'Background/General/Thread');
+    const threadBackground = variables.find((v) => v.name === VARIABLES.THREAD_BACKGROUND);
 
     if (threadBackground) {
       frame.fills = [
@@ -243,7 +245,7 @@ function setFrameThemeAndBackground(frame: FrameNode | ComponentNode, theme: 'li
 
 export default async function buildChatUserInterface({
   theme = 'light',
-  width = 402,
+  width = DEVICE_WIDTH,
   itemSpacing = 8,
   bubbleStyle = 'iOS',
   name,
@@ -295,14 +297,14 @@ export default async function buildChatUserInterface({
   if (!threadComponentSet) return;
 
   // Get the Type=1:1 variant
-  const threadVariant = findType11Variant(threadComponentSet);
+  const threadVariant = findThreadVariant(threadComponentSet);
   if (!threadVariant) return;
 
   // Create the frame component
   const frameComponent = createFrameComponent(tempFrame);
   frameComponent.x = originalX;
 
-  originalX += includePrototype ? 1104 : 652;
+  originalX += includePrototype ? FRAME_OFFSETS.WITH_PROTOTYPE : FRAME_OFFSETS.WITHOUT_PROTOTYPE;
 
   // Set theme and background on the frame component
   setFrameThemeAndBackground(frameComponent, theme);
@@ -321,12 +323,12 @@ export default async function buildChatUserInterface({
     prototypeFrame.visible = false;
 
     // Find the placeholder in the component
-    const placeholder = tempThreadComponent.findOne((node) => node.name === 'PLACEHOLDER_THREAD');
+    const placeholder = tempThreadComponent.findOne((node) => node.name === THREAD.PLACEHOLDER);
     if (placeholder) {
       // Create instance of the component
       const frameInstance = frameComponent.createInstance();
-      frameInstance.paddingTop = 142;
-      frameInstance.paddingBottom = 82;
+      frameInstance.paddingTop = FRAME_PADDING.TOP;
+      frameInstance.paddingBottom = FRAME_PADDING.BOTTOM;
 
       // Set the frame instance position before inserting
       frameInstance.x = placeholder.x;

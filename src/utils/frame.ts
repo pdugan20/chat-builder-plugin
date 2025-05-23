@@ -1,5 +1,5 @@
-import { colorCollection as importedColorCollection, modeId } from '../constants/collections';
-import colors from '../constants/colors';
+import MODE_ID from '../constants/collections';
+import { VARIABLES } from '../constants/components';
 
 // Constants
 const FRAME_SPACING = 50;
@@ -13,32 +13,18 @@ let lastFrameX = 0;
 
 // Helper functions
 async function getThreadBackgroundVariable(): Promise<Variable | null> {
-  try {
-    const threadBackground = await figma.variables.getVariableByIdAsync(colors['Background/General/Thread'].id);
-    if (threadBackground) return threadBackground;
-  } catch (error) {
-    //
-  }
-
   const localCollections = figma.variables.getLocalVariableCollections();
   const localColorCollection = localCollections.find((c) => c.name === 'Color');
 
   if (localColorCollection) {
     const variables = localColorCollection.variableIds.map((id) => figma.variables.getVariableById(id));
-    return variables.find((v) => v.name === 'Background/General/Thread') || null;
+    return variables.find((v) => v.name === VARIABLES.THREAD_BACKGROUND) || null;
   }
 
   return null;
 }
 
 async function getColorCollection(): Promise<VariableCollection | null> {
-  try {
-    const collection = await figma.variables.getVariableCollectionByIdAsync(importedColorCollection.id);
-    if (collection) return collection;
-  } catch (error) {
-    //
-  }
-
   const localCollections = figma.variables.getLocalVariableCollections();
   return localCollections.find((c) => c.name === 'Color') || null;
 }
@@ -62,7 +48,7 @@ export async function setFrameStyle(frame: FrameNode, theme: 'light' | 'dark'): 
   const collection = await getColorCollection();
 
   if (collection) {
-    frame.setExplicitVariableModeForCollection(collection, modeId[theme]);
+    frame.setExplicitVariableModeForCollection(collection, MODE_ID[theme]);
   }
 }
 

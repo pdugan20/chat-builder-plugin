@@ -1,9 +1,6 @@
-export const colorCollection = {
-  name: 'Color',
-  id: null,
-};
-
-export const modeId = {
+const MODE_ID = {
   light: '76:0',
   dark: '76:1',
-};
+} as const;
+
+export default MODE_ID;

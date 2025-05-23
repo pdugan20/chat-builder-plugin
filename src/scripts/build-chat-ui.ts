@@ -248,6 +248,7 @@ export default async function buildChatUserInterface({
   bubbleStyle = 'iOS',
   name,
   data,
+  includePrototype = false,
 }: BuildChatUserInterfaceProps): Promise<void> {
   const messages: string[] = [];
   const items = data;
@@ -300,7 +301,8 @@ export default async function buildChatUserInterface({
   // Create the frame component
   const frameComponent = createFrameComponent(tempFrame);
   frameComponent.x = originalX;
-  originalX += 1104;
+
+  originalX += includePrototype ? 1104 : 652;
 
   // Set theme and background on the frame component
   setFrameThemeAndBackground(frameComponent, theme);
@@ -308,42 +310,47 @@ export default async function buildChatUserInterface({
   // Create the thread component
   const tempThreadComponent = createThreadComponent(threadVariant, recipientName, items);
 
-  // Create and position the prototype frame
-  const prototypeFrame = createPrototypeFrame(tempThreadComponent, frameComponent);
-  setFrameThemeAndBackground(prototypeFrame, theme);
-  const threadInstance = tempThreadComponent.createInstance();
-  prototypeFrame.appendChild(threadInstance);
+  if (includePrototype) {
+    // Create and position the prototype frame
+    const prototypeFrame = createPrototypeFrame(tempThreadComponent, frameComponent);
+    setFrameThemeAndBackground(prototypeFrame, theme);
+    const threadInstance = tempThreadComponent.createInstance();
+    prototypeFrame.appendChild(threadInstance);
 
-  // Make prototype frame invisible
-  prototypeFrame.visible = false;
+    // Make prototype frame invisible
+    prototypeFrame.visible = false;
 
-  // Find the placeholder in the component
-  const placeholder = tempThreadComponent.findOne((node) => node.name === 'PLACEHOLDER_THREAD');
-  if (placeholder) {
-    // Create instance of the component
-    const frameInstance = frameComponent.createInstance();
-    frameInstance.paddingTop = 142;
-    frameInstance.paddingBottom = 82;
+    // Find the placeholder in the component
+    const placeholder = tempThreadComponent.findOne((node) => node.name === 'PLACEHOLDER_THREAD');
+    if (placeholder) {
+      // Create instance of the component
+      const frameInstance = frameComponent.createInstance();
+      frameInstance.paddingTop = 142;
+      frameInstance.paddingBottom = 82;
 
-    // Set the frame instance position before inserting
-    frameInstance.x = placeholder.x;
-    frameInstance.y = 0;
+      // Set the frame instance position before inserting
+      frameInstance.x = placeholder.x;
+      frameInstance.y = 0;
 
-    // Insert the frame instance at the placeholder's index
-    const placeholderIndex = placeholder.parent?.children.indexOf(placeholder) ?? 0;
-    placeholder.parent?.insertChild(placeholderIndex, frameInstance);
+      // Insert the frame instance at the placeholder's index
+      const placeholderIndex = placeholder.parent?.children.indexOf(placeholder) ?? 0;
+      placeholder.parent?.insertChild(placeholderIndex, frameInstance);
 
-    // Remove the placeholder
-    placeholder.remove();
+      // Remove the placeholder
+      placeholder.remove();
+    }
+
+    // Make prototype frame visible again
+    prototypeFrame.visible = true;
+
+    // Focus viewport on the new components
+    figma.viewport.scrollAndZoomIntoView([frameComponent, prototypeFrame]);
+  } else {
+    // Focus viewport on the new components
+    figma.viewport.scrollAndZoomIntoView([frameComponent]);
   }
 
   // Clean up temporary components
   tempFrame.remove();
   tempThreadComponent.remove();
-
-  // Make prototype frame visible again
-  prototypeFrame.visible = true;
-
-  // Focus viewport on the new components
-  figma.viewport.scrollAndZoomIntoView([frameComponent, prototypeFrame]);
 }

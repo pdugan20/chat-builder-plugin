@@ -12,6 +12,7 @@ export interface BuildChatUserInterfaceProps {
   itemSpacing?: number;
   bubbleStyle?: 'iOS' | 'Android';
   name?: string;
+  includePrototype?: boolean;
 }
 
 export interface MessageInstanceProps {

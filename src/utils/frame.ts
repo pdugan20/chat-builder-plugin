@@ -89,3 +89,27 @@ export async function buildFrame(
 
   return frame;
 }
+
+export function setFrameThemeAndBackground(frame: FrameNode | ComponentNode, theme: 'light' | 'dark'): void {
+  const localCollections = figma.variables.getLocalVariableCollections();
+  const localColorCollection = localCollections.find((c) => c.name === 'Color');
+
+  if (localColorCollection) {
+    // Set the variable mode
+    frame.setExplicitVariableModeForCollection(localColorCollection, MODE_ID[theme]);
+
+    // Get and set the background color
+    const variables = localColorCollection.variableIds.map((id) => figma.variables.getVariableById(id));
+    const threadBackground = variables.find((v) => v.name === VARIABLES.THREAD_BACKGROUND);
+
+    if (threadBackground) {
+      frame.fills = [
+        figma.variables.setBoundVariableForPaint(
+          { type: 'SOLID', color: { r: 1, g: 1, b: 1 } },
+          'color',
+          threadBackground
+        ),
+      ];
+    }
+  }
+}

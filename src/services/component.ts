@@ -1,4 +1,4 @@
-import { libraryComponentKey } from '../constants/keys';
+import { THREAD_COMPONENT_SETS } from '../constants/components';
 import { ComponentSets } from '../types/chat';
 import emojiKey from '../constants/emojis';
 import {
@@ -14,10 +14,10 @@ export async function loadComponentSets(): Promise<ComponentSets> {
   const localComponentSets = allNodes.filter((node) => node.type === 'COMPONENT_SET');
 
   // Find components by name since keys are null
-  const senderSet = localComponentSets.find((set) => set.name === libraryComponentKey.senderBubble.name);
-  const recipientSet = localComponentSets.find((set) => set.name === libraryComponentKey.recipientBubble.name);
-  const statusSet = localComponentSets.find((set) => set.name === libraryComponentKey.statusBanner.name);
-  const timestampSet = localComponentSets.find((set) => set.name === libraryComponentKey.timestamp.name);
+  const senderSet = localComponentSets.find((set) => set.name === THREAD_COMPONENT_SETS.SENDER_BUBBLE.name);
+  const recipientSet = localComponentSets.find((set) => set.name === THREAD_COMPONENT_SETS.RECIPIENT_BUBBLE.name);
+  const statusSet = localComponentSets.find((set) => set.name === THREAD_COMPONENT_SETS.STATUS_BANNER.name);
+  const timestampSet = localComponentSets.find((set) => set.name === THREAD_COMPONENT_SETS.TIMESTAMP.name);
 
   if (!senderSet || !recipientSet || !statusSet || !timestampSet) {
     throw new Error('Could not find all required component sets');

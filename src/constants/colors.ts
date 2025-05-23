@@ -1,5 +1,3 @@
-const colors = {
-  'Background/General/Thread': { id: null },
-};
+const COLORS = {} as const;
 
-export default colors;
+export default COLORS;

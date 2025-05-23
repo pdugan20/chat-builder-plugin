@@ -1,6 +1,6 @@
-const emojiKey = {
+const EMOJI_KEY = {
   color: {},
   transparentBlue: {},
-};
+} as const;
 
-export default emojiKey;
+export default EMOJI_KEY;

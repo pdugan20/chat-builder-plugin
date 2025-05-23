@@ -1,4 +1,4 @@
-const requiredFonts = [
+const REQUIRED_FONTS = [
   {
     family: 'SF Pro',
     style: 'Medium',
@@ -7,6 +7,6 @@ const requiredFonts = [
     family: 'SF Pro',
     style: 'Regular',
   },
-];
+] as const;
 
-export default requiredFonts;
+export default REQUIRED_FONTS;

@@ -1,4 +1,4 @@
-const chatData = [
+const CHAT_DATA = [
   {
     name: 'Mike Johnson',
     gender: 'male',
@@ -90,6 +90,6 @@ const chatData = [
     emojiReaction: 'exclamation',
     messagesInGroup: 1,
   },
-];
+] as const;
 
-export default chatData;
+export default CHAT_DATA;

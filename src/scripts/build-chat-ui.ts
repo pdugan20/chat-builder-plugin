@@ -1,4 +1,4 @@
-import { componentPropertyName } from '../constants/keys';
+import { BUBBLE_PROPERTIES, THREAD_PROPERTIES, VARIABLES } from '../constants/components';
 import flipHorizontal from '../utils/transform';
 import emojiKey from '../constants/emojis';
 import { ChatItem, BuildChatUserInterfaceProps } from '../types/chat';
@@ -11,9 +11,8 @@ import {
   createTimestampInstance,
   createStatusInstance,
 } from '../services/component';
-import { modeId } from '../constants/collections';
+import MODE_ID from '../constants/collections';
 import { DEVICE_WIDTH, FRAME_PADDING, FRAME_OFFSETS } from '../constants/dimensions';
-import { THREAD, VARIABLES } from '../constants/strings';
 
 // Track the original x position
 let originalX = 0;
@@ -27,7 +26,7 @@ function findThreadComponentSet(): ComponentSetNode | undefined {
 
 function findThreadVariant(threadComponentSet: ComponentSetNode): ComponentNode | undefined {
   const variants = threadComponentSet.children as ComponentNode[];
-  return variants.find((variant) => variant.name === THREAD.VARIANT);
+  return variants.find((variant) => variant.name === THREAD_PROPERTIES.VARIANT);
 }
 
 function createFrameComponent(tempFrame: FrameNode): ComponentNode {
@@ -57,7 +56,7 @@ function createFrameComponent(tempFrame: FrameNode): ComponentNode {
 }
 
 function setPersonaProperties(tempThreadComponent: ComponentNode, items: ChatItem[]): void {
-  const persona = tempThreadComponent.findOne((node) => node.name === THREAD.PERSONA);
+  const persona = tempThreadComponent.findOne((node) => node.name === THREAD_PROPERTIES.PERSONA);
   const rootNodes = figma.root.findAll();
   const personaSet = rootNodes.find((node) => node.type === 'COMPONENT_SET' && node.name === 'Persona');
 
@@ -87,9 +86,9 @@ function createThreadComponent(threadVariant: ComponentNode, recipientName: stri
   });
 
   // Set navigation bar properties
-  const navBar = tempThreadComponent.findOne((node) => node.name === THREAD.NAV_BAR);
+  const navBar = tempThreadComponent.findOne((node) => node.name === THREAD_PROPERTIES.NAV_BAR);
   if (navBar && 'setProperties' in navBar) {
-    (navBar as InstanceNode).setProperties({ [THREAD.CHAT_NAME]: recipientName });
+    (navBar as InstanceNode).setProperties({ [THREAD_PROPERTIES.CHAT_NAME]: recipientName });
   }
 
   // Set persona properties
@@ -121,7 +120,7 @@ function handleEmojiReaction(instance: InstanceNode, props: MessageInstanceProps
 
     if (emoji?.id) {
       emojiInstance.setProperties({
-        [componentPropertyName.emoji]: emoji.id,
+        [BUBBLE_PROPERTIES.EMOJI]: emoji.id,
       });
     }
   }
@@ -287,7 +286,7 @@ function setFrameThemeAndBackground(frame: FrameNode | ComponentNode, theme: 'li
 
   if (localColorCollection) {
     // Set the variable mode
-    frame.setExplicitVariableModeForCollection(localColorCollection, modeId[theme]);
+    frame.setExplicitVariableModeForCollection(localColorCollection, MODE_ID[theme]);
 
     // Get and set the background color
     const variables = localColorCollection.variableIds.map((id) => figma.variables.getVariableById(id));
@@ -385,7 +384,7 @@ export default async function buildChatUserInterface({
     prototypeFrame.visible = false;
 
     // Find the placeholder in the component
-    const placeholder = tempThreadComponent.findOne((node) => node.name === THREAD.PLACEHOLDER);
+    const placeholder = tempThreadComponent.findOne((node) => node.name === THREAD_PROPERTIES.PLACEHOLDER);
     if (placeholder) {
       // Create instance of the component
       const frameInstance = frameComponent.createInstance();

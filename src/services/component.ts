@@ -1,41 +1,27 @@
 import { libraryComponentKey } from '../constants/keys';
 import { ComponentSets } from '../types/chat';
 import emojiKey from '../constants/emojis';
-import { findColorHeart, addHeartToStyles, processComponent } from '../utils/components';
+import {
+  findColorHeart,
+  addHeartToStyles,
+  processComponent,
+  transformStyleName,
+  transformEmojiName,
+} from '../utils/components';
 
 export async function loadComponentSets(): Promise<ComponentSets> {
   const allNodes = figma.root.findAll();
   const localComponentSets = allNodes.filter((node) => node.type === 'COMPONENT_SET');
 
-  const componentKeys = [
-    libraryComponentKey.senderBubble.key,
-    libraryComponentKey.recipientBubble.key,
-    libraryComponentKey.statusBanner.key,
-    libraryComponentKey.timestamp.key,
-  ];
+  // Find components by name since keys are null
+  const senderSet = localComponentSets.find((set) => set.name === libraryComponentKey.senderBubble.name);
+  const recipientSet = localComponentSets.find((set) => set.name === libraryComponentKey.recipientBubble.name);
+  const statusSet = localComponentSets.find((set) => set.name === libraryComponentKey.statusBanner.name);
+  const timestampSet = localComponentSets.find((set) => set.name === libraryComponentKey.timestamp.name);
 
-  const collections = await figma.teamLibrary.getAvailableLibraryVariableCollectionsAsync();
-  const hasChatBuilderLibrary = collections.some((collection) => collection.libraryName === 'iMessage Chat Builder');
-
-  if (hasChatBuilderLibrary) {
-    const localComponentKeys = componentKeys.map((key) => {
-      const componentInfo = Object.values(libraryComponentKey).find((info) => info.key === key);
-      if (!componentInfo) return key;
-
-      const localComponent = localComponentSets.find((set) => set.name === componentInfo.name);
-      return localComponent?.key || key;
-    });
-
-    const [senderSet, recipientSet, statusSet, timestampSet] = await Promise.all(
-      localComponentKeys.map((key) => figma.importComponentSetByKeyAsync(key))
-    );
-
-    return { senderSet, recipientSet, statusSet, timestampSet };
+  if (!senderSet || !recipientSet || !statusSet || !timestampSet) {
+    throw new Error('Could not find all required component sets');
   }
-
-  const [senderSet, recipientSet, statusSet, timestampSet] = await Promise.all(
-    componentKeys.map((key) => figma.importComponentSetByKeyAsync(key))
-  );
 
   return { senderSet, recipientSet, statusSet, timestampSet };
 }
@@ -62,16 +48,38 @@ export async function updateEmojiKeyIds(): Promise<void> {
     return;
   }
 
-  const promises: Promise<void>[] = Object.entries(emojiKey).flatMap(([style, emojis]) =>
-    Object.entries(emojis).map(async ([key, value]) => {
-      try {
-        const component: ComponentNode = await figma.importComponentByKeyAsync(value.key);
-        emojiKey[style][key].id = component.id;
-      } catch (error) {
-        //
-      }
-    })
+  // Find all emoji components
+  const allNodes = figma.root.findAll();
+  const emojiComponents = allNodes.filter(
+    (node): node is ComponentNode =>
+      node.type === 'COMPONENT' && (node.name.startsWith('System/') || node.name.startsWith('iMessage/'))
   );
+
+  // Process each emoji component
+  const promises = emojiComponents.map(async (component) => {
+    const nameParts = component.name.split('/');
+    if (nameParts.length < 3) return;
+
+    // Transform style name before using it
+    const originalStyle = nameParts[1].toLowerCase();
+    const style = transformStyleName(originalStyle);
+
+    // Transform emoji name before any checks
+    const originalEmojiName = nameParts[2].toLowerCase();
+    const emojiName = transformEmojiName(originalEmojiName);
+
+    // Skip heart as it's already been added
+    if (emojiName === 'heart') return;
+
+    if (!emojiKey[style]) {
+      emojiKey[style] = {};
+    }
+
+    emojiKey[style][emojiName] = {
+      key: component.key,
+      id: component.id,
+    };
+  });
 
   await Promise.all(promises);
 }
@@ -107,6 +115,7 @@ export async function createStatusInstance(
   hasAction: boolean
 ): Promise<InstanceNode> {
   const statusInstance: InstanceNode = statusSet.defaultVariant.createInstance();
+  const availableProps = statusSet.componentPropertyDefinitions;
 
   const notificationLabel = statusInstance.findOne(
     (node: { type: string; name: string }) => node.type === 'TEXT' && node.name === 'Notification Text'
@@ -116,9 +125,12 @@ export async function createStatusInstance(
     notificationLabel.characters = notificationText;
   }
 
-  statusInstance.setProperties({
-    'Has action': hasAction ? 'Yes' : 'No',
-  });
+  // Only set the property if it exists in the component
+  if ('Has action' in availableProps) {
+    statusInstance.setProperties({
+      'Has action': hasAction ? 'Yes' : 'No',
+    });
+  }
 
   return statusInstance;
 }

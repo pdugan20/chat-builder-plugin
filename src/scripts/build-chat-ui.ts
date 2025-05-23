@@ -113,14 +113,17 @@ function handleEmojiReaction(instance: InstanceNode, props: MessageInstanceProps
   if (instance.exposedInstances.length > 0 && props.emojiReaction) {
     const emojiInstance: InstanceNode = instance.exposedInstances[0];
     const emojiStyle = props.role === 'sender' ? 'color' : 'transparentBlue';
+    const emoji = emojiKey[emojiStyle]?.[props.emojiReaction];
 
     if (props.role === 'recipient') {
       emojiInstance.setProperties({ Style: props.bubbleStyle });
     }
 
-    emojiInstance.setProperties({
-      [componentPropertyName.emoji]: emojiKey[emojiStyle][props.emojiReaction].id,
-    });
+    if (emoji?.id) {
+      emojiInstance.setProperties({
+        [componentPropertyName.emoji]: emoji.id,
+      });
+    }
   }
 }
 
@@ -131,36 +134,73 @@ function setMessageGroupProperties(
   chatItems: ChatItem[]
 ): void {
   for (let i: number = 0; i < props.messagesInGroup; i += 1) {
-    const bubbleKey: string = bubbleKeys[i];
-    if (bubbleKey && chatItems[props.index + i]) {
-      instance.setProperties({
-        [bubbleKey]: chatItems[props.index + i].message,
-      });
-      props.messages.push(chatItems[props.index + i].message);
+    const message = chatItems[props.index + i]?.message;
+    if (message) {
+      // Find text nodes in the instance
+      const textNodes = instance.findAll((node) => node.type === 'TEXT') as TextNode[];
+
+      // Try to find a text node that might be for the message
+      const messageNode = textNodes.find(
+        (node) =>
+          node.name.toLowerCase().includes('message') ||
+          node.name.toLowerCase().includes('bubble') ||
+          node.name.toLowerCase().includes('text')
+      );
+
+      if (messageNode) {
+        messageNode.characters = message;
+      }
+      props.messages.push(message);
     }
   }
 }
 
 function createSenderInstance(props: MessageInstanceProps, chatItems: ChatItem[]): InstanceNode {
   const instance: InstanceNode = props.componentSet.defaultVariant.createInstance();
-  const bubbleKeys: string[] = componentPropertyName.senderBubble;
-  const bubble: string = bubbleKeys[0];
+  const availableProps = props.componentSet.componentPropertyDefinitions;
 
-  instance.setProperties({
+  // Set basic properties
+  const properties: Record<string, string> = {
     Bubbles: props.messagesInGroup.toString(),
     Style: props.bubbleStyle,
     'Has reaction': props.emojiReaction ? 'Yes' : 'No',
     'Has mustache text': 'No',
-    [bubble]: props.message,
+  };
+
+  // Only set properties that exist in the component
+  Object.entries(properties).forEach(([key, value]) => {
+    if (key in availableProps) {
+      instance.setProperties({ [key]: value });
+    }
   });
 
-  setMessageGroupProperties(instance, props, bubbleKeys, chatItems);
+  // Set the first message
+  const textNodes = instance.findAll((node) => node.type === 'TEXT') as TextNode[];
+  const messageNode = textNodes.find(
+    (node) =>
+      node.name.toLowerCase().includes('message') ||
+      node.name.toLowerCase().includes('bubble') ||
+      node.name.toLowerCase().includes('text')
+  );
+
+  if (messageNode) {
+    messageNode.characters = props.message;
+  }
+
+  setMessageGroupProperties(instance, props, [], chatItems);
   handleEmojiReaction(instance, props);
 
   if (props.index === chatItems.length - 1) {
-    instance.setProperties({
+    const mustacheProps = {
       'Has mustache text': 'Yes',
       'Mustache#129:16': 'Delivered Quietly',
+    };
+
+    // Only set mustache properties that exist
+    Object.entries(mustacheProps).forEach(([key, value]) => {
+      if (key in availableProps) {
+        instance.setProperties({ [key]: value });
+      }
     });
   }
 
@@ -168,19 +208,41 @@ function createSenderInstance(props: MessageInstanceProps, chatItems: ChatItem[]
 }
 
 function createRecipientInstance(props: MessageInstanceProps, chatItems: ChatItem[]): InstanceNode {
-  const instance: InstanceNode = props.componentSet.defaultVariant.createInstance();
-  const bubbleKeys: string[] = componentPropertyName.recipientBubble;
-  const bubble: string = bubbleKeys[0];
+  // Get the recipient component set
+  const recipientSet = props.componentSet;
 
-  instance.setProperties({
+  // Create instance from the recipient component set
+  const instance: InstanceNode = recipientSet.defaultVariant.createInstance();
+  const availableProps = recipientSet.componentPropertyDefinitions;
+
+  // Set basic properties
+  const properties: Record<string, string> = {
     Bubbles: props.messagesInGroup.toString(),
-    'Is group chat': 'No',
     'Has reaction': props.emojiReaction ? 'Yes' : 'No',
     'Has mustache text': 'No',
-    [bubble]: props.message,
+  };
+
+  // Only set properties that exist in the component
+  Object.entries(properties).forEach(([key, value]) => {
+    if (key in availableProps) {
+      instance.setProperties({ [key]: value });
+    }
   });
 
-  setMessageGroupProperties(instance, props, bubbleKeys, chatItems);
+  // Set the first message
+  const textNodes = instance.findAll((node) => node.type === 'TEXT') as TextNode[];
+  const messageNode = textNodes.find(
+    (node) =>
+      node.name.toLowerCase().includes('message') ||
+      node.name.toLowerCase().includes('bubble') ||
+      node.name.toLowerCase().includes('text')
+  );
+
+  if (messageNode) {
+    messageNode.characters = props.message;
+  }
+
+  setMessageGroupProperties(instance, props, [], chatItems);
   handleEmojiReaction(instance, props);
   instance.relativeTransform = flipHorizontal(instance);
 

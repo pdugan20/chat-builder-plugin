@@ -14,6 +14,7 @@ import {
 import MODE_ID from '../constants/collections';
 import { DEVICE_WIDTH, FRAME_OFFSETS } from '../constants/dimensions';
 import buildPrototype from './build-prototype';
+import COLORS from '../constants/colors';
 
 // Track the original x position
 let originalX = 0;
@@ -242,11 +243,7 @@ function setFrameThemeAndBackground(frame: FrameNode | ComponentNode, theme: 'li
 
     if (threadBackground) {
       frame.fills = [
-        figma.variables.setBoundVariableForPaint(
-          { type: 'SOLID', color: { r: 1, g: 1, b: 1 } },
-          'color',
-          threadBackground
-        ),
+        figma.variables.setBoundVariableForPaint({ type: 'SOLID', color: COLORS.WHITE }, 'color', threadBackground),
       ];
     }
   }

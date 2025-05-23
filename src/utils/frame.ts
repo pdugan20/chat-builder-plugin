@@ -1,12 +1,7 @@
 import MODE_ID from '../constants/collections';
 import { VARIABLES } from '../constants/components';
-
-// Constants
-const FRAME_SPACING = 50;
-const DEFAULT_PADDING = {
-  left: 16,
-  right: 12,
-};
+import COLORS from '../constants/colors';
+import { FRAME_SPACING, FRAME_PADDING } from '../constants/dimensions';
 
 // State
 let lastFrameX = 0;
@@ -35,11 +30,7 @@ export async function setFrameBackgroundFill(frame: FrameNode): Promise<void> {
 
   if (threadBackground) {
     frame.fills = [
-      figma.variables.setBoundVariableForPaint(
-        { type: 'SOLID', color: { r: 1, g: 1, b: 1 } },
-        'color',
-        threadBackground
-      ),
+      figma.variables.setBoundVariableForPaint({ type: 'SOLID', color: COLORS.WHITE }, 'color', threadBackground),
     ];
   }
 }
@@ -82,8 +73,8 @@ export async function buildFrame(
 
   // Set frame properties
   frame.name = `Chat thread: ${name}`;
-  frame.paddingLeft = DEFAULT_PADDING.left;
-  frame.paddingRight = DEFAULT_PADDING.right;
+  frame.paddingLeft = FRAME_PADDING.left;
+  frame.paddingRight = FRAME_PADDING.right;
   frame.layoutMode = 'VERTICAL';
   frame.itemSpacing = itemSpacing;
 
@@ -104,11 +95,7 @@ export function setFrameThemeAndBackground(frame: FrameNode | ComponentNode, the
 
     if (threadBackground) {
       frame.fills = [
-        figma.variables.setBoundVariableForPaint(
-          { type: 'SOLID', color: { r: 1, g: 1, b: 1 } },
-          'color',
-          threadBackground
-        ),
+        figma.variables.setBoundVariableForPaint({ type: 'SOLID', color: COLORS.WHITE }, 'color', threadBackground),
       ];
     }
   }

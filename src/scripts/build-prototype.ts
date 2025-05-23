@@ -80,8 +80,8 @@ async function buildPrototype(
   if (placeholder) {
     // Create instance of the component
     const frameInstance = frameComponent.createInstance();
-    frameInstance.paddingTop = FRAME_PADDING.TOP;
-    frameInstance.paddingBottom = FRAME_PADDING.BOTTOM;
+    frameInstance.paddingTop = FRAME_PADDING.top;
+    frameInstance.paddingBottom = FRAME_PADDING.bottom;
 
     // Set the frame instance position before inserting
     frameInstance.x = placeholder.x;

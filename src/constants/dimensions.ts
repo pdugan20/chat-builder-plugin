@@ -1,15 +1,20 @@
 export const PLUGIN_WIDTH = 295;
+
 export const PLUGIN_HEIGHT = {
   DEFAULT: 422,
 };
 
-export const DEVICE_WIDTH = 402;
-export const FRAME_PADDING = {
-  TOP: 142,
-  BOTTOM: 82,
-};
+export const DEVICE_WIDTH = 405;
 
 export const FRAME_OFFSETS = {
   WITH_PROTOTYPE: 1104,
   WITHOUT_PROTOTYPE: 652,
-};
+} as const;
+export const FRAME_SPACING = 50;
+
+export const FRAME_PADDING = {
+  left: 16,
+  right: 12,
+  top: 142,
+  bottom: 82,
+} as const;

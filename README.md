@@ -1,91 +1,111 @@
-# Figma Plugin React Tailwindcss Example
+# Chat Builder - Figma Plugin
 
-An example project for the Figma plugin with React.js, React Router, and Tailwind CSS.
+A Figma plugin that allows you to generate realistic iMessage chat interfaces using AI. Create engaging chat conversations with customizable participants, message counts, and styling options.
 
-Refer to [this post](https://benedictmonster.wordpress.com/2023/11/14/an-example-figma-plugin-with-react-js-react-router-and-tailwindcss/) for more information.
+## Features
 
-<img src="https://github.com/BenedictMonster/figma-react-tailwindcss-example/blob/main/img/Screenshot-2023-11-28.gif" width="300" alt="A screenshot of this plugin.">
+- Generate realistic iMessage chat conversations using AI
+- Customize number of participants (2+)
+- Control maximum number of messages
+- Choose between light and dark themes
+- Include interactive prototype view
+- Support for emoji reactions and message status indicators
+- Realistic iMessage UI components and styling
 
-## Development Guide
+## Prerequisites
 
-### Pre-requisites
-
-- [Node.js](https://nodejs.org) – v18
+- [Node.js](https://nodejs.org) (v18 or higher)
 - [Figma desktop app](https://figma.com/downloads/)
+- Anthropic API key (for chat generation)
 
-### Build the plugin
+## Installation
 
-Clone this project, and then...
+1. Clone this repository:
 
-To install dependencies:
-
-```
-$ yarn install
-```
-
-To build the plugin:
-
-```
-$ yarn run build
+```bash
+git clone https://github.com/patdugan/chat-builder-plugin.git
+cd chat-builder-plugin
 ```
 
-This will generate a `dist/` directory containing the JavaScript bundles for the plugin.
+2. Install dependencies:
 
-To watch for code changes and rebuild the plugin automatically:
-
-```
-$ yarn run watch
+```bash
+npm install
 ```
 
-To upgrade packages:
+3. Build the plugin:
 
-```
-npm install -g syncyarnlock
-yarn upgrade --latest
-syncyarnlock -s -k
+```bash
+npm run build
 ```
 
-### Install the plugin
+4. Install in Figma:
+   - Open Figma desktop app
+   - Go to Menu > Plugins > Development > Import plugin from manifest...
+   - Select the `manifest.json` file from the project directory
 
-1. In the Figma desktop app, open a Figma document.
-2. Search for and run `Import plugin from manifest…` via the Quick Actions search bar.
-   - Location of the action: `Menu bar` > `Plugins` > `Development` > `Import plugin from manifest…`
-3. Select the `manifest.json` file.
+## Development
 
-### Debugging
+To start development with hot reloading:
 
-Use `console.log` statements to inspect values in your code.
+```bash
+npm run watch
+```
 
-To open the developer console, search for and run `Open Console` via the Quick Actions search bar.
+This will automatically rebuild the plugin when you make changes to the code.
 
-- Location of the action: `Menu bar` > `Plugins` > `Development` > `Show/Hide console`
+## Usage
 
-## See also
+1. Open your Figma document
+2. Run the Chat Builder plugin
+3. Configure your chat generation settings:
+   - Select number of participants
+   - Set maximum number of messages
+   - Choose theme (light/dark)
+   - Enter a prompt to guide the conversation
+   - Optionally enable prototype view
+4. Click "Generate chat" to create your iMessage conversation
 
-Official docs and code samples from Figma:
+## Project Structure
 
-- [Plugin API docs](https://figma.com/plugin-docs/)
-- [`figma/plugin-samples`](https://github.com/figma/plugin-samples#readme)
+```
+src/
+├── constants/     # Configuration and constants
+├── scripts/       # Core plugin functionality
+├── services/      # External service integrations
+├── types/         # TypeScript type definitions
+├── ui/            # React UI components
+└── utils/         # Utility functions
+```
 
-I referenced the project's configuration and structure below.
+## Available Scripts
 
-Figma plugin boilerplates with React.js, TailwindCSS
+- `npm run build` - Build the plugin for production
+- `npm run watch` - Start development mode with hot reloading
+- `npm run lint:fix` - Fix linting issues
+- `npm run style:write` - Format code with Prettier
+- `npm test` - Run tests
+- `npm run test:watch` - Run tests in watch mode
+- `npm run test:coverage` - Generate test coverage report
 
-- https://github.com/hseoy/figma-plugin-react-boilerplate
+## Contributing
 
-Routing on Figma plugin.
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-- https://reactrouter.com/en/main/router-components/memory-router
+## License
 
-Related to Tailwind CSS
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-- https://github.com/bricks-cloud/figma-plugin-tailwindcss-template
-- https://github.com/tailwindlabs/tailwindcss-forms
-- https://tailwindcss-forms.vercel.app/
+## Author
 
-## Problems
+Patrick Dugan
 
-- When Hot-Reload doesn't work...
-  - If a plugin doesn't reload itself on Figma, press `command + option + p` to re-run the last plugin. -> This works for me. But I'm not satisfied with this solution...
-  - https://forum.figma.com/t/hot-reload-not-working-with-react/46831 -> This doesn't work for me.
-  - https://www.reactjunkie.com/react-graphql-figma-plugin -> I didn't test yet.
+## Acknowledgments
+
+- Built with React, TypeScript, and Tailwind CSS
+- Uses Anthropic's Claude API for chat generation
+- Inspired by iMessage's clean and intuitive interface

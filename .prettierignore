@@ -1,4 +1,22 @@
+# Dependencies
 node_modules/
 package.json
+package-lock.json
 yarn.lock
-dist
+
+# Build output
+dist/
+build/
+
+# Coverage
+coverage/
+
+# Cache
+.cache/
+.eslintcache
+.stylelintcache
+
+# IDE
+.idea/
+.vscode/
+*.sublime-*

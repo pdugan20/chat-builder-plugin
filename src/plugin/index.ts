@@ -19,6 +19,11 @@ async function initializePlugin() {
   await checkIfHasLocalComponents();
 }
 
+async function initializeUI() {
+  figma.showUI(__html__, { themeColors: true, width: PLUGIN_WIDTH, height: PLUGIN_HEIGHT });
+  await initializePlugin();
+}
+
 figma.ui.onmessage = (msg) => {
   switch (msg.type) {
     case MESSAGE_TYPE.UPDATE_ANTHROPIC_KEY:
@@ -39,8 +44,7 @@ figma.ui.onmessage = (msg) => {
       break;
 
     case MESSAGE_TYPE.RELOAD:
-      figma.showUI(__html__, { themeColors: true, width: PLUGIN_WIDTH, height: PLUGIN_HEIGHT.DEFAULT });
-      initializePlugin();
+      initializeUI();
       break;
 
     default:
@@ -49,6 +53,5 @@ figma.ui.onmessage = (msg) => {
 };
 
 (async () => {
-  figma.showUI(__html__, { themeColors: true, width: PLUGIN_WIDTH, height: PLUGIN_HEIGHT.DEFAULT });
-  await initializePlugin();
+  await initializeUI();
 })();

@@ -12,7 +12,7 @@ import {
   createStatusInstance,
 } from '../services/component';
 import MODE_ID from '../constants/collections';
-import { DEVICE_WIDTH, FRAME_OFFSETS } from '../constants/dimensions';
+import { DEVICE_WIDTH, FRAME_OFFSET } from '../constants/dimensions';
 import buildPrototype from './build-prototype';
 import COLORS from '../constants/colors';
 
@@ -310,7 +310,7 @@ export default async function buildChatUserInterface({
   const frameComponent = createFrameComponent(tempFrame);
   frameComponent.x = originalX;
 
-  originalX += includePrototype ? FRAME_OFFSETS.WITH_PROTOTYPE : FRAME_OFFSETS.WITHOUT_PROTOTYPE;
+  originalX += includePrototype ? FRAME_OFFSET.WITH_PROTOTYPE : FRAME_OFFSET.WITHOUT_PROTOTYPE;
 
   // Set theme and background on the frame component
   setFrameThemeAndBackground(frameComponent, theme);

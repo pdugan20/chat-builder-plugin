@@ -1,6 +1,7 @@
 .fp-Text {
   cursor: default;
   font-weight: var(--font-weight-default);
+  user-select: none;
 
   &.fp-weight-strong {
     font-weight: var(--font-weight-strong);
@@ -23,6 +24,7 @@
 
   &.subtitle {
     display: flex;
+    user-select: none;
 
     &.truncated {
       display: block;

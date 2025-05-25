@@ -16,7 +16,9 @@ A Figma plugin that allows you to generate realistic iMessage chat interfaces us
 
 - [Node.js](https://nodejs.org) (v18 or higher)
 - [Figma desktop app](https://figma.com/downloads/)
-- Anthropic API key (for chat generation)
+- [Anthropic API key](https://docs.anthropic.com/en/api/overview) (for chat generation)
+- [Apple SF Pro typeface](https://developer.apple.com/fonts/)
+- [iMessage Chat Builder UI Kit](#) (components accessible in Figma)
 
 ## Installation
 
@@ -56,15 +58,24 @@ This will automatically rebuild the plugin when you make changes to the code.
 
 ## Usage
 
-1. Open your Figma document
-2. Run the Chat Builder plugin
-3. Configure your chat generation settings:
+1. Open your Figma file
+2. Ensure the file has access to iMessage Chat Builder UI Kit components
+3. Run the Chat Builder plugin
+4. Configure your chat generation settings:
    - Select number of participants
    - Set maximum number of messages
    - Choose theme (light/dark)
    - Enter a prompt to guide the conversation
    - Optionally enable prototype view
-4. Click "Generate chat" to create your iMessage conversation
+5. Click "Generate chat" to create your iMessage conversation
+
+### Test Data
+
+To enable test data mode:
+
+1. Open `src/ui/app.tsx`
+2. Setting `USE_TEST_DATA = true` will only generate chats using local test data
+3. Setting `USE_TEST_DATA = false` will enable the plugin to query the Anthropic API
 
 ## Project Structure
 
@@ -108,4 +119,3 @@ Patrick Dugan
 
 - Built with React, TypeScript, and Tailwind CSS
 - Uses Anthropic's Claude API for chat generation
-- Inspired by iMessage's clean and intuitive interface

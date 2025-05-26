@@ -4,13 +4,13 @@ A Figma plugin that allows you to generate realistic iMessage chat interfaces us
 
 ## Features
 
-- Generate realistic iMessage chat conversations using AI
-- Customize number of participants (2+)
-- Control maximum number of messages
-- Choose between light and dark themes
-- Include interactive prototype view
-- Support for emoji reactions and message status indicators
-- Realistic iMessage UI components and styling
+- 🤖 Generate realistic iMessage chat conversations using AI
+- 👥 Customize number of participants (2+)
+- 📝 Control maximum number of messages
+- 🌓 Choose between light and dark themes
+- 🔄 Include interactive prototype view
+- 💬 Support for emoji reactions and message status indicators
+- 🎨 Realistic iMessage UI components and styling
 
 ## Prerequisites
 
@@ -109,11 +109,7 @@ src/
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Author
-
-Patrick Dugan
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Acknowledgments
 

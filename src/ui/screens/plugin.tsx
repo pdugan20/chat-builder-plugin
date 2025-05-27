@@ -4,6 +4,7 @@ import TextareaAutosize from 'react-textarea-autosize';
 import Navigation from '../navigation';
 import AlertBanner from '../components/banners/alert';
 import promptExamples from '../../constants/prompts';
+import { MESSAGE_COUNT_OPTIONS, STYLE_OPTIONS, PARTICIPANT_OPTIONS } from '../../constants/options';
 import { useAnthropic } from '../context/anthropic';
 import { usePlugin } from '../context/plugin';
 import LoadingOverlay from '../components/overlays/loading';
@@ -11,10 +12,6 @@ import ApiKeyOverlay from '../components/overlays/api-key';
 import DisabledOverlay from '../components/overlays/disabled';
 import useChatGeneration from '../hooks/use-chat-generation';
 import { getAlertData, getDisabledLinkClass } from '../../utils/alerts';
-
-const MESSAGE_COUNT_OPTIONS = ['5', '10', '15', '20'];
-const STYLE_OPTIONS = ['light', 'dark'];
-const PARTICIPANT_OPTIONS = ['2', '3'];
 
 interface PluginScreenProps {
   screen?: string;
@@ -37,7 +34,7 @@ function PluginScreen({
   const {
     state: { hasComponentLibrary, hasLocalComponents, isLoading: isPluginLoading, hasFonts },
   } = usePlugin();
-  const { loading, generateChat } = useChatGeneration({ anthropicKey, useTestData });
+  const { loading, streaming, streamingMessages, generateChat } = useChatGeneration({ anthropicKey, useTestData });
   const [style, setStyle] = useState(defaultStyle);
   const [participants, setParticipants] = useState(defaultParticipants);
   const [maxMessages, setMaxMessages] = useState(defaultMaxMessages);
@@ -245,7 +242,7 @@ function PluginScreen({
             );
           })()}
         </div>
-        {loading && <LoadingOverlay />}
+        {loading && <LoadingOverlay streamingMessages={streaming ? streamingMessages : ''} />}
       </div>
       {!anthropicKey && <ApiKeyOverlay />}
     </>

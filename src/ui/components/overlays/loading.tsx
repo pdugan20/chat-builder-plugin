@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Text } from 'figma-kit';
+import loadingConstants from '../../../constants/loading';
 
 interface LoadingOverlayProps {
+  streamingMessages?: string;
+  showStreamingText?: boolean;
   showSpinner?: boolean;
 }
 
@@ -13,22 +16,23 @@ const loadingStages = [
   'Finishing up',
 ];
 
-const TIMEOUT_DURATION = 30000;
-
-function LoadingOverlay({ showSpinner = false }: LoadingOverlayProps): React.JSX.Element {
+function LoadingOverlay({
+  streamingMessages = '',
+  showStreamingText = false,
+  showSpinner = false,
+}: LoadingOverlayProps): React.JSX.Element {
   const [currentStage, setCurrentStage] = useState(0);
-  const [key, setKey] = useState(0);
   const [isTimedOut, setIsTimedOut] = useState(false);
+  const [dots, setDots] = useState('');
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       setIsTimedOut(true);
-    }, TIMEOUT_DURATION);
+    }, loadingConstants.TIMEOUT_DURATION);
 
     const stageInterval = setInterval(() => {
       setCurrentStage((prev) => {
         const nextStage = prev < loadingStages.length - 1 ? prev + 1 : prev;
-        setKey((k) => k + 1);
 
         if (nextStage === loadingStages.length - 1) {
           clearInterval(stageInterval);
@@ -38,20 +42,21 @@ function LoadingOverlay({ showSpinner = false }: LoadingOverlayProps): React.JSX
       });
     }, 3500);
 
+    const dotsInterval = setInterval(() => {
+      setDots((prev) => (prev.length >= 3 ? '' : `${prev}.`));
+    }, 500);
+
     return () => {
       clearInterval(stageInterval);
       clearTimeout(timeoutId);
+      clearInterval(dotsInterval);
     };
   }, []);
 
   const currentMessage = isTimedOut ? 'This is taking longer than expected. Please wait' : loadingStages[currentStage];
 
   return (
-    <div
-      className='loading-overlay fixed inset-0 z-50 flex items-center justify-center'
-      role='alert'
-      aria-live='polite'
-    >
+    <div className='loading-overlay fixed inset-0 z-50 flex items-center justify-center'>
       <div className='flex flex-col items-center gap-3'>
         {showSpinner && (
           <div
@@ -59,9 +64,15 @@ function LoadingOverlay({ showSpinner = false }: LoadingOverlayProps): React.JSX
             aria-hidden='true'
           />
         )}
-        <Text key={key} className='loading-stage loading-dots text-sm text-[var(--figma-color-text-secondary)]'>
+        <Text key={currentStage} className='loading-stage text-sm animate-up text-[var(--figma-color-text-secondary)]'>
           {currentMessage}
+          <span className='inline-block w-4 text-left'>{dots}</span>
         </Text>
+        {showStreamingText && streamingMessages && (
+          <div className='rounded-lg mt-4 max-h-40 w-full overflow-y-auto bg-[var(--figma-color-bg-secondary)] p-4'>
+            <Text className='text-sm whitespace-pre-line text-[var(--figma-color-text)]'>{streamingMessages}</Text>
+          </div>
+        )}
       </div>
     </div>
   );

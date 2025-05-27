@@ -30,7 +30,19 @@ export default function useChatGeneration({
   const [streaming, setStreaming] = useState(false);
   const [streamingMessages, setStreamingMessages] = useState('');
 
-  useEffect(() => {}, [streamingMessages]);
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      const { type } = event.data.pluginMessage;
+
+      if (type === MESSAGE_TYPE.BUILD_COMPLETE) {
+        setLoading(false);
+        setStreaming(false);
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
 
   const generateChat = async ({
     participants,
@@ -93,7 +105,7 @@ export default function useChatGeneration({
         },
         '*'
       );
-    } finally {
+    } catch (error) {
       setLoading(false);
       setStreaming(false);
     }

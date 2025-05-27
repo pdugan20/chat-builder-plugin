@@ -15,6 +15,7 @@ import MODE_ID from '../constants/collections';
 import { DEVICE_WIDTH, FRAME_OFFSET } from '../constants/dimensions';
 import buildPrototype from './build-prototype';
 import COLORS from '../constants/colors';
+import { MESSAGE_TYPE } from '../constants/messages';
 
 // Track the original x position
 let originalX = 0;
@@ -324,4 +325,9 @@ export default async function buildChatUserInterface({
 
   // Clean up temporary components
   tempFrame.remove();
+
+  // Signal build completion
+  figma.ui.postMessage({
+    type: MESSAGE_TYPE.BUILD_COMPLETE,
+  });
 }

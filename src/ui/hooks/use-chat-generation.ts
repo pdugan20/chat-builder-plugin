@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { MESSAGE_TYPE } from '../../constants/messages';
 import createChatQuery from '../../api/anthropic';
 import cleanAndParseJson from '../../utils/json';
@@ -11,6 +11,8 @@ interface UseChatGenerationProps {
 
 interface UseChatGenerationReturn {
   loading: boolean;
+  streaming: boolean;
+  streamingMessages: string;
   generateChat: (params: {
     participants: string;
     maxMessages: string;
@@ -25,6 +27,10 @@ export default function useChatGeneration({
   useTestData = false,
 }: UseChatGenerationProps): UseChatGenerationReturn {
   const [loading, setLoading] = useState(false);
+  const [streaming, setStreaming] = useState(false);
+  const [streamingMessages, setStreamingMessages] = useState('');
+
+  useEffect(() => {}, [streamingMessages]);
 
   const generateChat = async ({
     participants,
@@ -40,6 +46,8 @@ export default function useChatGeneration({
     includePrototype: boolean;
   }) => {
     setLoading(true);
+    setStreaming(true);
+    setStreamingMessages('');
 
     try {
       if (useTestData) {
@@ -56,6 +64,22 @@ export default function useChatGeneration({
       const response = await createChatQuery({
         apiKey: anthropicKey,
         queryInputs: { participants, maxMessages, prompt },
+        onStream: (chunk) => {
+          setStreamingMessages((prev) => {
+            const newText = prev + chunk;
+            parent.postMessage(
+              {
+                pluginMessage: {
+                  type: MESSAGE_TYPE.STREAM_UPDATE,
+                  chunk,
+                  accumulatedText: newText,
+                },
+              },
+              '*'
+            );
+            return newText;
+          });
+        },
       });
 
       if (!response?.content?.[0]?.text) {
@@ -71,11 +95,14 @@ export default function useChatGeneration({
       );
     } finally {
       setLoading(false);
+      setStreaming(false);
     }
   };
 
   return {
     loading,
+    streaming,
+    streamingMessages,
     generateChat,
   };
 }

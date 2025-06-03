@@ -82,23 +82,33 @@ function setMessageGroupProperties(
   bubbleKeys: string[],
   chatItems: ChatItem[]
 ): void {
+  // eslint-disable-next-line no-console
+  console.log('Message group properties:', {
+    role: props.role,
+    messagesInGroup: props.messagesInGroup,
+  });
+
+  // Find all text nodes in the instance
+  const allTextNodes = instance.findAll((node) => node.type === 'TEXT') as TextNode[];
+  // eslint-disable-next-line no-console
+  console.log(
+    'Available text nodes:',
+    allTextNodes.map((node) => ({ name: node.name, content: node.characters }))
+  );
+
+  // Sort text nodes by their y position to maintain order
+  const sortedTextNodes = allTextNodes.sort((a, b) => a.y - b.y);
+
   for (let i: number = 0; i < props.messagesInGroup; i += 1) {
     const message = chatItems[props.index + i]?.message;
-    if (message) {
-      // Find text nodes in the instance
-      const textNodes = instance.findAll((node) => node.type === 'TEXT') as TextNode[];
-
-      // Try to find a text node that might be for the message
-      const messageNode = textNodes.find(
-        (node) =>
-          node.name.toLowerCase().includes('message') ||
-          node.name.toLowerCase().includes('bubble') ||
-          node.name.toLowerCase().includes('text')
-      );
-
-      if (messageNode) {
-        messageNode.characters = message;
-      }
+    if (message && sortedTextNodes[i]) {
+      sortedTextNodes[i].characters = message;
+      // eslint-disable-next-line no-console
+      console.log('Updated text node:', {
+        index: i,
+        name: sortedTextNodes[i].name,
+        message,
+      });
       props.messages.push(message);
     }
   }

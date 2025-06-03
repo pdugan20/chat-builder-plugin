@@ -57,6 +57,19 @@ export default function useChatGeneration({
     style: string;
     includePrototype: boolean;
   }) => {
+    if (!anthropicKey) {
+      parent.postMessage(
+        {
+          pluginMessage: {
+            type: MESSAGE_TYPE.POST_API_ERROR,
+            error: 'API key is required',
+          },
+        },
+        '*'
+      );
+      return;
+    }
+
     setLoading(true);
     setStreaming(true);
     setStreamingMessages('');
@@ -95,10 +108,34 @@ export default function useChatGeneration({
       });
 
       if (!response?.content?.[0]?.text) {
+        parent.postMessage(
+          {
+            pluginMessage: {
+              type: MESSAGE_TYPE.POST_API_ERROR,
+              error: 'No response generated from API',
+              retryable: true,
+            },
+          },
+          '*'
+        );
         return;
       }
 
       const data = cleanAndParseJson(response.content[0].text);
+      if (!data) {
+        parent.postMessage(
+          {
+            pluginMessage: {
+              type: MESSAGE_TYPE.POST_API_ERROR,
+              error: 'Failed to parse API response',
+              retryable: true,
+            },
+          },
+          '*'
+        );
+        return;
+      }
+
       parent.postMessage(
         {
           pluginMessage: { type: MESSAGE_TYPE.BUILD_CHAT_UI, data, style, prompt, includePrototype },
@@ -108,6 +145,16 @@ export default function useChatGeneration({
     } catch (error) {
       setLoading(false);
       setStreaming(false);
+      parent.postMessage(
+        {
+          pluginMessage: {
+            type: MESSAGE_TYPE.POST_API_ERROR,
+            error: error instanceof Error ? error.message : 'An error occurred while generating chat',
+            retryable: true,
+          },
+        },
+        '*'
+      );
     }
   };
 

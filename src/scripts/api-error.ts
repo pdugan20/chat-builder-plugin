@@ -1,12 +1,11 @@
 import { MESSAGE_TYPE } from '../constants/messages';
 
 interface ErrorNotification {
-  errorType: string;
   errorMessage: string;
-  retryable: boolean;
+  retryable?: boolean;
 }
 
-export default async function notifyUser({ errorMessage, retryable }: ErrorNotification) {
+export default async function notifyUser({ errorMessage, retryable = false }: ErrorNotification) {
   const actionButton = retryable
     ? {
         text: 'Try Again',

@@ -40,7 +40,10 @@ figma.ui.onmessage = (msg) => {
       break;
 
     case MESSAGE_TYPE.POST_API_ERROR:
-      notifyUser(msg.errorType);
+      notifyUser({
+        errorMessage: msg.error,
+        retryable: msg.retryable ?? false,
+      });
       break;
 
     case MESSAGE_TYPE.RELOAD:

@@ -39,3 +39,12 @@ nav {
     display: flex;
   }
 }
+
+.update-key-dialog {
+  margin-top: calc(-1 * var(--space-1));
+}
+
+.heading-parent .update-key-dialog {
+  margin-top: 0;
+  margin-left: auto;
+}

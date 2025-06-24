@@ -106,9 +106,6 @@ async function attemptRequest(
     content: [{ type: 'text', text: rawResponse }],
   };
 
-  // eslint-disable-next-line no-console
-  console.log('API Response:', JSON.stringify(response, null, 2));
-
   return response;
 }
 

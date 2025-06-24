@@ -8,6 +8,23 @@ interface LoadingOverlayProps {
   showSpinner?: boolean;
 }
 
+interface AnimatedMessageProps {
+  message: string;
+  dots: string;
+}
+
+function AnimatedMessage({ message, dots }: AnimatedMessageProps): React.JSX.Element {
+  return (
+    <Text
+      key={message}
+      className='loading-stage text-sm animate-up min-w-[300px] text-center text-[var(--figma-color-text-secondary)]'
+    >
+      {message}
+      <span className='inline-block w-4 text-left'>{dots}</span>
+    </Text>
+  );
+}
+
 const loadingStages = [
   'Initializing chat generation',
   'Analyzing conversation inputs',
@@ -53,7 +70,7 @@ function LoadingOverlay({
     };
   }, []);
 
-  const currentMessage = isTimedOut ? 'This is taking longer than expected. Please wait' : loadingStages[currentStage];
+  const currentMessage = isTimedOut ? "We're still working. Please wait" : loadingStages[currentStage];
 
   return (
     <div className='loading-overlay fixed inset-0 z-50 flex items-center justify-center'>
@@ -64,10 +81,7 @@ function LoadingOverlay({
             aria-hidden='true'
           />
         )}
-        <Text key={currentStage} className='loading-stage text-sm animate-up text-[var(--figma-color-text-secondary)]'>
-          {currentMessage}
-          <span className='inline-block w-4 text-left'>{dots}</span>
-        </Text>
+        <AnimatedMessage message={currentMessage} dots={dots} />
         {showStreamingText && streamingMessages && (
           <div className='rounded-lg mt-4 max-h-40 w-full overflow-y-auto bg-[var(--figma-color-bg-secondary)] p-4'>
             <Text className='text-sm whitespace-pre-line text-[var(--figma-color-text)]'>{streamingMessages}</Text>

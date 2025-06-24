@@ -1,7 +1,7 @@
 ---
-name: Bug Report
+name: Bug report
 about: Report a bug encountered while using the plugin.
-title: "[Bug]: Describe your issue"
+title: '[Bug]: Describe your issue'
 labels: bug
 assignees: 'pdugan20'
 ---

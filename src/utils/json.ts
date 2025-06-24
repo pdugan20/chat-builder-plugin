@@ -1,8 +1,5 @@
 function cleanAndParseJSON(text: string) {
   try {
-    // eslint-disable-next-line no-console
-    console.log('Raw API response:', text);
-
     const start = text.indexOf('[') !== -1 ? text.indexOf('[') : text.indexOf('{');
     const end = text.lastIndexOf(']') !== -1 ? text.lastIndexOf(']') + 1 : text.lastIndexOf('}') + 1;
 

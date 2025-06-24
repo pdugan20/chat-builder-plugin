@@ -32,7 +32,7 @@ function UpdateKeyDialog({
     return (
       <AlertDialog.Trigger>
         {buttonVariant === 'primary' ? (
-          <Button variant='primary' size='medium'>
+          <Button variant='primary' size='small'>
             {actionLabel}
           </Button>
         ) : (
@@ -99,11 +99,13 @@ function UpdateKeyDialog({
   }
 
   return (
-    <AlertDialog.Root>
-      {renderTrigger()}
-      {renderOverlay()}
-      {renderContent()}
-    </AlertDialog.Root>
+    <div className='update-key-dialog'>
+      <AlertDialog.Root>
+        {renderTrigger()}
+        {renderOverlay()}
+        {renderContent()}
+      </AlertDialog.Root>
+    </div>
   );
 }
 

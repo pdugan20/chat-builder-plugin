@@ -1,13 +1,14 @@
 {
   "name": "imessage-chat-builder",
-  "version": "1.0.0",
-  "description": "A Figma plugin that allows for the generation of iMessage chats.",
+  "version": "1.0.1",
+  "description": "Create convincing iMessage prototypes with AI. Turn ideas into iMessage prototypes instantly.",
   "main": "dist/plugin.js",
   "license": "MIT",
   "author": "Patrick Dugan",
   "scripts": {
     "watch": "webpack --mode=development --watch",
     "build": "webpack --mode=production",
+    "update-version": "node scripts/update-version.js",
     "lint:fix": "eslint --ext .tsx --ext .ts .",
     "style:write": "prettier --write .",
     "test": "jest",

@@ -223,8 +223,8 @@ async function createMessageInstance(
   return instance;
 }
 
-function setFrameThemeAndBackground(frame: FrameNode | ComponentNode, theme: 'light' | 'dark'): void {
-  const localCollections = figma.variables.getLocalVariableCollections();
+async function setFrameThemeAndBackground(frame: FrameNode | ComponentNode, theme: 'light' | 'dark'): Promise<void> {
+  const localCollections = await figma.variables.getLocalVariableCollectionsAsync();
   const localColorCollection = localCollections.find((c) => c.name === 'Color');
 
   if (localColorCollection) {
@@ -232,7 +232,8 @@ function setFrameThemeAndBackground(frame: FrameNode | ComponentNode, theme: 'li
     frame.setExplicitVariableModeForCollection(localColorCollection, MODE_ID[theme]);
 
     // Get and set the background color
-    const variables = localColorCollection.variableIds.map((id) => figma.variables.getVariableById(id));
+    const variablePromises = localColorCollection.variableIds.map((id) => figma.variables.getVariableByIdAsync(id));
+    const variables = await Promise.all(variablePromises);
     const threadBackground = variables.find((v) => v.name === VARIABLES.THREAD_BACKGROUND);
 
     if (threadBackground) {
@@ -307,7 +308,7 @@ export default async function buildChatUserInterface({
   originalX += includePrototype ? FRAME_OFFSET.WITH_PROTOTYPE : FRAME_OFFSET.WITHOUT_PROTOTYPE;
 
   // Set theme and background on the frame component
-  setFrameThemeAndBackground(frameComponent, theme);
+  await setFrameThemeAndBackground(frameComponent, theme);
 
   if (includePrototype) {
     await buildPrototype(frameComponent, threadVariant, items, theme);

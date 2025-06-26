@@ -4,13 +4,17 @@ import Navigation from '../navigation';
 import UpdateKeyDialog from '../components/dialogs/update-key';
 import { useAnthropic } from '../context/anthropic';
 import URLS from '../../constants/urls';
+import PLUGIN_VERSION from '../../constants/plugin';
 
 interface SettingsScreenProps {
   screen?: string;
   pluginVersion?: string;
 }
 
-function SettingsScreen({ screen = 'settings', pluginVersion = '1.0' }: SettingsScreenProps): React.JSX.Element {
+function SettingsScreen({
+  screen = 'settings',
+  pluginVersion = PLUGIN_VERSION,
+}: SettingsScreenProps): React.JSX.Element {
   const { anthropicKey } = useAnthropic();
 
   function renderNav(): React.JSX.Element {

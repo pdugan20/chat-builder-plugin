@@ -1,4 +1,5 @@
 import { MESSAGE_TYPE } from '../constants/messages';
+import MODE_ID from '../constants/collections';
 
 export async function checkIfHasLibrary() {
   try {
@@ -19,16 +20,26 @@ export async function checkIfHasLibrary() {
 
 export async function checkIfHasLocalComponents() {
   try {
-    await figma.loadAllPagesAsync();
+    // Get all local variable collections
+    const localCollections = await figma.variables.getLocalVariableCollectionsAsync();
 
-    let allNodes = figma.root.findAll();
+    // Look for the specific "Color" collection that our plugin creates
+    const localColorCollection = localCollections.find((c) => c.name === 'Color');
 
-    if (allNodes.length === 0) {
-      allNodes = figma.currentPage.findAll();
+    if (!localColorCollection) {
+      figma.ui.postMessage({
+        type: MESSAGE_TYPE.HAS_LOCAL_COMPONENTS,
+        hasLocalComponents: false,
+      });
+      return;
     }
 
-    const components = allNodes.filter((node) => node.type === 'COMPONENT' || node.type === 'COMPONENT_SET');
-    const hasLocalComponents = components.some((c) => c.name.includes('iMessage'));
+    // Check if the collection has the expected mode IDs that our plugin uses
+    const hasLightMode = localColorCollection.modes.some((mode) => mode.modeId === MODE_ID.light);
+    const hasDarkMode = localColorCollection.modes.some((mode) => mode.modeId === MODE_ID.dark);
+
+    // If the collection has both light and dark modes, we have local components
+    const hasLocalComponents = hasLightMode && hasDarkMode;
 
     figma.ui.postMessage({
       type: MESSAGE_TYPE.HAS_LOCAL_COMPONENTS,

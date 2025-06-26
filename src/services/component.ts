@@ -27,8 +27,8 @@ export async function loadComponentSets(): Promise<ComponentSets> {
 }
 
 export async function updateEmojiKeyIds(): Promise<void> {
-  const collections = await figma.teamLibrary.getAvailableLibraryVariableCollectionsAsync();
-  const hasChatBuilderLibrary = collections.some((collection) => collection.libraryName === 'iMessage Chat Builder');
+  const collections = await figma.variables.getLocalVariableCollectionsAsync();
+  const hasChatBuilderLibrary = collections.some((collection) => collection.name === 'iMessage Chat Builder');
 
   if (!hasChatBuilderLibrary) {
     const allNodes = figma.root.findAll();

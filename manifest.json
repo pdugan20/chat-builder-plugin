@@ -1,9 +1,10 @@
 {
   "api": "1.0.0",
   "editorType": ["figma"],
-  "id": "imessage-chat-builder",
-  "name": "Chat Builder",
+  "id": "1519731262843198057",
+  "name": "iMessage AI Chat Builder",
   "main": "dist/plugin.js",
+  "documentAccess": "dynamic-page",
   "ui": "dist/ui.html",
   "permissions": ["teamlibrary"],
   "networkAccess": {

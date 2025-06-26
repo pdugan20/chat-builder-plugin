@@ -8,11 +8,12 @@ let lastFrameX = 0;
 
 // Helper functions
 async function getThreadBackgroundVariable(): Promise<Variable | null> {
-  const localCollections = figma.variables.getLocalVariableCollections();
+  const localCollections = await figma.variables.getLocalVariableCollectionsAsync();
   const localColorCollection = localCollections.find((c) => c.name === 'Color');
 
   if (localColorCollection) {
-    const variables = localColorCollection.variableIds.map((id) => figma.variables.getVariableById(id));
+    const variablePromises = localColorCollection.variableIds.map((id) => figma.variables.getVariableByIdAsync(id));
+    const variables = await Promise.all(variablePromises);
     return variables.find((v) => v.name === VARIABLES.THREAD_BACKGROUND) || null;
   }
 
@@ -20,7 +21,7 @@ async function getThreadBackgroundVariable(): Promise<Variable | null> {
 }
 
 async function getColorCollection(): Promise<VariableCollection | null> {
-  const localCollections = figma.variables.getLocalVariableCollections();
+  const localCollections = await figma.variables.getLocalVariableCollectionsAsync();
   return localCollections.find((c) => c.name === 'Color') || null;
 }
 
@@ -81,8 +82,11 @@ export async function buildFrame(
   return frame;
 }
 
-export function setFrameThemeAndBackground(frame: FrameNode | ComponentNode, theme: 'light' | 'dark'): void {
-  const localCollections = figma.variables.getLocalVariableCollections();
+export async function setFrameThemeAndBackground(
+  frame: FrameNode | ComponentNode,
+  theme: 'light' | 'dark'
+): Promise<void> {
+  const localCollections = await figma.variables.getLocalVariableCollectionsAsync();
   const localColorCollection = localCollections.find((c) => c.name === 'Color');
 
   if (localColorCollection) {
@@ -90,7 +94,8 @@ export function setFrameThemeAndBackground(frame: FrameNode | ComponentNode, the
     frame.setExplicitVariableModeForCollection(localColorCollection, MODE_ID[theme]);
 
     // Get and set the background color
-    const variables = localColorCollection.variableIds.map((id) => figma.variables.getVariableById(id));
+    const variablePromises = localColorCollection.variableIds.map((id) => figma.variables.getVariableByIdAsync(id));
+    const variables = await Promise.all(variablePromises);
     const threadBackground = variables.find((v) => v.name === VARIABLES.THREAD_BACKGROUND);
 
     if (threadBackground) {

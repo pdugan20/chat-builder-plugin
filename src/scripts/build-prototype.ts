@@ -68,7 +68,7 @@ async function buildPrototype(
 
   // Create and position the prototype frame
   const prototypeFrame = createPrototypeFrame(tempThreadComponent, frameComponent);
-  setFrameThemeAndBackground(prototypeFrame, theme);
+  await setFrameThemeAndBackground(prototypeFrame, theme);
   const threadInstance = tempThreadComponent.createInstance();
   prototypeFrame.appendChild(threadInstance);
 

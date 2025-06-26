@@ -1,6 +1,6 @@
 # iMessage AI Chat Builder - Figma Plugin
 
-A Figma plugin that allows you to generate realistic iMessage chat interfaces using AI. Create engaging chat conversations with customizable participants, message counts, and styling options. ([Add in Figma](https://www.figma.com/community/plugin/1519731262843198057/imessage-ai-chat-builder))
+A Figma plugin that allows you to generate realistic iMessage chat interfaces using AI. Create engaging chat conversations with customizable participants, message counts, and styling options. ([View in Figma](https://www.figma.com/community/plugin/1519731262843198057/imessage-ai-chat-builder)).
 
 ## Features
 

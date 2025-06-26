@@ -20,10 +20,7 @@ export async function checkIfHasLibrary() {
 
 export async function checkIfHasLocalComponents() {
   try {
-    // Get all local variable collections
     const localCollections = await figma.variables.getLocalVariableCollectionsAsync();
-
-    // Look for the specific "Color" collection that our plugin creates
     const localColorCollection = localCollections.find((c) => c.name === 'Color');
 
     if (!localColorCollection) {
@@ -38,8 +35,14 @@ export async function checkIfHasLocalComponents() {
     const hasLightMode = localColorCollection.modes.some((mode) => mode.modeId === MODE_ID.light);
     const hasDarkMode = localColorCollection.modes.some((mode) => mode.modeId === MODE_ID.dark);
 
-    // If the collection has both light and dark modes, we have local components
     const hasLocalComponents = hasLightMode && hasDarkMode;
+
+    // If we have local components, preload all pages in the background
+    if (hasLocalComponents) {
+      figma.loadAllPagesAsync().catch(() => {
+        // Ignore
+      });
+    }
 
     figma.ui.postMessage({
       type: MESSAGE_TYPE.HAS_LOCAL_COMPONENTS,

@@ -41,6 +41,8 @@ function PluginScreen({
   const [prompt, setPrompt] = useState(defaultPrompt);
   const [includePrototype, setIncludePrototype] = useState(false);
 
+  const isLocalComponentsInitialized = hasLocalComponents !== undefined;
+
   function renderNav(): React.JSX.Element {
     return <Navigation screen={screen} />;
   }
@@ -217,7 +219,7 @@ function PluginScreen({
     );
   }
 
-  if (isAnthropicLoading) {
+  if (isAnthropicLoading || !isLocalComponentsInitialized) {
     return null;
   }
 

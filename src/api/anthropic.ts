@@ -21,9 +21,6 @@ interface AnthropicError {
   };
 }
 
-const MAX_RETRIES = 3;
-const RETRY_DELAY = 2000; // 2 seconds
-
 function delay(ms: number): Promise<void> {
   return new Promise((resolve) => {
     setTimeout(resolve, ms);
@@ -41,9 +38,10 @@ async function attemptRequest(
 
   const stream = await anthropic.messages.create({
     model: API_CONSTANTS.CLAUDE_MODEL,
-    max_tokens: 8192,
-    temperature: 1,
+    max_tokens: API_CONSTANTS.MAX_TOKENS,
+    temperature: API_CONSTANTS.TEMPERATURE,
     stream: true,
+    system: API_CONSTANTS.SYSTEM_MESSAGE,
     messages: [
       {
         role: 'user',
@@ -122,8 +120,8 @@ async function retryWithDelay(
       (error instanceof Error && error.message.includes('overloaded_error')) ||
       (error as AnthropicError)?.error?.error?.type === 'overloaded_error';
 
-    if (isOverloaded && attempt < MAX_RETRIES - 1) {
-      await delay(RETRY_DELAY);
+    if (isOverloaded && attempt < API_CONSTANTS.MAX_RETRIES - 1) {
+      await delay(API_CONSTANTS.RETRY_DELAY);
       return retryWithDelay(anthropic, queryInputs, onStream, attempt + 1);
     }
 

@@ -110,73 +110,48 @@ interface GetInstructionsPromptParams {
 }
 
 export function getInstructionsPrompt({ prompt, maxMessages, participants }: GetInstructionsPromptParams): string {
-  const instructions = `You are tasked with generating an iMessage chat conversation based on user inputs. The conversation should be realistic, engaging, and formatted according to specific requirements. Follow these instructions carefully to create the conversation:
+  return `Generate an iMessage conversation as a valid JSON array. Follow this exact format:
 
-1. Input variables:
-<topic_and_tone>
-${prompt}
-</topic_and_tone>
+REQUIREMENTS:
+- Topic/Tone: ${prompt}
+- Max messages: ${maxMessages}
+- Participants: ${participants}
+- One participant must be role "sender", others "recipient"
+- Generate realistic first+last names, assign genders (male/female)
+- Times in "H:MM AM/PM" format, chronological order
+- emojiReaction: null OR one of: heart, haha, exclamation, thumbsUp, thumbsDown, question
 
-<max_messages>
-${maxMessages}
-</max_messages>
+CRITICAL - messagesInGroup Logic:
+- messagesInGroup = total number of consecutive messages by the SAME person
+- If person sends 1 message alone: messagesInGroup = 1
+- If person sends 3 messages in a row: ALL 3 have messagesInGroup = 3
+- When different person starts talking: reset counter for their group
+- Example: [Alice(1), Alice(1)] → Alice gets messagesInGroup=1, Alice gets messagesInGroup=1
+- Example: [Bob(2), Bob(2), Alice(1)] → Bob gets messagesInGroup=2, Bob gets messagesInGroup=2, Alice gets messagesInGroup=1
 
-<num_participants>
-${participants}
-</num_participants>
+CRITICAL: Output ONLY the JSON array, no other text. Start with [ and end with ].
 
-2. Participant information:
-- Generate names for the number of participants specified in num_participants.
-- Each participant should have a first and last name.
-- Assign a gender (male or female) to each participant.
-- Designate one participant as the "sender" and the rest as "recipients".
-
-3. Message generation:
-- Create a conversation based on the topic_and_tone. If no specific tone is mentioned, keep it casual.
-- Generate between 1 and 3 messages for each participant's turn before switching to another participant.
-- Ensure the total number of messages does not exceed max_messages.
-- Assign a time to each message in AM/PM format.
-- Randomly add emoji reactions to some messages. Use only these reactions: heart, haha, exclamation, thumbsUp, thumbsDown, question and make sure the emoji is appropriate given the content of the message.
-- If a user has sent multiple messages in a row, specify the number of messages as a number.
-
-4. JSON formatting:
-- Format the conversation as a JSON array where each object represents a message.
-- Include the following properties for each message:
-  - name
-  - gender
-  - role (sender or recipient)
-  - message
-  - time
-  - emojiReaction (if applicable)
-  - messagesInGroup
-
-5. Example output format:
+EXAMPLE FORMAT:
 [
   {
-    "name": "John",
+    "name": "Mike Johnson",
     "gender": "male",
     "role": "sender",
-    "message": "Hey everyone, what do you think about the new movie?",
-    "time": "2:30 PM",
+    "message": "Hey, want to see that new movie?",
+    "time": "3:15 PM",
     "emojiReaction": null,
     "messagesInGroup": 1
   },
   {
-    "name": "Sarah",
+    "name": "Sarah Chen",
     "gender": "female",
     "role": "recipient",
-    "message": "I loved it! The special effects were amazing.",
-    "time": "2:32 PM",
-    "emojiReaction": "heart",
+    "message": "Yes! I heard it's amazing",
+    "time": "3:17 PM",
+    "emojiReaction": "exclamation",
     "messagesInGroup": 1
   }
 ]
 
-6. Generate the conversation:
-- Create a realistic conversation based on the given topic and tone.
-- Ensure the conversation flows naturally and stays on topic.
-- Make the response type JSON
-- Make sure to include all required properties for each message.`;
-
-  return instructions;
+Generate realistic conversation based on the topic above:`;
 }

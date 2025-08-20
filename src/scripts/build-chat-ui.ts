@@ -245,7 +245,12 @@ function createSenderInstance(props: MessageInstanceProps, chatItems: ChatItem[]
   setMessageGroupProperties(instance, props, [], chatItems);
   handleEmojiReaction(instance, props);
 
-  if (props.index === chatItems.length - 1) {
+  // Check if this bubble contains the very last message in the chat
+  const isLastMessageInChat = props.index + props.messagesInGroup - 1 === chatItems.length - 1;
+  
+  if (isLastMessageInChat) {
+    console.log(`📝 Adding delivery status to sender bubble (message group ending at position ${props.index + props.messagesInGroup - 1})`);
+    
     // Detect if it's a group chat to determine the delivery message
     const uniqueRecipients = new Set(chatItems.filter(item => item.role === 'recipient').map(item => item.name));
     const isGroupChat = uniqueRecipients.size > 1;
@@ -486,18 +491,23 @@ export default async function buildChatUserInterface({
   // Set theme and background on the frame component
   await setFrameThemeAndBackground(frameComponent, theme);
 
-  if (includePrototype) {
-    await buildPrototype(frameComponent, threadVariant, items, theme, isGroupChat);
-  } else {
-    // Focus viewport on the new components
-    figma.viewport.scrollAndZoomIntoView([frameComponent]);
-  }
-
   // Clean up temporary components
   tempFrame.remove();
 
-  // Signal build completion
-  figma.ui.postMessage({
-    type: MESSAGE_TYPE.BUILD_COMPLETE,
-  });
+  if (includePrototype) {
+    await buildPrototype(frameComponent, threadVariant, items, theme, isGroupChat);
+    
+    // Signal completion after prototype is built (this happens after "Using Group/1:1 thread variant" logs)
+    figma.ui.postMessage({
+      type: MESSAGE_TYPE.BUILD_COMPLETE,
+    });
+  } else {
+    // Focus viewport on the new components
+    figma.viewport.scrollAndZoomIntoView([frameComponent]);
+    
+    // For non-prototype builds, signal completion immediately after viewport operation
+    figma.ui.postMessage({
+      type: MESSAGE_TYPE.BUILD_COMPLETE,
+    });
+  }
 }

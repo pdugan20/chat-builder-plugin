@@ -125,6 +125,7 @@ REQUIREMENTS:
 - Messages should show natural group chat dynamics with all ${participants} people participating
 - Times in "H:MM AM/PM" format, chronological order
 - emojiReaction: null OR one of: heart, haha, exclamation, thumbsUp, thumbsDown, question
+- Use emoji reactions SPARINGLY - only 2-4 total reactions per conversation, not on every message
 
 CONVERSATION STYLE:
 - Keep messages conversational and natural - like real text messages

@@ -54,7 +54,10 @@ async function setGroupPersonaProperties(tempThreadComponent: ComponentNode, ite
   // Sort recipients by name for consistent ordering - same as chat bubbles
   recipients.sort((a, b) => a.name.localeCompare(b.name));
 
-  console.log('Setting personas for group chat participants:', recipients.map(r => `${r.name} (${r.gender})`));
+  console.log('🔍 DEBUGGING AI-GENERATED DATA:');
+  console.log('Raw chat items:', items.map(item => ({ name: item.name, gender: item.gender, role: item.role })));
+  console.log('Filtered recipients:', recipients.map(r => `${r.name} (${r.gender})`));
+  console.log('Recipients count:', recipients.length);
   
   // Look for Profile Photo components in the nav bar, just like chat bubbles
   const navBar = tempThreadComponent.findOne((node) => node.name === THREAD_PROPERTIES.NAV_BAR);
@@ -79,52 +82,59 @@ async function setGroupPersonaProperties(tempThreadComponent: ComponentNode, ite
     console.warn(`Only found ${profilePhotos.length} profile photos but need ${recipients.length} for all recipients. Some photos may not be updated.`);
   }
 
-  // Map each recipient to a profile photo (same as chat bubbles)
-  recipients.forEach((recipient, recipientIndex) => {
-    if (recipientIndex < profilePhotos.length) {
-      const profilePhoto = profilePhotos[recipientIndex];
-      console.log(`Mapping recipient ${recipientIndex + 1}/${recipients.length}: ${recipient.name} (${recipient.gender}) to profile photo "${profilePhoto.name}"`);
-      
-      // Find the nested Persona component within the Profile Photo (same as chat bubbles)
-      const persona = 'findOne' in profilePhoto 
-        ? profilePhoto.findOne((node) => 
-            node.name === 'Persona' && node.type === 'INSTANCE'
-          )
-        : null;
+  // Update all profile photos found - cycle through recipients if we have more slots than recipients
+  console.log(`📍 Updating ${profilePhotos.length} profile photo slots for ${recipients.length} recipients`);
+  
+  // Map each profile photo slot to a recipient (cycling through recipients if needed)
+  for (let i = 0; i < profilePhotos.length; i++) {
+    const recipientIndex = i % recipients.length; // Cycle through recipients if we have more slots
+    const recipient = recipients[recipientIndex];
+    const profilePhoto = profilePhotos[i];
+    
+    console.log(`Mapping profile photo slot ${i + 1} to recipient ${recipientIndex + 1}/${recipients.length}: ${recipient.name} (${recipient.gender})`);
+    
+    // Find the nested Persona component within the Profile Photo (same as chat bubbles)
+    const persona = 'findOne' in profilePhoto 
+      ? profilePhoto.findOne((node) => 
+          node.name === 'Persona' && node.type === 'INSTANCE'
+        )
+      : null;
 
-      if (persona && 'setProperties' in persona) {
-        const recipientGender = recipient.gender.charAt(0).toUpperCase() + recipient.gender.slice(1);
-        const personaVariants = (personaSet as ComponentSetNode).children as ComponentNode[];
-        const matchingVariants = personaVariants.filter((variant) => variant.name.includes(recipientGender));
+    if (persona && 'setProperties' in persona) {
+      const recipientGender = recipient.gender.charAt(0).toUpperCase() + recipient.gender.slice(1);
+      const personaVariants = (personaSet as ComponentSetNode).children as ComponentNode[];
+      const matchingVariants = personaVariants.filter((variant) => variant.name.includes(recipientGender));
 
-        if (matchingVariants.length > 0) {
-          // Use the same consistent mapping logic as chat bubbles
-          const sameGenderRecipients = recipients.filter(r => r.gender === recipient.gender);
-          const recipientIndex = sameGenderRecipients.findIndex(r => r.name === recipient.name);
-          const variantIndex = recipientIndex % matchingVariants.length;
-          const selectedVariant = matchingVariants[variantIndex];
-          
-          const personaInstance = persona as InstanceNode;
-          console.log(`✅ Setting header persona to ${recipientGender} variant: ${selectedVariant.name} for ${recipient.name} (matching chat bubble)`);
-          
-          // Direct assignment - same as working chat bubble code
-          personaInstance.mainComponent = selectedVariant;
-          console.log('Header persona main component updated successfully');
-        } else {
-          console.log(`No matching variants found for ${recipientGender}`);
-        }
+      if (matchingVariants.length > 0) {
+        // Use the same consistent mapping logic as chat bubbles
+        const sameGenderRecipients = recipients.filter(r => r.gender === recipient.gender);
+        const recipientIndex = sameGenderRecipients.findIndex(r => r.name === recipient.name);
+        const variantIndex = recipientIndex % matchingVariants.length;
+        const selectedVariant = matchingVariants[variantIndex];
+        
+        const personaInstance = persona as InstanceNode;
+        console.log(`✅ Setting header persona to ${recipientGender} variant: ${selectedVariant.name} for ${recipient.name} (matching chat bubble)`);
+        
+        // Direct assignment - same as working chat bubble code
+        personaInstance.mainComponent = selectedVariant;
+        console.log('Header persona main component updated successfully');
       } else {
-        console.log('No nested Persona instance found within Profile Photo');
-        if ('children' in profilePhoto) {
-          console.log('Profile Photo children:', profilePhoto.children.map(child => ({ name: child.name, type: child.type })));
-        } else {
-          console.log('Profile Photo has no children property');
-        }
+        console.log(`No matching variants found for ${recipientGender}`);
       }
     } else {
-      console.log(`❌ No profile photo available for recipient ${recipientIndex + 1}: ${recipient.name}`);
+      console.log('No nested Persona instance found within Profile Photo');
+      if ('children' in profilePhoto) {
+        console.log('Profile Photo children:', profilePhoto.children.map(child => ({ name: child.name, type: child.type })));
+      } else {
+        console.log('Profile Photo has no children property');
+      }
     }
-  });
+  }
+  
+  // Log info about extra profile photos but don't hide them - they might be needed for the layout
+  if (profilePhotos.length > recipients.length) {
+    console.log(`ℹ️  Found ${profilePhotos.length - recipients.length} extra profile photo slots - this might be normal for the Group layout`);
+  }
 }
 
 async function createThreadComponent(
@@ -177,6 +187,7 @@ async function createThreadComponent(
         
         console.log(`🔧 Setting navigation bar photo type for ${recipientCount} recipients (${recipientCount + 1}-person chat)`);
         console.log(`📸 Need to switch nested photo component to: "${photoType}"`);
+        console.log('🤖 Check if this matches the participant data logged above');
         
         // Find the nested photo component within the navigation bar
         const photoComponent = navBar && 'findOne' in navBar 

@@ -1,9 +1,11 @@
 export const THREAD_PROPERTIES = {
   VARIANT: 'Type=1:1',
+  VARIANT_GROUP: 'Type=Group',
   PLACEHOLDER: 'PLACEHOLDER_THREAD',
   NAV_BAR: 'Thread Navigation Bar',
   CHAT_NAME: 'Chat name#424:0',
   PERSONA: 'Persona',
+  PHOTO_TYPE: 'Photo type#424:1', // This will need to be verified with logs
 } as const;
 
 export const VARIABLES = {

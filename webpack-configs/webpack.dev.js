@@ -1,6 +1,6 @@
-"use strict";
+'use strict';
 
 module.exports = {
-  mode: "development",
-  devtool: "inline-source-map",
+  mode: 'development',
+  devtool: 'inline-source-map',
 };

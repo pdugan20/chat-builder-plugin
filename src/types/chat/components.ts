@@ -24,6 +24,7 @@ export interface MessageInstanceProps {
   index: number;
   componentSet: ComponentSetNode;
   messages: string[];
+  senderName?: string;
 }
 
 export interface ChatItem {

@@ -59,10 +59,18 @@ function createFrameComponent(tempFrame: FrameNode): ComponentNode {
 }
 
 function handleEmojiReaction(instance: InstanceNode, props: MessageInstanceProps): void {
+  console.log(`🎭 Processing emoji reaction for ${props.role}: ${props.emojiReaction}`);
+  console.log(`   Exposed instances count: ${instance.exposedInstances.length}`);
+  
   if (instance.exposedInstances.length > 0 && props.emojiReaction) {
     const emojiInstance: InstanceNode = instance.exposedInstances[0];
     const emojiStyle = props.role === 'sender' ? 'color' : 'transparentBlue';
     const emoji = emojiKey[emojiStyle]?.[props.emojiReaction];
+    
+    console.log(`   Emoji style: ${emojiStyle}, Emoji found: ${!!emoji?.id}`);
+    if (emoji?.id) {
+      console.log(`   Setting emoji ID: ${emoji.id}`);
+    }
 
     if (props.role === 'recipient') {
       emojiInstance.setProperties({ Style: props.bubbleStyle });
@@ -72,7 +80,12 @@ function handleEmojiReaction(instance: InstanceNode, props: MessageInstanceProps
       emojiInstance.setProperties({
         [BUBBLE_PROPERTIES.EMOJI]: emoji.id,
       });
+      console.log(`✅ Emoji reaction set successfully for ${props.role}`);
+    } else {
+      console.log(`❌ No emoji ID found for ${props.emojiReaction} with style ${emojiStyle}`);
     }
+  } else if (props.emojiReaction) {
+    console.log(`❌ No exposed instances found for ${props.role} bubble with reaction ${props.emojiReaction}`);
   }
 }
 
@@ -85,8 +98,16 @@ function setMessageGroupProperties(
   // Find all text nodes in the instance
   const allTextNodes = instance.findAll((node) => node.type === 'TEXT') as TextNode[];
 
+  // Filter out the Sender Name node and only get Message Text nodes
+  const messageTextNodes = allTextNodes.filter((node) => 
+    node.name === 'Message Text' || 
+    node.name.toLowerCase().includes('message') || 
+    node.name.toLowerCase().includes('bubble') ||
+    node.name.toLowerCase().includes('text')
+  );
+
   // Sort text nodes by their y position to maintain order
-  const sortedTextNodes = allTextNodes.sort((a, b) => a.y - b.y);
+  const sortedTextNodes = messageTextNodes.sort((a, b) => a.y - b.y);
 
   for (let i: number = 0; i < props.messagesInGroup; i += 1) {
     const message = chatItems[props.index + i]?.message;
@@ -97,9 +118,95 @@ function setMessageGroupProperties(
   }
 }
 
+function setRecipientPersona(instance: InstanceNode, props: MessageInstanceProps, chatItems: ChatItem[]): void {
+  // Find the current recipient's gender from the chat data
+  const currentRecipient = chatItems.find(item => item.name === props.senderName && item.role === 'recipient');
+  if (!currentRecipient) return;
+
+  // Find the Profile Photo component instance in the recipient bubble
+  const profilePhoto = 'findOne' in instance 
+    ? instance.findOne((node) => 
+        node.name === 'Profile Photo' || 
+        node.name.toLowerCase().includes('profile')
+      )
+    : null;
+
+  if (!profilePhoto) {
+    console.log('No Profile Photo instance found in recipient bubble');
+    return;
+  }
+
+  // Now look for the nested Persona component within the Profile Photo
+  const persona = 'findOne' in profilePhoto 
+    ? profilePhoto.findOne((node) => 
+        node.name === 'Persona' && node.type === 'INSTANCE'
+      )
+    : null;
+
+  if (!persona || !('setProperties' in persona)) {
+    console.log('No Persona instance found within Profile Photo');
+    if ('children' in profilePhoto) {
+      console.log('Profile Photo children:', profilePhoto.children.map(child => ({ name: child.name, type: child.type })));
+    } else {
+      console.log('Profile Photo has no children property');
+    }
+    return;
+  }
+
+  // Use the same approach as the prototype: find the Persona component set and set mainComponent directly
+  const rootNodes = figma.root.findAll();
+  const personaSet = rootNodes.find((node) => node.type === 'COMPONENT_SET' && node.name === 'Persona');
+
+  if (!personaSet) {
+    console.log('No Persona component set found');
+    return;
+  }
+
+  const personaInstance = persona as InstanceNode;
+  const recipientGender = currentRecipient.gender.charAt(0).toUpperCase() + currentRecipient.gender.slice(1);
+  const personaVariants = (personaSet as ComponentSetNode).children as ComponentNode[];
+  const matchingVariants = personaVariants.filter((variant) => variant.name.includes(recipientGender));
+
+  if (matchingVariants.length > 0) {
+    // Get all unique recipients in this chat to avoid duplicate photos
+    const allRecipients = chatItems
+      .filter(item => item.role === 'recipient')
+      .reduce((unique, item) => {
+        if (!unique.some(u => u.name === item.name)) {
+          unique.push({ name: item.name, gender: item.gender });
+        }
+        return unique;
+      }, [] as Array<{ name: string; gender: string }>);
+
+    // Sort recipients by name for consistent ordering
+    allRecipients.sort((a, b) => a.name.localeCompare(b.name));
+    
+    // Find which recipient this is (by index) among recipients of the same gender
+    const sameGenderRecipients = allRecipients.filter(r => r.gender === currentRecipient.gender);
+    const recipientIndex = sameGenderRecipients.findIndex(r => r.name === currentRecipient.name);
+    
+    // Use the recipient's index to select a variant, cycling through available options
+    const variantIndex = recipientIndex % matchingVariants.length;
+    const selectedVariant = matchingVariants[variantIndex];
+    
+    console.log(`Setting nested Persona mainComponent to ${recipientGender} variant: ${selectedVariant.name} for ${props.senderName} (index ${recipientIndex} of ${sameGenderRecipients.length} ${recipientGender.toLowerCase()} recipients)`);
+    personaInstance.mainComponent = selectedVariant;
+  } else {
+    console.log(`No matching persona variants found for ${recipientGender}`);
+    console.log('Available variants:', personaVariants.map(v => v.name));
+  }
+}
+
 function createSenderInstance(props: MessageInstanceProps, chatItems: ChatItem[]): InstanceNode {
   const instance: InstanceNode = props.componentSet.defaultVariant.createInstance();
   const availableProps = props.componentSet.componentPropertyDefinitions;
+
+  // Detect if it's a group chat
+  const uniqueRecipients = new Set(chatItems.filter(item => item.role === 'recipient').map(item => item.name));
+  const isGroupChat = uniqueRecipients.size > 1;
+
+  console.log('Sender Bubble available properties:', Object.keys(availableProps));
+  console.log('Is group chat:', isGroupChat);
 
   // Set basic properties
   const properties: Record<string, string> = {
@@ -108,6 +215,12 @@ function createSenderInstance(props: MessageInstanceProps, chatItems: ChatItem[]
     'Has reaction': props.emojiReaction ? 'Yes' : 'No',
     'Has mustache text': 'No',
   };
+
+  // Set "Is group chat" property for sender bubbles too
+  if (isGroupChat && 'Is group chat' in availableProps) {
+    console.log('Setting sender "Is group chat" to Yes');
+    properties['Is group chat'] = 'Yes';
+  }
 
   // Only set properties that exist in the component
   Object.entries(properties).forEach(([key, value]) => {
@@ -133,9 +246,13 @@ function createSenderInstance(props: MessageInstanceProps, chatItems: ChatItem[]
   handleEmojiReaction(instance, props);
 
   if (props.index === chatItems.length - 1) {
+    // Detect if it's a group chat to determine the delivery message
+    const uniqueRecipients = new Set(chatItems.filter(item => item.role === 'recipient').map(item => item.name));
+    const isGroupChat = uniqueRecipients.size > 1;
+    
     const mustacheProps = {
       'Has mustache text': 'Yes',
-      'Mustache#129:16': 'Delivered Quietly',
+      'Mustache#129:16': isGroupChat ? 'Delivered' : 'Delivered Quietly',
     };
 
     // Only set mustache properties that exist
@@ -149,13 +266,21 @@ function createSenderInstance(props: MessageInstanceProps, chatItems: ChatItem[]
   return instance;
 }
 
-function createRecipientInstance(props: MessageInstanceProps, chatItems: ChatItem[]): InstanceNode {
+function createRecipientInstance(
+  props: MessageInstanceProps,
+  chatItems: ChatItem[],
+  isGroupChat: boolean
+): InstanceNode {
   // Get the recipient component set
   const recipientSet = props.componentSet;
 
   // Create instance from the recipient component set
   const instance: InstanceNode = recipientSet.defaultVariant.createInstance();
   const availableProps = recipientSet.componentPropertyDefinitions;
+
+  // Log available properties to see what's available for group chats
+  console.log('Recipient Bubble available properties:', Object.keys(availableProps));
+  console.log('Is group chat:', isGroupChat);
 
   // Set basic properties
   const properties: Record<string, string> = {
@@ -164,6 +289,12 @@ function createRecipientInstance(props: MessageInstanceProps, chatItems: ChatIte
     'Has mustache text': 'No',
   };
 
+  // Set "Is group chat" property if it's a group chat
+  if (isGroupChat && 'Is group chat' in availableProps) {
+    console.log('Setting "Is group chat" to Yes');
+    properties['Is group chat'] = 'Yes';
+  }
+
   // Only set properties that exist in the component
   Object.entries(properties).forEach(([key, value]) => {
     if (key in availableProps) {
@@ -171,20 +302,25 @@ function createRecipientInstance(props: MessageInstanceProps, chatItems: ChatIte
     }
   });
 
-  // Set the first message
-  const textNodes = instance.findAll((node) => node.type === 'TEXT') as TextNode[];
-  const messageNode = textNodes.find(
-    (node) =>
-      node.name.toLowerCase().includes('message') ||
-      node.name.toLowerCase().includes('bubble') ||
-      node.name.toLowerCase().includes('text')
-  );
+  // Set message group properties first (this handles multiple messages)
+  setMessageGroupProperties(instance, props, [], chatItems);
+  
+  // Then set the recipient name for group chats AFTER messages are set
+  if (isGroupChat && props.senderName) {
+    const textNodes = instance.findAll((node) => node.type === 'TEXT') as TextNode[];
+    const nameNode = textNodes.find((node) => node.name === 'Sender Name');
 
-  if (messageNode) {
-    messageNode.characters = props.message;
+    if (nameNode) {
+      // Extract first name only for display
+      const firstName = props.senderName.split(' ')[0];
+      nameNode.characters = firstName;
+    }
   }
 
-  setMessageGroupProperties(instance, props, [], chatItems);
+  // Set the persona/profile photo based on recipient's gender
+  setRecipientPersona(instance, props, chatItems);
+
+  
   handleEmojiReaction(instance, props);
   instance.relativeTransform = flipHorizontal(instance);
 
@@ -199,25 +335,47 @@ async function createMessageInstance(
   messages: string[],
   chatItems: ChatItem[]
 ): Promise<InstanceNode | null> {
-  const { role, message, emojiReaction, messagesInGroup } = item;
+  const { role, message, emojiReaction, messagesInGroup, name } = item;
+  
+  console.log(`📨 Processing message ${index + 1}: ${role} - ${name} - "${message}" - emoji: ${emojiReaction}`);
 
   if (messages.includes(message)) {
+    console.log(`⏭️ Skipping duplicate message: "${message}"`);
     return null;
+  }
+
+  // Detect if it's a group chat by counting unique recipient names
+  const uniqueRecipients = new Set(chatItems.filter((item) => item.role === 'recipient').map((item) => item.name));
+  const isGroupChat = uniqueRecipients.size > 1;
+
+  // For message groups, check if ANY message in the group has an emoji reaction
+  let groupEmojiReaction = emojiReaction;
+  if (messagesInGroup > 1) {
+    // Look ahead in the chat items to find any emoji reactions in this message group
+    for (let i = 0; i < messagesInGroup; i++) {
+      const groupMessage = chatItems[index + i];
+      if (groupMessage && groupMessage.emojiReaction && groupMessage.role === role && groupMessage.name === name) {
+        groupEmojiReaction = groupMessage.emojiReaction;
+        console.log(`🎯 Found emoji reaction "${groupEmojiReaction}" in message group for ${role}`);
+        break;
+      }
+    }
   }
 
   const props: MessageInstanceProps = {
     role,
     message,
-    emojiReaction,
+    emojiReaction: groupEmojiReaction,
     messagesInGroup,
     bubbleStyle,
     index,
     componentSet,
     messages,
+    senderName: name, // Pass the sender's name for group chats
   };
 
   const instance =
-    role === 'sender' ? createSenderInstance(props, chatItems) : createRecipientInstance(props, chatItems);
+    role === 'sender' ? createSenderInstance(props, chatItems) : createRecipientInstance(props, chatItems, isGroupChat);
 
   messages.push(message);
   return instance;
@@ -279,17 +437,22 @@ export default async function buildChatUserInterface({
     }
   });
 
-  // Create and append status
-  const recipientName = getRecipientName(items);
-  const hasAction = isLastChatItemSender(items);
-  const statusInstance = await createStatusInstance(
-    statusSet,
-    `${recipientName} has notifications silenced`,
-    hasAction
-  );
+  // Create and append status - but only for 1:1 chats, not group chats
+  const uniqueRecipients = new Set(items.filter((item) => item.role === 'recipient').map((item) => item.name));
+  const isGroupChat = uniqueRecipients.size > 1;
+  
+  if (!isGroupChat) {
+    const recipientName = getRecipientName(items);
+    const hasAction = isLastChatItemSender(items);
+    const statusInstance = await createStatusInstance(
+      statusSet,
+      `${recipientName} has notifications silenced`,
+      hasAction
+    );
 
-  tempFrame.appendChild(statusInstance);
-  statusInstance.layoutSizingHorizontal = 'FILL';
+    tempFrame.appendChild(statusInstance);
+    statusInstance.layoutSizingHorizontal = 'FILL';
+  }
 
   await Promise.all(messagePromises);
 
@@ -297,9 +460,22 @@ export default async function buildChatUserInterface({
   const threadComponentSet = findThreadComponentSet();
   if (!threadComponentSet) return;
 
-  // Get the Type=1:1 variant
-  const threadVariant = findThreadVariant(threadComponentSet);
-  if (!threadVariant) return;
+  // Get the appropriate variant (1:1 or Group)
+  let threadVariant: ComponentNode | undefined;
+  if (isGroupChat) {
+    console.log('Using Group thread variant for', uniqueRecipients.size + 1, 'participants');
+    threadVariant = threadComponentSet.children.find(
+      (variant) => variant.type === 'COMPONENT' && variant.name === THREAD_PROPERTIES.VARIANT_GROUP
+    ) as ComponentNode | undefined;
+  } else {
+    console.log('Using 1:1 thread variant');
+    threadVariant = findThreadVariant(threadComponentSet);
+  }
+
+  if (!threadVariant) {
+    console.error('Could not find thread variant:', isGroupChat ? 'Group' : '1:1');
+    return;
+  }
 
   // Create the frame component
   const frameComponent = createFrameComponent(tempFrame);
@@ -311,7 +487,7 @@ export default async function buildChatUserInterface({
   await setFrameThemeAndBackground(frameComponent, theme);
 
   if (includePrototype) {
-    await buildPrototype(frameComponent, threadVariant, items, theme);
+    await buildPrototype(frameComponent, threadVariant, items, theme, isGroupChat);
   } else {
     // Focus viewport on the new components
     figma.viewport.scrollAndZoomIntoView([frameComponent]);

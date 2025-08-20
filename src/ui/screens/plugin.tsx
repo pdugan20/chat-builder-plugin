@@ -94,7 +94,7 @@ function PluginScreen({
           <Select.Trigger />
           <Select.Content>
             {PARTICIPANT_OPTIONS.map((value) => (
-              <Select.Item key={value} value={value} disabled={value === '3'}>
+              <Select.Item key={value} value={value}>
                 {value}
               </Select.Item>
             ))}

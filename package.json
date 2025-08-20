@@ -1,6 +1,6 @@
 {
   "name": "imessage-chat-builder",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Create convincing iMessage prototypes with AI. Turn ideas into iMessage prototypes instantly.",
   "main": "dist/plugin.js",
   "license": "MIT",

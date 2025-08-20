@@ -17,8 +17,30 @@ import buildPrototype from './build-prototype';
 import COLORS from '../constants/colors';
 import { MESSAGE_TYPE } from '../constants/messages';
 
-// Track the original x position
+// Track the original x position - initialize to viewport center or find rightmost component
 let originalX = 0;
+
+function getNextChatPosition(): number {
+  // Find all existing components on the page to position new ones to the right
+  const allNodes = figma.currentPage.children;
+  let rightmostX = -Infinity;
+  
+  allNodes.forEach(node => {
+    if (node.type === 'COMPONENT') {
+      const rightEdge = node.x + node.width;
+      if (rightEdge > rightmostX) {
+        rightmostX = rightEdge;
+      }
+    }
+  });
+  
+  // If no existing components found, start at origin, otherwise add spacing
+  if (rightmostX === -Infinity) {
+    return 0; // Start at origin for first component
+  } else {
+    return rightmostX + 100; // Add spacing after existing components
+  }
+}
 
 // Simple hash function to consistently map names to indices
 export function hashNameToIndex(name: string, maxValue: number): number {
@@ -58,8 +80,14 @@ function findThreadVariant(threadComponentSet: ComponentSetNode): ComponentNode 
   return variants.find((variant) => variant.name === THREAD_PROPERTIES.VARIANT);
 }
 
-async function createFrameComponent(tempFrame: FrameNode): Promise<ComponentNode> {
+async function createFrameComponent(tempFrame: FrameNode, x?: number): Promise<ComponentNode> {
   const frameComponent = figma.createComponent();
+  
+  // Set position immediately after creation, before any other operations
+  if (x !== undefined) {
+    frameComponent.x = x;
+  }
+  
   frameComponent.name = tempFrame.name;
   frameComponent.resize(tempFrame.width, tempFrame.height);
 
@@ -391,6 +419,9 @@ export default async function buildChatUserInterface({
   data,
   includePrototype = false,
 }: BuildChatUserInterfaceProps): Promise<void> {
+  // Get the correct position for this new chat
+  originalX = getNextChatPosition();
+  
   const messages: string[] = [];
   const items = data;
   const { senderSet, recipientSet, statusSet, timestampSet } = await loadComponentSets();
@@ -463,9 +494,8 @@ export default async function buildChatUserInterface({
   // Yield before heavy frame operations
   await new Promise(resolve => setTimeout(resolve, 0));
   
-  // Create the frame component
-  const frameComponent = await createFrameComponent(tempFrame);
-  frameComponent.x = originalX;
+  // Create the frame component at the correct position immediately
+  const frameComponent = await createFrameComponent(tempFrame, originalX);
 
   originalX += includePrototype ? FRAME_OFFSET.WITH_PROTOTYPE : FRAME_OFFSET.WITHOUT_PROTOTYPE;
 

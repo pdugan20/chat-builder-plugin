@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { MESSAGE_TYPE } from '../../constants/messages';
 import createChatQuery from '../../api/anthropic';
 import cleanAndParseJson from '../../utils/json';
-import chatData from '../../constants/test-data';
+import { CHAT_DATA_2, CHAT_DATA_3, CHAT_DATA_4 } from '../../constants/test-data';
 
 interface UseChatGenerationProps {
   anthropicKey: string;
@@ -76,7 +76,12 @@ export default function useChatGeneration({
 
     try {
       if (useTestData) {
-        const data = chatData;
+        const testDataMap = {
+          '2': CHAT_DATA_2,
+          '3': CHAT_DATA_3,
+          '4': CHAT_DATA_4,
+        };
+        const data = testDataMap[participants as keyof typeof testDataMap] || CHAT_DATA_2;
         parent.postMessage(
           {
             pluginMessage: { type: MESSAGE_TYPE.BUILD_CHAT_UI, data, style, prompt, includePrototype },

@@ -1,5 +1,5 @@
-"use strict";
+'use strict';
 
 module.exports = {
-  mode: "production",
+  mode: 'production',
 };

@@ -1,10 +1,10 @@
-const HtmlWebpackInlineSourcePlugin = require("html-webpack-inline-source-plugin");
-const HtmlWebpackPlugin = require("html-webpack-plugin");
-const CaseSensitivePathsPlugin = require("case-sensitive-paths-webpack-plugin");
-const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
-const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+const HtmlWebpackInlineSourcePlugin = require('html-webpack-inline-source-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
-const paths = require("./paths.js");
+const paths = require('./paths.js');
 
 module.exports = {
   entry: {
@@ -15,29 +15,29 @@ module.exports = {
     rules: [
       {
         test: /\.tsx?$/,
-        use: "ts-loader",
+        use: 'ts-loader',
         exclude: /node_modules/,
       },
       {
         test: /\.css$/i,
-        use: ["style-loader", "css-loader", "postcss-loader"],
+        use: ['style-loader', 'css-loader', 'postcss-loader'],
       },
       {
         test: /\.(png|jpg|gif|webp|svg)$/,
-        loader: "url-loader",
+        loader: 'url-loader',
       },
       {
         test: /\.(woff|woff2|eot|ttf|otf)$/,
-        type: "asset/resource",
+        type: 'asset/resource',
       },
     ],
   },
-  resolve: { extensions: [".tsx", ".ts", ".jsx", ".js"] },
+  resolve: { extensions: ['.tsx', '.ts', '.jsx', '.js'] },
   output: {
-    filename: "[name].js",
+    filename: '[name].js',
     path: paths.appBuild,
-    publicPath: "/",
-    assetModuleFilename: "[name][ext]",
+    publicPath: '/',
+    assetModuleFilename: '[name][ext]',
   },
   plugins: [
     new CleanWebpackPlugin(),
@@ -45,9 +45,9 @@ module.exports = {
     new ForkTsCheckerWebpackPlugin(),
     new HtmlWebpackPlugin({
       template: paths.uiHtml,
-      filename: "ui.html",
-      inlineSource: ".(js)$",
-      chunks: ["ui"],
+      filename: 'ui.html',
+      inlineSource: '.(js)$',
+      chunks: ['ui'],
       cache: false,
     }),
     new HtmlWebpackInlineSourcePlugin(HtmlWebpackPlugin),

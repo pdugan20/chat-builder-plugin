@@ -110,16 +110,28 @@ interface GetInstructionsPromptParams {
 }
 
 export function getInstructionsPrompt({ prompt, maxMessages, participants }: GetInstructionsPromptParams): string {
-  return `Generate an iMessage conversation as a valid JSON array. Follow this exact format:
+  const participantCount = parseInt(participants, 10);
+  const recipientCount = participantCount - 1;
+
+  return `Generate an iMessage GROUP CHAT conversation as a valid JSON array. Follow this exact format:
 
 REQUIREMENTS:
 - Topic/Tone: ${prompt}
 - Max messages: ${maxMessages}
-- Participants: ${participants}
-- One participant must be role "sender", others "recipient"
-- Generate realistic first+last names, assign genders (male/female)
+- Total participants: ${participants} (1 sender + ${recipientCount} recipient${recipientCount > 1 ? 's' : ''})
+- EXACTLY ONE participant with role "sender" (the person whose phone this is)
+- EXACTLY ${recipientCount} different participant${recipientCount > 1 ? 's' : ''} with role "recipient"
+- Each participant must have a unique realistic first+last name and gender (male/female)
+- Messages should show natural group chat dynamics with all ${participants} people participating
 - Times in "H:MM AM/PM" format, chronological order
 - emojiReaction: null OR one of: heart, haha, exclamation, thumbsUp, thumbsDown, question
+
+CONVERSATION STYLE:
+- Keep messages conversational and natural - like real text messages
+- Messages should be SHORT (typically 1-2 sentences, max 3)
+- Use casual language, contractions, and informal tone
+- Include natural reactions, questions, and responses between participants
+- Avoid overly formal or long-winded messages
 
 CRITICAL - messagesInGroup Logic:
 - messagesInGroup = total number of consecutive messages by the SAME person

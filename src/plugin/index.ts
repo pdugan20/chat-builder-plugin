@@ -4,6 +4,7 @@ import { checkIfHasLibrary, checkIfHasLocalComponents } from '../scripts/check-c
 import updateAnthropicKey from '../scripts/update-key';
 import notifyUser from '../scripts/api-error';
 import buildChatUserInterface from '../scripts/build-chat-ui';
+import cleanAndParseJson from '../utils/json';
 import { MESSAGE_TYPE } from '../constants/messages';
 import { PLUGIN_WIDTH, PLUGIN_HEIGHT } from '../constants/dimensions';
 
@@ -37,6 +38,37 @@ figma.ui.onmessage = (msg) => {
         name: msg.prompt,
         includePrototype: msg.includePrototype,
       });
+      break;
+
+    case MESSAGE_TYPE.PARSE_AND_BUILD_CHAT:
+      // Parse JSON and build UI with async handling
+      (async () => {
+        try {
+          const parsedData = cleanAndParseJson(msg.rawResponse);
+          if (!parsedData) {
+            notifyUser({
+              errorMessage: 'Failed to parse API response',
+              retryable: true,
+            });
+            figma.ui.postMessage({ type: MESSAGE_TYPE.BUILD_COMPLETE });
+            return;
+          }
+          
+          // Build the UI - this is now async with yielding
+          await buildChatUserInterface({
+            data: parsedData,
+            theme: msg.style,
+            name: msg.prompt,
+            includePrototype: msg.includePrototype,
+          });
+        } catch (error) {
+          notifyUser({
+            errorMessage: error instanceof Error ? error.message : 'Failed to parse API response',
+            retryable: true,
+          });
+          figma.ui.postMessage({ type: MESSAGE_TYPE.BUILD_COMPLETE });
+        }
+      })();
       break;
 
     case MESSAGE_TYPE.POST_API_ERROR:

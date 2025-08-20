@@ -21,24 +21,29 @@ import { MESSAGE_TYPE } from '../constants/messages';
 let originalX = 0;
 
 function getNextChatPosition(): number {
-  // Find all existing components on the page to position new ones to the right
+  // Find all existing components and prototype frames on the page to position new ones to the right
   const allNodes = figma.currentPage.children;
   let rightmostX = -Infinity;
   
   allNodes.forEach(node => {
+    let rightEdge = -Infinity;
+    
     if (node.type === 'COMPONENT') {
-      const rightEdge = node.x + node.width;
-      if (rightEdge > rightmostX) {
-        rightmostX = rightEdge;
-      }
+      rightEdge = node.x + node.width;
+    } else if (node.type === 'FRAME' && node.name === 'Prototype') {
+      rightEdge = node.x + node.width;
+    }
+    
+    if (rightEdge > rightmostX) {
+      rightmostX = rightEdge;
     }
   });
   
-  // If no existing components found, start at origin, otherwise add spacing
+  // If no existing components or prototypes found, start at origin, otherwise add spacing
   if (rightmostX === -Infinity) {
     return 0; // Start at origin for first component
   } else {
-    return rightmostX + 100; // Add spacing after existing components
+    return rightmostX + 200; // Add spacing after existing components/prototypes
   }
 }
 

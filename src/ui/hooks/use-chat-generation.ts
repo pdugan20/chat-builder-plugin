@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { MESSAGE_TYPE } from '../../constants/messages';
 import createChatQuery from '../../api/anthropic';
-import cleanAndParseJson from '../../utils/json';
 import { CHAT_DATA_2, CHAT_DATA_3, CHAT_DATA_4 } from '../../constants/test-data';
 
 interface UseChatGenerationProps {
@@ -91,26 +90,50 @@ export default function useChatGeneration({
         return;
       }
 
+      // Use a buffer to batch streaming updates
+      let streamBuffer = '';
+      let bufferTimer: NodeJS.Timeout | null = null;
+      
       const response = await createChatQuery({
         apiKey: anthropicKey,
         queryInputs: { participants, maxMessages, prompt },
         onStream: (chunk) => {
-          setStreamingMessages((prev) => {
-            const newText = prev + chunk;
-            parent.postMessage(
-              {
-                pluginMessage: {
-                  type: MESSAGE_TYPE.STREAM_UPDATE,
-                  chunk,
-                  accumulatedText: newText,
-                },
-              },
-              '*'
-            );
-            return newText;
-          });
+          streamBuffer += chunk;
+          
+          // Batch updates every 100ms to reduce UI thread blocking
+          if (!bufferTimer) {
+            bufferTimer = setTimeout(() => {
+              setStreamingMessages((prev) => {
+                const newText = prev + streamBuffer;
+                parent.postMessage(
+                  {
+                    pluginMessage: {
+                      type: MESSAGE_TYPE.STREAM_UPDATE,
+                      chunk: streamBuffer,
+                      accumulatedText: newText,
+                    },
+                  },
+                  '*'
+                );
+                streamBuffer = '';
+                bufferTimer = null;
+                return newText;
+              });
+            }, 100);
+          }
         },
       });
+
+      // Flush any remaining buffered content
+      if (bufferTimer) {
+        clearTimeout(bufferTimer);
+        if (streamBuffer) {
+          setStreamingMessages((prev) => prev + streamBuffer);
+        }
+      }
+
+      // Stop streaming indicator
+      setStreaming(false);
 
       if (!response?.content?.[0]?.text) {
         parent.postMessage(
@@ -126,24 +149,16 @@ export default function useChatGeneration({
         return;
       }
 
-      const data = cleanAndParseJson(response.content[0].text);
-      if (!data) {
-        parent.postMessage(
-          {
-            pluginMessage: {
-              type: MESSAGE_TYPE.POST_API_ERROR,
-              error: 'Failed to parse API response',
-              retryable: true,
-            },
-          },
-          '*'
-        );
-        return;
-      }
-
+      // Send raw response to plugin for parsing to avoid blocking UI thread
       parent.postMessage(
         {
-          pluginMessage: { type: MESSAGE_TYPE.BUILD_CHAT_UI, data, style, prompt, includePrototype },
+          pluginMessage: { 
+            type: MESSAGE_TYPE.PARSE_AND_BUILD_CHAT, 
+            rawResponse: response.content[0].text, 
+            style, 
+            prompt, 
+            includePrototype 
+          },
         },
         '*'
       );

@@ -8,12 +8,7 @@ function cleanAndParseJSON(text: string) {
     }
 
     const jsonString = text.substring(start, end);
-    // eslint-disable-next-line no-console
-    console.log('Extracted JSON string:', jsonString);
-
     const parsed = JSON.parse(jsonString);
-    // eslint-disable-next-line no-console
-    console.log('Parsed data:', parsed);
 
     if (!parsed || (typeof parsed !== 'object' && !Array.isArray(parsed))) {
       throw new Error('Invalid JSON structure in response');

@@ -20,6 +20,32 @@ import { MESSAGE_TYPE } from '../constants/messages';
 // Track the original x position
 let originalX = 0;
 
+// Simple hash function to consistently map names to indices
+export function hashNameToIndex(name: string, maxValue: number): number {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = ((hash << 5) - hash) + name.charCodeAt(i);
+    hash = hash & hash; // Convert to 32-bit integer
+  }
+  return Math.abs(hash) % maxValue;
+}
+
+export function getPersonaForRecipient(
+  recipientName: string,
+  recipientGender: string,
+  personaVariants: ComponentNode[]
+): ComponentNode | null {
+  // Filter variants by gender
+  const genderKey = recipientGender.charAt(0).toUpperCase() + recipientGender.slice(1);
+  const genderVariants = personaVariants.filter(v => v.name.includes(genderKey));
+  
+  if (genderVariants.length === 0) return null;
+  
+  // Use name hash to consistently select a persona
+  const index = hashNameToIndex(recipientName, genderVariants.length);
+  return genderVariants[index];
+}
+
 function findThreadComponentSet(): ComponentSetNode | undefined {
   const allNodes = figma.root.findAll();
   return allNodes.find((node) => node.type === 'COMPONENT_SET' && node.name === 'Thread') as
@@ -32,17 +58,22 @@ function findThreadVariant(threadComponentSet: ComponentSetNode): ComponentNode 
   return variants.find((variant) => variant.name === THREAD_PROPERTIES.VARIANT);
 }
 
-function createFrameComponent(tempFrame: FrameNode): ComponentNode {
+async function createFrameComponent(tempFrame: FrameNode): Promise<ComponentNode> {
   const frameComponent = figma.createComponent();
   frameComponent.name = tempFrame.name;
   frameComponent.resize(tempFrame.width, tempFrame.height);
 
-  // Clone children
+  // Clone all children at once, then append in batch
+  const clonedChildren: SceneNode[] = [];
   tempFrame.children.forEach((child) => {
     if ('clone' in child) {
-      const childClone = child.clone();
-      frameComponent.appendChild(childClone);
+      clonedChildren.push(child.clone());
     }
+  });
+  
+  // Batch append all cloned children
+  clonedChildren.forEach(child => {
+    frameComponent.appendChild(child);
   });
 
   // Copy properties
@@ -59,18 +90,10 @@ function createFrameComponent(tempFrame: FrameNode): ComponentNode {
 }
 
 function handleEmojiReaction(instance: InstanceNode, props: MessageInstanceProps): void {
-  console.log(`🎭 Processing emoji reaction for ${props.role}: ${props.emojiReaction}`);
-  console.log(`   Exposed instances count: ${instance.exposedInstances.length}`);
-  
   if (instance.exposedInstances.length > 0 && props.emojiReaction) {
     const emojiInstance: InstanceNode = instance.exposedInstances[0];
     const emojiStyle = props.role === 'sender' ? 'color' : 'transparentBlue';
     const emoji = emojiKey[emojiStyle]?.[props.emojiReaction];
-    
-    console.log(`   Emoji style: ${emojiStyle}, Emoji found: ${!!emoji?.id}`);
-    if (emoji?.id) {
-      console.log(`   Setting emoji ID: ${emoji.id}`);
-    }
 
     if (props.role === 'recipient') {
       emojiInstance.setProperties({ Style: props.bubbleStyle });
@@ -80,12 +103,7 @@ function handleEmojiReaction(instance: InstanceNode, props: MessageInstanceProps
       emojiInstance.setProperties({
         [BUBBLE_PROPERTIES.EMOJI]: emoji.id,
       });
-      console.log(`✅ Emoji reaction set successfully for ${props.role}`);
-    } else {
-      console.log(`❌ No emoji ID found for ${props.emojiReaction} with style ${emojiStyle}`);
     }
-  } else if (props.emojiReaction) {
-    console.log(`❌ No exposed instances found for ${props.role} bubble with reaction ${props.emojiReaction}`);
   }
 }
 
@@ -132,7 +150,6 @@ function setRecipientPersona(instance: InstanceNode, props: MessageInstanceProps
     : null;
 
   if (!profilePhoto) {
-    console.log('No Profile Photo instance found in recipient bubble');
     return;
   }
 
@@ -144,12 +161,6 @@ function setRecipientPersona(instance: InstanceNode, props: MessageInstanceProps
     : null;
 
   if (!persona || !('setProperties' in persona)) {
-    console.log('No Persona instance found within Profile Photo');
-    if ('children' in profilePhoto) {
-      console.log('Profile Photo children:', profilePhoto.children.map(child => ({ name: child.name, type: child.type })));
-    } else {
-      console.log('Profile Photo has no children property');
-    }
     return;
   }
 
@@ -158,42 +169,21 @@ function setRecipientPersona(instance: InstanceNode, props: MessageInstanceProps
   const personaSet = rootNodes.find((node) => node.type === 'COMPONENT_SET' && node.name === 'Persona');
 
   if (!personaSet) {
-    console.log('No Persona component set found');
     return;
   }
 
   const personaInstance = persona as InstanceNode;
-  const recipientGender = currentRecipient.gender.charAt(0).toUpperCase() + currentRecipient.gender.slice(1);
   const personaVariants = (personaSet as ComponentSetNode).children as ComponentNode[];
-  const matchingVariants = personaVariants.filter((variant) => variant.name.includes(recipientGender));
-
-  if (matchingVariants.length > 0) {
-    // Get all unique recipients in this chat to avoid duplicate photos
-    const allRecipients = chatItems
-      .filter(item => item.role === 'recipient')
-      .reduce((unique, item) => {
-        if (!unique.some(u => u.name === item.name)) {
-          unique.push({ name: item.name, gender: item.gender });
-        }
-        return unique;
-      }, [] as Array<{ name: string; gender: string }>);
-
-    // Sort recipients by name for consistent ordering
-    allRecipients.sort((a, b) => a.name.localeCompare(b.name));
-    
-    // Find which recipient this is (by index) among recipients of the same gender
-    const sameGenderRecipients = allRecipients.filter(r => r.gender === currentRecipient.gender);
-    const recipientIndex = sameGenderRecipients.findIndex(r => r.name === currentRecipient.name);
-    
-    // Use the recipient's index to select a variant, cycling through available options
-    const variantIndex = recipientIndex % matchingVariants.length;
-    const selectedVariant = matchingVariants[variantIndex];
-    
-    console.log(`Setting nested Persona mainComponent to ${recipientGender} variant: ${selectedVariant.name} for ${props.senderName} (index ${recipientIndex} of ${sameGenderRecipients.length} ${recipientGender.toLowerCase()} recipients)`);
+  
+  // Use name-based hash to select persona
+  const selectedVariant = getPersonaForRecipient(
+    currentRecipient.name,
+    currentRecipient.gender,
+    personaVariants
+  );
+  
+  if (selectedVariant) {
     personaInstance.mainComponent = selectedVariant;
-  } else {
-    console.log(`No matching persona variants found for ${recipientGender}`);
-    console.log('Available variants:', personaVariants.map(v => v.name));
   }
 }
 
@@ -205,9 +195,6 @@ function createSenderInstance(props: MessageInstanceProps, chatItems: ChatItem[]
   const uniqueRecipients = new Set(chatItems.filter(item => item.role === 'recipient').map(item => item.name));
   const isGroupChat = uniqueRecipients.size > 1;
 
-  console.log('Sender Bubble available properties:', Object.keys(availableProps));
-  console.log('Is group chat:', isGroupChat);
-
   // Set basic properties
   const properties: Record<string, string> = {
     Bubbles: props.messagesInGroup.toString(),
@@ -218,7 +205,6 @@ function createSenderInstance(props: MessageInstanceProps, chatItems: ChatItem[]
 
   // Set "Is group chat" property for sender bubbles too
   if (isGroupChat && 'Is group chat' in availableProps) {
-    console.log('Setting sender "Is group chat" to Yes');
     properties['Is group chat'] = 'Yes';
   }
 
@@ -249,8 +235,6 @@ function createSenderInstance(props: MessageInstanceProps, chatItems: ChatItem[]
   const isLastMessageInChat = props.index + props.messagesInGroup - 1 === chatItems.length - 1;
   
   if (isLastMessageInChat) {
-    console.log(`📝 Adding delivery status to sender bubble (message group ending at position ${props.index + props.messagesInGroup - 1})`);
-    
     // Detect if it's a group chat to determine the delivery message
     const uniqueRecipients = new Set(chatItems.filter(item => item.role === 'recipient').map(item => item.name));
     const isGroupChat = uniqueRecipients.size > 1;
@@ -283,10 +267,6 @@ function createRecipientInstance(
   const instance: InstanceNode = recipientSet.defaultVariant.createInstance();
   const availableProps = recipientSet.componentPropertyDefinitions;
 
-  // Log available properties to see what's available for group chats
-  console.log('Recipient Bubble available properties:', Object.keys(availableProps));
-  console.log('Is group chat:', isGroupChat);
-
   // Set basic properties
   const properties: Record<string, string> = {
     Bubbles: props.messagesInGroup.toString(),
@@ -296,7 +276,6 @@ function createRecipientInstance(
 
   // Set "Is group chat" property if it's a group chat
   if (isGroupChat && 'Is group chat' in availableProps) {
-    console.log('Setting "Is group chat" to Yes');
     properties['Is group chat'] = 'Yes';
   }
 
@@ -342,10 +321,7 @@ async function createMessageInstance(
 ): Promise<InstanceNode | null> {
   const { role, message, emojiReaction, messagesInGroup, name } = item;
   
-  console.log(`📨 Processing message ${index + 1}: ${role} - ${name} - "${message}" - emoji: ${emojiReaction}`);
-
   if (messages.includes(message)) {
-    console.log(`⏭️ Skipping duplicate message: "${message}"`);
     return null;
   }
 
@@ -361,7 +337,6 @@ async function createMessageInstance(
       const groupMessage = chatItems[index + i];
       if (groupMessage && groupMessage.emojiReaction && groupMessage.role === role && groupMessage.name === name) {
         groupEmojiReaction = groupMessage.emojiReaction;
-        console.log(`🎯 Found emoji reaction "${groupEmojiReaction}" in message group for ${role}`);
         break;
       }
     }
@@ -431,15 +406,22 @@ export default async function buildChatUserInterface({
   // Update emoji IDs
   await updateEmojiKeyIds();
 
-  // Create and append messages
-  const messagePromises = items.map(async (item: ChatItem, index: number) => {
+  // Process all messages in parallel for better performance
+  const messagePromises = items.map((item: ChatItem, index: number) => {
     const componentSet = item.role === 'sender' ? senderSet : recipientSet;
-    const messageInstance = await createMessageInstance(item, index, componentSet, bubbleStyle, messages, items);
-
-    if (messageInstance) {
-      tempFrame.appendChild(messageInstance);
-      messageInstance.layoutSizingHorizontal = 'FILL';
-    }
+    return createMessageInstance(item, index, componentSet, bubbleStyle, messages, items);
+  });
+  
+  // Wait for all messages to be created
+  const messageInstances = await Promise.all(messagePromises);
+  
+  // Batch append all message instances at once for better performance and cleaner UI
+  const validInstances = messageInstances.filter(instance => instance !== null) as InstanceNode[];
+  
+  // Append all instances in a single batch operation
+  validInstances.forEach(messageInstance => {
+    tempFrame.appendChild(messageInstance);
+    messageInstance.layoutSizingHorizontal = 'FILL';
   });
 
   // Create and append status - but only for 1:1 chats, not group chats
@@ -459,8 +441,6 @@ export default async function buildChatUserInterface({
     statusInstance.layoutSizingHorizontal = 'FILL';
   }
 
-  await Promise.all(messagePromises);
-
   // Find the Thread component set
   const threadComponentSet = findThreadComponentSet();
   if (!threadComponentSet) return;
@@ -468,12 +448,10 @@ export default async function buildChatUserInterface({
   // Get the appropriate variant (1:1 or Group)
   let threadVariant: ComponentNode | undefined;
   if (isGroupChat) {
-    console.log('Using Group thread variant for', uniqueRecipients.size + 1, 'participants');
     threadVariant = threadComponentSet.children.find(
       (variant) => variant.type === 'COMPONENT' && variant.name === THREAD_PROPERTIES.VARIANT_GROUP
     ) as ComponentNode | undefined;
   } else {
-    console.log('Using 1:1 thread variant');
     threadVariant = findThreadVariant(threadComponentSet);
   }
 
@@ -482,12 +460,18 @@ export default async function buildChatUserInterface({
     return;
   }
 
+  // Yield before heavy frame operations
+  await new Promise(resolve => setTimeout(resolve, 0));
+  
   // Create the frame component
-  const frameComponent = createFrameComponent(tempFrame);
+  const frameComponent = await createFrameComponent(tempFrame);
   frameComponent.x = originalX;
 
   originalX += includePrototype ? FRAME_OFFSET.WITH_PROTOTYPE : FRAME_OFFSET.WITHOUT_PROTOTYPE;
 
+  // Yield before theme setting
+  await new Promise(resolve => setTimeout(resolve, 0));
+  
   // Set theme and background on the frame component
   await setFrameThemeAndBackground(frameComponent, theme);
 
@@ -495,19 +479,26 @@ export default async function buildChatUserInterface({
   tempFrame.remove();
 
   if (includePrototype) {
+    // Yield before prototype building
+    await new Promise(resolve => setTimeout(resolve, 0));
     await buildPrototype(frameComponent, threadVariant, items, theme, isGroupChat);
     
-    // Signal completion after prototype is built (this happens after "Using Group/1:1 thread variant" logs)
+    // Signal completion after prototype is built
     figma.ui.postMessage({
       type: MESSAGE_TYPE.BUILD_COMPLETE,
     });
   } else {
+    // Yield before viewport operation
+    await new Promise(resolve => setTimeout(resolve, 0));
+    
     // Focus viewport on the new components
     figma.viewport.scrollAndZoomIntoView([frameComponent]);
     
-    // For non-prototype builds, signal completion immediately after viewport operation
-    figma.ui.postMessage({
-      type: MESSAGE_TYPE.BUILD_COMPLETE,
-    });
+    // Signal completion after a small delay to ensure UI updates
+    setTimeout(() => {
+      figma.ui.postMessage({
+        type: MESSAGE_TYPE.BUILD_COMPLETE,
+      });
+    }, 10);
   }
 }

@@ -5,6 +5,7 @@ import UpdateKeyDialog from '../components/dialogs/update-key';
 import { useAnthropic } from '../context/anthropic';
 import URLS from '../../constants/urls';
 import PLUGIN_VERSION from '../../constants/plugin';
+import { MESSAGE_TYPE } from '../../constants/messages';
 
 interface SettingsScreenProps {
   screen?: string;
@@ -69,6 +70,40 @@ function SettingsScreen({
     );
   }
 
+  function renderDebugSection(): React.JSX.Element | null {
+    // Only show in development mode
+    if (process.env.NODE_ENV !== 'development') {
+      return null;
+    }
+
+    const clearClientStorage = () => {
+      parent.postMessage(
+        {
+          pluginMessage: {
+            type: MESSAGE_TYPE.CLEAR_CLIENT_STORAGE,
+          },
+        },
+        '*'
+      );
+    };
+
+    return (
+      <div className='row-item'>
+        <Text className='heading'>Debug</Text>
+        <Link
+          href='#'
+          onClick={(e) => {
+            e.preventDefault();
+            clearClientStorage();
+          }}
+          style={{ color: 'var(--figma-color-text-danger)' }}
+        >
+          Clear clientStorage
+        </Link>
+      </div>
+    );
+  }
+
   function renderBody(): React.JSX.Element {
     return (
       <div className='body'>
@@ -76,6 +111,7 @@ function SettingsScreen({
         {renderKey()}
         {renderModel()}
         {renderFeedbackLink()}
+        {renderDebugSection()}
       </div>
     );
   }

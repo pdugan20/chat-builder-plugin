@@ -18,6 +18,9 @@ export const MESSAGE_TYPE = {
   // Progress & Control
   PROGRESS_UPDATE: 'PROGRESS_UPDATE',
   CANCEL_GENERATION: 'CANCEL_GENERATION',
+  
+  // Debug (development only)
+  CLEAR_CLIENT_STORAGE: 'CLEAR_CLIENT_STORAGE',
 } as const;
 
 export type MessageType = (typeof MESSAGE_TYPE)[keyof typeof MESSAGE_TYPE];

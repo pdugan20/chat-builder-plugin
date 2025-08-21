@@ -53,7 +53,7 @@ figma.ui.onmessage = (msg) => {
             figma.ui.postMessage({ type: MESSAGE_TYPE.BUILD_COMPLETE });
             return;
           }
-          
+
           // Build the UI - this is now async with yielding
           await buildChatUserInterface({
             data: parsedData,

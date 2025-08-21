@@ -10,17 +10,22 @@ interface LoadingOverlayProps {
 
 interface AnimatedMessageProps {
   message: string;
-  dots: string;
 }
 
-function AnimatedMessage({ message, dots }: AnimatedMessageProps): React.JSX.Element {
+function AnimatedMessage({ message }: AnimatedMessageProps): React.JSX.Element {
   return (
     <Text
       key={message}
       className='loading-stage text-sm animate-up min-w-[300px] text-center text-[var(--figma-color-text-secondary)]'
     >
-      {message}
-      <span className='inline-block w-4 text-left'>{dots}</span>
+      <span className='loading-message'>
+        {message}
+        <span className='loading-dots'>
+          <span className='dot dot-1'>.</span>
+          <span className='dot dot-2'>.</span>
+          <span className='dot dot-3'>.</span>
+        </span>
+      </span>
     </Text>
   );
 }
@@ -40,7 +45,6 @@ function LoadingOverlay({
 }: LoadingOverlayProps): React.JSX.Element {
   const [currentStage, setCurrentStage] = useState(0);
   const [isTimedOut, setIsTimedOut] = useState(false);
-  const [dots, setDots] = useState('');
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -59,14 +63,9 @@ function LoadingOverlay({
       });
     }, 3500);
 
-    const dotsInterval = setInterval(() => {
-      setDots((prev) => (prev.length >= 3 ? '' : `${prev}.`));
-    }, 500);
-
     return () => {
       clearInterval(stageInterval);
       clearTimeout(timeoutId);
-      clearInterval(dotsInterval);
     };
   }, []);
 
@@ -81,7 +80,7 @@ function LoadingOverlay({
             aria-hidden='true'
           />
         )}
-        <AnimatedMessage message={currentMessage} dots={dots} />
+        <AnimatedMessage message={currentMessage} />
         {showStreamingText && streamingMessages && (
           <div className='rounded-lg mt-4 max-h-40 w-full overflow-y-auto bg-[var(--figma-color-bg-secondary)] p-4'>
             <Text className='text-sm whitespace-pre-line text-[var(--figma-color-text)]'>{streamingMessages}</Text>

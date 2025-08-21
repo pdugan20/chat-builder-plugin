@@ -81,12 +81,14 @@ To enable test data mode:
 
 ```
 src/
+├── api/           # External API integrations (Anthropic)
 ├── constants/     # Configuration and constants
 ├── scripts/       # Core plugin functionality
-├── services/      # External service integrations
+├── services/      # Service classes and utilities
 ├── types/         # TypeScript type definitions
 ├── ui/            # React UI components
-└── utils/         # Utility functions
+├── utils/         # Utility functions
+└── workers/       # WebWorker implementations
 ```
 
 ## Available Scripts

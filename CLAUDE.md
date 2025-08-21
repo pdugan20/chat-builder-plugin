@@ -41,10 +41,12 @@ The plugin follows a layered architecture:
 
 ### Key Components
 
-- **Chat Generation**: `src/scripts/build-chat-ui.ts` handles the main chat UI creation
+- **Chat Generation**: `src/scripts/build-chat-ui.ts` handles the main chat UI creation with optimized rendering
 - **Anthropic Integration**: `src/api/anthropic.ts` manages Claude API with streaming and retry logic
+- **Service Classes**: `src/services/` contains modular service classes for frame management, message building, and worker pools
 - **State Management**: React Context providers in `src/ui/context/`
 - **Component Library**: Checks for required Figma components via `src/scripts/check-components.ts`
+- **Workers**: `src/workers/` contains WebWorker implementations for performance optimization
 
 ### Message Flow
 
@@ -80,3 +82,5 @@ The plugin follows a layered architecture:
 - Anthropic API key is stored in plugin clientStorage
 - Font loading (Apple SF Pro) happens asynchronously
 - Test data mode available for development without API calls
+- Chat rendering is optimized to prevent visual artifacts during assembly
+- ESLint configuration has been tuned for this codebase with appropriate rule exceptions

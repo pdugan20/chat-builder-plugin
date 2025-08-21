@@ -4,29 +4,7 @@ import { BUBBLE_PROPERTIES } from '../constants/components';
 import emojiKey from '../constants/emojis';
 import flipHorizontal from '../utils/transform';
 import { getRecipientName } from '../utils/chat';
-
-export function hashNameToIndex(name: string, maxValue: number): number {
-  let hash = 0;
-  for (let i = 0; i < name.length; i++) {
-    hash = (hash << 5) - hash + name.charCodeAt(i);
-    hash = hash & hash;
-  }
-  return Math.abs(hash) % maxValue;
-}
-
-export function getPersonaForRecipient(
-  recipientName: string,
-  recipientGender: string,
-  personaVariants: ComponentNode[]
-): ComponentNode | null {
-  const genderKey = recipientGender.charAt(0).toUpperCase() + recipientGender.slice(1);
-  const genderVariants = personaVariants.filter((v) => v.name.includes(genderKey));
-
-  if (genderVariants.length === 0) return null;
-
-  const index = hashNameToIndex(recipientName, genderVariants.length);
-  return genderVariants[index];
-}
+import { getPersonaForRecipient, hashNameToIndex } from '../utils/persona';
 
 export class MessageBuilder {
   private static instance: MessageBuilder;
@@ -99,7 +77,7 @@ export class MessageBuilder {
 
     let groupEmojiReaction = emojiReaction;
     if (messagesInGroup > 1) {
-      for (let i = 0; i < messagesInGroup; i++) {
+      for (let i = 0; i < messagesInGroup; i += 1) {
         const groupMessage = chatItems[index + i];
         if (groupMessage && groupMessage.emojiReaction && groupMessage.role === role && groupMessage.name === name) {
           groupEmojiReaction = groupMessage.emojiReaction;

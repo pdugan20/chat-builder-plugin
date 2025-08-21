@@ -99,7 +99,7 @@ export class JsonParserService {
       this.worker.addEventListener('message', this.handleWorkerMessage.bind(this));
       this.worker.addEventListener('error', this.handleWorkerError.bind(this));
     } catch (error) {
-      console.warn('Failed to initialize WebWorker, falling back to main thread parsing');
+      // Failed to initialize WebWorker, falling back to main thread parsing
       this.worker = null;
     }
   }
@@ -122,7 +122,7 @@ export class JsonParserService {
   }
 
   private handleWorkerError(error: ErrorEvent): void {
-    console.error('Worker error:', error);
+    // Worker error occurred
     this.pendingRequests.forEach(({ reject }) => {
       reject(new Error('Worker error occurred'));
     });

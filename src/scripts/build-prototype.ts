@@ -3,7 +3,7 @@ import { FRAME_PADDING } from '../constants/dimensions';
 import { ChatItem } from '../types/chat';
 import { getRecipientName, getRecipientGender } from '../utils/chat';
 import { setFrameThemeAndBackground } from '../utils/frame';
-import { getPersonaForRecipient } from './build-chat-ui';
+import { getPersonaForRecipient } from '../utils/persona';
 
 function createPrototypeFrame(tempThreadComponent: ComponentNode, frameComponent: ComponentNode): FrameNode {
   const prototypeFrame = figma.createFrame();
@@ -77,7 +77,7 @@ async function setGroupPersonaProperties(tempThreadComponent: ComponentNode, ite
   // Update all profile photos found - cycle through recipients if we have more slots than recipients
 
   // Map each profile photo slot to a recipient (cycling through recipients if needed)
-  for (let i = 0; i < profilePhotos.length; i++) {
+  for (let i = 0; i < profilePhotos.length; i += 1) {
     const recipientIndex = i % recipients.length; // Cycle through recipients if we have more slots
     const recipient = recipients[recipientIndex];
     const profilePhoto = profilePhotos[i];
@@ -97,10 +97,6 @@ async function setGroupPersonaProperties(tempThreadComponent: ComponentNode, ite
       if (selectedVariant) {
         const personaInstance = persona as InstanceNode;
         personaInstance.mainComponent = selectedVariant;
-      }
-    } else {
-      if ('children' in profilePhoto) {
-      } else {
       }
     }
   }

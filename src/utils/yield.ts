@@ -23,23 +23,21 @@ export async function processInChunks<T, R>(
   chunkSize: number = 5
 ): Promise<R[]> {
   const results: R[] = [];
-  
+
   for (let i = 0; i < items.length; i += chunkSize) {
     const chunk = items.slice(i, i + chunkSize);
-    
+
     // Process chunk
-    const chunkResults = await Promise.all(
-      chunk.map((item, index) => processor(item, i + index))
-    );
-    
+    const chunkResults = await Promise.all(chunk.map((item, index) => processor(item, i + index)));
+
     results.push(...chunkResults);
-    
+
     // Yield to main thread between chunks
     if (i + chunkSize < items.length) {
       await yieldToMainThread();
     }
   }
-  
+
   return results;
 }
 
@@ -47,18 +45,15 @@ export async function processInChunks<T, R>(
  * Executes a function with periodic yielding
  * Useful for long-running operations that can't be easily chunked
  */
-export async function withYielding<T>(
-  fn: () => T | Promise<T>,
-  yieldInterval: number = 100
-): Promise<T> {
+export async function withYielding<T>(fn: () => T | Promise<T>, yieldInterval: number = 100): Promise<T> {
   const startTime = Date.now();
   const result = await fn();
-  
+
   // Yield if operation took longer than threshold
   if (Date.now() - startTime > yieldInterval) {
     await yieldToMainThread();
   }
-  
+
   return result;
 }
 
@@ -90,14 +85,12 @@ export class BatchProcessor<T> {
     try {
       while (this.queue.length > 0) {
         const batch = this.queue.splice(0, this.batchSize);
-        
+
         // Process batch
-        const batchResults = await Promise.all(
-          batch.map(op => op())
-        );
-        
+        const batchResults = await Promise.all(batch.map((op) => op()));
+
         results.push(...batchResults);
-        
+
         // Yield between batches
         if (this.queue.length > 0) {
           await yieldToMainThread();

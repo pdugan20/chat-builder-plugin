@@ -60,7 +60,8 @@ export async function buildFrame(
   theme: 'light' | 'dark',
   width: number,
   itemSpacing: number,
-  name: string
+  name: string,
+  chatItems?: any[]
 ): Promise<FrameNode> {
   const frame = figma.createFrame();
 
@@ -76,6 +77,9 @@ export async function buildFrame(
   frame.name = `Chat thread: ${name}`;
   frame.paddingLeft = FRAME_PADDING.left;
   frame.paddingRight = FRAME_PADDING.right;
+  frame.paddingTop = FRAME_PADDING.top;
+  frame.paddingBottom = FRAME_PADDING.bottom;
+
   frame.layoutMode = 'VERTICAL';
   frame.itemSpacing = itemSpacing;
 

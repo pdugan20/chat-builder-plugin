@@ -236,7 +236,17 @@ async function buildPrototype(
     // Create instance of the component to insert
     const frameInstance = frameComponent.createInstance();
     frameInstance.paddingTop = FRAME_PADDING.top;
-    frameInstance.paddingBottom = FRAME_PADDING.bottom;
+    
+    // Check if last message is from recipient for extra bottom padding
+    // Recipients never have mustache text, so we add padding when last message is from recipient
+    let bottomPadding = FRAME_PADDING.bottom;
+    if (items && items.length > 0) {
+      const lastItem = items[items.length - 1];
+      if (lastItem.role === 'recipient') {
+        bottomPadding += 5;
+      }
+    }
+    frameInstance.paddingBottom = bottomPadding;
 
     // Set the frame instance position before inserting
     frameInstance.x = placeholder.x;

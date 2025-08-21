@@ -92,14 +92,14 @@ export default function useChatGeneration({
 
       // Use a buffer to batch streaming updates
       let streamBuffer = '';
-      let bufferTimer: NodeJS.Timeout | null = null;
-      
+      let bufferTimer: ReturnType<typeof setTimeout> | null = null;
+
       const response = await createChatQuery({
         apiKey: anthropicKey,
         queryInputs: { participants, maxMessages, prompt },
         onStream: (chunk) => {
           streamBuffer += chunk;
-          
+
           // Batch updates every 100ms to reduce UI thread blocking
           if (!bufferTimer) {
             bufferTimer = setTimeout(() => {
@@ -152,12 +152,12 @@ export default function useChatGeneration({
       // Send raw response to plugin for parsing to avoid blocking UI thread
       parent.postMessage(
         {
-          pluginMessage: { 
-            type: MESSAGE_TYPE.PARSE_AND_BUILD_CHAT, 
-            rawResponse: response.content[0].text, 
-            style, 
-            prompt, 
-            includePrototype 
+          pluginMessage: {
+            type: MESSAGE_TYPE.PARSE_AND_BUILD_CHAT,
+            rawResponse: response.content[0].text,
+            style,
+            prompt,
+            includePrototype,
           },
         },
         '*'

@@ -15,36 +15,58 @@
   }
 }
 
-@keyframes ellipsis-fade {
-  0%, 100% { opacity: 0; }
-  50% { opacity: 1; }
-}
-
 .loading-stage {
   animation: fadeInUp 0.5s ease forwards;
 }
 
+/* Loading message and dots container */
+.loading-message {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+/* Container for the three dots */
 .loading-dots {
-  min-width: 300px;
-  text-align: center;
-}
-
-.animate-ellipsis {
   display: inline-block;
-  width: 1em;
-  text-align: left;
+  width: 1.2em; /* Fixed width to prevent layout shift */
+  margin-left: -0.05em; /* Negative margin to overlap slightly with text */
 }
 
-.animate-ellipsis::after {
-  content: '';
+/* Individual dot styling */
+.dot {
   display: inline-block;
-  animation: ellipsis-dots 1.5s steps(4) infinite;
+  opacity: 0;
+  animation: dot-blink 1.2s infinite step-start; /* Sped up from 1.6s to 1.2s */
 }
 
-@keyframes ellipsis-dots {
-  0% { content: ''; }
-  25% { content: '.'; }
-  50% { content: '..'; }
-  75% { content: '...'; }
-  100% { content: ''; }
+/* Stagger the animation for each dot */
+.dot-1 {
+  animation-delay: 0s;
+}
+
+.dot-2 {
+  animation-delay: 0.15s;
+}
+
+.dot-3 {
+  animation-delay: 0.3s;
+}
+
+/* Dot blink animation - instant on/off */
+@keyframes dot-blink {
+  0%, 80%, 100% {
+    opacity: 0;
+  }
+  20%, 70% {
+    opacity: 1;  /* Stay visible from 20% to 70% of the cycle */
+  }
+}
+
+@-webkit-keyframes dot-blink {
+  0%, 80%, 100% {
+    opacity: 0;
+  }
+  20%, 70% {
+    opacity: 1;  /* Stay visible from 20% to 70% of the cycle */
+  }
 }

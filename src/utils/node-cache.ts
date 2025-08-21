@@ -5,8 +5,11 @@
 
 class NodeCache {
   private cache = new Map<string, SceneNode>();
+
   private componentSetCache = new Map<string, ComponentSetNode>();
+
   private lastClearTime = Date.now();
+
   private readonly CACHE_LIFETIME = 5 * 60 * 1000; // 5 minutes
 
   /**

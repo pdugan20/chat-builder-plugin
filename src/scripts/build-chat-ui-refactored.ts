@@ -11,8 +11,8 @@ import { DEVICE_WIDTH } from '../constants/dimensions';
 import buildPrototype from './build-prototype';
 import { MESSAGE_TYPE } from '../constants/messages';
 
-import { FrameManager } from '../services/frame-manager';
-import { MessageBuilder } from '../services/message-builder';
+import FrameManager from '../services/frame-manager';
+import MessageBuilder from '../services/message-builder';
 import { LayoutManager } from '../services/layout-manager';
 import { ProgressTracker } from '../services/progress-tracker';
 

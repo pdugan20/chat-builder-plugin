@@ -60,8 +60,8 @@ export async function buildFrame(
   theme: 'light' | 'dark',
   width: number,
   itemSpacing: number,
-  name: string,
-  chatItems?: any[]
+  name: string
+  // chatItems?: any[] // Removed unused parameter
 ): Promise<FrameNode> {
   const frame = figma.createFrame();
 

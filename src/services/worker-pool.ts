@@ -6,13 +6,13 @@
 interface WorkerTask {
   id: string;
   type: string;
-  data: any;
-  resolve: (value: any) => void;
+  data: unknown;
+  resolve: (value: unknown) => void;
   reject: (error: Error) => void;
   timeout?: ReturnType<typeof setTimeout>;
 }
 
-export class WorkerPool {
+export default class WorkerPool {
   private static instance: WorkerPool;
   private workers: Worker[] = [];
   private availableWorkers: Worker[] = [];
@@ -106,7 +106,7 @@ export class WorkerPool {
           }
         });
 
-        worker.addEventListener('error', (error) => {
+        worker.addEventListener('error', () => {
           // Worker error handled by rejection
           // Recreate the worker if it errors
           this.replaceWorker(worker);
@@ -125,7 +125,9 @@ export class WorkerPool {
     if (index !== -1) {
       try {
         faultyWorker.terminate();
-      } catch {}
+      } catch {
+        // Worker operation failed, continue anyway
+      }
 
       // Create a new worker
       const blob = new Blob([this.workerScript], { type: 'application/javascript' });
@@ -201,7 +203,9 @@ export class WorkerPool {
     this.workers.forEach((worker) => {
       try {
         worker.terminate();
-      } catch {}
+      } catch {
+        // Worker operation failed, continue anyway
+      }
     });
 
     this.workers = [];

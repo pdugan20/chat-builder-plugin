@@ -8,6 +8,7 @@ export interface LayoutConfig {
 
 export class LayoutManager {
   private static instance: LayoutManager;
+
   private pendingLayouts: Array<() => void> = [];
 
   static getInstance(): LayoutManager {

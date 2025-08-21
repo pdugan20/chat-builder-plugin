@@ -1,4 +1,4 @@
-export class AdaptiveStreamBuffer {
+export default class AdaptiveStreamBuffer {
   private buffer: string = '';
   private bufferTimer: ReturnType<typeof setTimeout> | null = null;
   private messageRate: number[] = [];

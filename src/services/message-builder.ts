@@ -3,10 +3,9 @@ import { MessageInstanceProps } from '../types/chat/components';
 import { BUBBLE_PROPERTIES } from '../constants/components';
 import emojiKey from '../constants/emojis';
 import flipHorizontal from '../utils/transform';
-import { getRecipientName } from '../utils/chat';
-import { getPersonaForRecipient, hashNameToIndex } from '../utils/persona';
+import { getPersonaForRecipient } from '../utils/persona';
 
-export class MessageBuilder {
+export default class MessageBuilder {
   private static instance: MessageBuilder;
   private messageCache = new Map<string, InstanceNode>();
   private batchOperations: Array<() => void> = [];

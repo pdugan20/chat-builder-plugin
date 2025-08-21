@@ -1,8 +1,7 @@
 export function hashNameToIndex(name: string, maxValue: number): number {
   let hash = 0;
   for (let i = 0; i < name.length; i += 1) {
-    hash = (hash << 5) - hash + name.charCodeAt(i);
-    hash = hash & hash;
+    hash = (hash * 31 + name.charCodeAt(i)) % 2147483647; // Use multiplication instead of bitwise
   }
   return Math.abs(hash) % maxValue;
 }

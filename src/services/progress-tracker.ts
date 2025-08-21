@@ -9,10 +9,15 @@ export interface ProgressUpdate {
 
 export class ProgressTracker {
   private static instance: ProgressTracker;
+
   private cancelled = false;
+
   private currentPhase: ProgressUpdate['phase'] = 'loading';
+
   private totalSteps = 0;
+
   private completedSteps = 0;
+
   private phaseWeights = {
     loading: 0.1,
     creating: 0.5,

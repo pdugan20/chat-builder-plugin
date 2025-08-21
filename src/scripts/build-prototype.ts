@@ -103,6 +103,7 @@ async function setGroupPersonaProperties(tempThreadComponent: ComponentNode, ite
 
   // Log info about extra profile photos but don't hide them - they might be needed for the layout
   if (profilePhotos.length > recipients.length) {
+    // Extra photos exist but we keep them for layout purposes
   }
 }
 
@@ -131,8 +132,8 @@ async function createThreadComponent(
 
     // Use async API to get properties
     try {
-      const mainComponent = await navBarInstance.getMainComponentAsync();
-      const availableProps = mainComponent?.componentPropertyDefinitions;
+      // Get main component for property setting
+      await navBarInstance.getMainComponentAsync();
 
       // Set chat name
       let chatName = recipientName;
@@ -166,9 +167,10 @@ async function createThreadComponent(
 
           // Show all component sets to help identify the correct one
           const allComponentSets = rootNodes.filter((node) => node.type === 'COMPONENT_SET');
-          allComponentSets.forEach((cs) => {
-            const variants = (cs as ComponentSetNode).children.map((child: any) => child.name);
-          });
+          // Component sets inspection for debugging (currently unused)
+          // allComponentSets.forEach((cs) => {
+          //   const variants = (cs as ComponentSetNode).children.map((child) => child.name);
+          // });
 
           // Look specifically for "Navigation Bar Photo" component set
           const photoComponentSet = allComponentSets.find((cs) => cs.name === 'Navigation Bar Photo') as
@@ -254,7 +256,9 @@ async function buildPrototype(
   tempThreadComponent.remove();
 
   // Add a small delay to ensure all layout operations are complete
-  await new Promise((resolve) => setTimeout(resolve, 50));
+  await new Promise<void>((resolve) => {
+    setTimeout(() => resolve(), 50);
+  });
 
   // Focus viewport on the new components after everything is settled
   figma.viewport.scrollAndZoomIntoView([frameComponent, prototypeFrame]);

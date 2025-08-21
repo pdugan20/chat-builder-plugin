@@ -5,6 +5,7 @@ import { ChatItem, BuildChatUserInterfaceProps } from '../types/chat';
 import { MessageInstanceProps } from '../types/chat/components';
 import { buildFrame } from '../utils/frame';
 import { getFirstChatItemDateTime, isLastChatItemSender, getRecipientName } from '../utils/chat';
+import { yieldToMainThread, processInChunks } from '../utils/yield';
 import {
   loadComponentSets,
   updateEmojiKeyIds,
@@ -73,11 +74,25 @@ export function getPersonaForRecipient(
   return genderVariants[index];
 }
 
+// Cache for component sets to avoid repeated traversals
+const componentSetCache = new Map<string, ComponentSetNode>();
+
 function findThreadComponentSet(): ComponentSetNode | undefined {
+  // Check cache first
+  if (componentSetCache.has('Thread')) {
+    return componentSetCache.get('Thread');
+  }
+  
   const allNodes = figma.root.findAll();
-  return allNodes.find((node) => node.type === 'COMPONENT_SET' && node.name === 'Thread') as
+  const threadSet = allNodes.find((node) => node.type === 'COMPONENT_SET' && node.name === 'Thread') as
     | ComponentSetNode
     | undefined;
+  
+  if (threadSet) {
+    componentSetCache.set('Thread', threadSet);
+  }
+  
+  return threadSet;
 }
 
 function findThreadVariant(threadComponentSet: ComponentSetNode): ComponentNode | undefined {
@@ -96,7 +111,7 @@ async function createFrameComponent(tempFrame: FrameNode, x?: number): Promise<C
   frameComponent.name = tempFrame.name;
   frameComponent.resize(tempFrame.width, tempFrame.height);
 
-  // Clone all children at once, then append in batch
+  // Clone all children at once
   const clonedChildren: SceneNode[] = [];
   tempFrame.children.forEach((child) => {
     if ('clone' in child) {
@@ -104,7 +119,12 @@ async function createFrameComponent(tempFrame: FrameNode, x?: number): Promise<C
     }
   });
 
-  // Batch append all cloned children
+  // Yield once before appending
+  if (clonedChildren.length > 20) {
+    await yieldToMainThread();
+  }
+
+  // Append all children at once for cleaner appearance
   clonedChildren.forEach((child) => {
     frameComponent.appendChild(child);
   });
@@ -435,7 +455,7 @@ export default async function buildChatUserInterface({
   // Update emoji IDs
   await updateEmojiKeyIds();
 
-  // Process all messages in parallel for better performance
+  // Process all messages in parallel but keep them in memory
   const messagePromises = items.map((item: ChatItem, index: number) => {
     const componentSet = item.role === 'sender' ? senderSet : recipientSet;
     return createMessageInstance(item, index, componentSet, bubbleStyle, messages, items);
@@ -444,10 +464,13 @@ export default async function buildChatUserInterface({
   // Wait for all messages to be created
   const messageInstances = await Promise.all(messagePromises);
 
-  // Batch append all message instances at once for better performance and cleaner UI
+  // Filter out null instances
   const validInstances = messageInstances.filter((instance) => instance !== null) as InstanceNode[];
 
-  // Append all instances in a single batch operation
+  // Yield once before batch append
+  await yieldToMainThread();
+
+  // Append all instances in a single operation for cleaner UI
   validInstances.forEach((messageInstance) => {
     tempFrame.appendChild(messageInstance);
     messageInstance.layoutSizingHorizontal = 'FILL';

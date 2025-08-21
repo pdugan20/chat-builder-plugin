@@ -3,7 +3,7 @@ import { MESSAGE_TYPE } from '../../constants/messages';
 import createChatQuery from '../../api/anthropic';
 import { CHAT_DATA_2, CHAT_DATA_3, CHAT_DATA_4 } from '../../constants/test-data';
 import { AdaptiveStreamBuffer } from '../../services/adaptive-stream-buffer';
-import { JsonParserService } from '../../services/json-parser-service';
+import { WorkerPool } from '../../services/worker-pool';
 
 interface UseChatGenerationProps {
   anthropicKey: string;
@@ -32,7 +32,7 @@ export default function useChatGeneration({
   const [streaming, setStreaming] = useState(false);
   const [streamingMessages, setStreamingMessages] = useState('');
   const streamBufferRef = useRef<AdaptiveStreamBuffer | null>(null);
-  const jsonParserRef = useRef<JsonParserService>(JsonParserService.getInstance());
+  const workerPoolRef = useRef<WorkerPool>(WorkerPool.getInstance());
   const abortControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
@@ -59,11 +59,17 @@ export default function useChatGeneration({
     };
 
     window.addEventListener('message', handleMessage);
+    
+    // Initialize worker pool
+    const workerPool = WorkerPool.getInstance();
+    
     return () => {
       window.removeEventListener('message', handleMessage);
       if (streamBufferRef.current) {
         streamBufferRef.current.reset();
       }
+      // Note: Don't terminate worker pool here as it's a singleton
+      // and might be used by other components
     };
   }, []);
 
@@ -192,15 +198,36 @@ export default function useChatGeneration({
         return;
       }
 
-      // Parse JSON in WebWorker if available
+      // Use worker pool for parsing and processing
       try {
-        const parsedData = await jsonParserRef.current.parse(response.content[0].text);
+        // Parse and process in parallel using worker pool
+        const [parsedData, processedData] = await Promise.all([
+          workerPoolRef.current.execute<any>('PARSE_JSON', response.content[0].text),
+          workerPoolRef.current.execute<any>('PROCESS_CHAT_DATA', response.content[0].text)
+        ]);
+
+        // Validate messages in worker
+        const validation = await workerPoolRef.current.execute<any>(
+          'VALIDATE_MESSAGES',
+          processedData
+        );
+
+        if (validation.invalid.length > 0) {
+          console.warn('Invalid messages found:', validation.invalid);
+        }
+
+        // Prepare batches for efficient processing
+        const batches = await workerPoolRef.current.execute<any>(
+          'PREPARE_BATCH',
+          { messages: validation.valid, batchSize: 5 }
+        );
 
         parent.postMessage(
           {
             pluginMessage: {
               type: MESSAGE_TYPE.BUILD_CHAT_UI,
-              data: parsedData,
+              data: validation.valid,
+              batches, // Send pre-computed batches
               style,
               prompt,
               includePrototype,
@@ -209,6 +236,7 @@ export default function useChatGeneration({
           '*'
         );
       } catch (parseError) {
+        console.warn('Worker processing failed, falling back:', parseError);
         // Fallback to plugin-side parsing
         parent.postMessage(
           {

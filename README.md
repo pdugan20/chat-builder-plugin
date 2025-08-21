@@ -77,6 +77,11 @@ To enable test data mode:
 2. Setting `USE_TEST_DATA = true` will only generate chats using local test data
 3. Setting `USE_TEST_DATA = false` will enable the plugin to query the Anthropic API
 
+## Documentation
+
+- [End-to-End Flow](docs/END_TO_END_FLOW.md) - Detailed technical walkthrough of how user inputs become Figma components
+- [Project Guide](CLAUDE.md) - Development setup, architecture overview, and coding guidelines
+
 ## Project Structure
 
 ```

@@ -101,6 +101,9 @@ function findThreadVariant(threadComponentSet: ComponentSetNode): ComponentNode 
 async function createFrameComponent(tempFrame: FrameNode, x?: number): Promise<ComponentNode> {
   const frameComponent = figma.createComponent();
 
+  // Hide frame component during construction to prevent double-frame visibility
+  frameComponent.visible = false;
+
   // Set position immediately after creation, before any other operations
   if (x !== undefined) {
     frameComponent.x = x;
@@ -407,6 +410,11 @@ async function createMessageInstance(
       ? createSenderInstance(props, chatItems)
       : createRecipientInstance(props, chatItems, messageIsGroupChat);
 
+  // Hide instance immediately to prevent it from briefly appearing in Figma
+  if (instance) {
+    instance.visible = false;
+  }
+
   messages.push(message);
   return instance;
 }
@@ -449,6 +457,9 @@ export default async function buildChatUserInterface({
   const { senderSet, recipientSet, statusSet, timestampSet } = await loadComponentSets();
   const tempFrame: FrameNode = await buildFrame(theme, width, itemSpacing, name);
 
+  // Hide frame during construction to prevent individual message flashing
+  tempFrame.visible = false;
+
   // Create and append timestamp
   const { date, time } = getFirstChatItemDateTime(items);
   const timestampInstance = await createTimestampInstance(timestampSet, date, time);
@@ -478,6 +489,8 @@ export default async function buildChatUserInterface({
   validInstances.forEach((messageInstance) => {
     tempFrame.appendChild(messageInstance);
     messageInstance.layoutSizingHorizontal = 'FILL';
+    // Make visible now that it's properly contained in the frame
+    messageInstance.visible = true;
   });
 
   // Create and append status - but only for 1:1 chats, not group chats
@@ -525,7 +538,7 @@ export default async function buildChatUserInterface({
     setTimeout(() => resolve(), 0);
   });
 
-  // Create the frame component at the correct position immediately
+  // Create the frame component at the correct position immediately (tempFrame stays hidden)
   const frameComponent = await createFrameComponent(tempFrame, originalX);
 
   originalX += includePrototype ? FRAME_OFFSET.WITH_PROTOTYPE : FRAME_OFFSET.WITHOUT_PROTOTYPE;
@@ -540,6 +553,9 @@ export default async function buildChatUserInterface({
 
   // Clean up temporary components
   tempFrame.remove();
+
+  // Show the final frame component now that everything is ready
+  frameComponent.visible = true;
 
   if (includePrototype) {
     // Yield before prototype building

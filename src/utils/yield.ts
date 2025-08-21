@@ -63,7 +63,9 @@ export async function withYielding<T>(fn: () => T | Promise<T>, yieldInterval: n
  */
 export class BatchProcessor<T> {
   private queue: Array<() => T | Promise<T>> = [];
+
   private batchSize: number;
+
   private processing = false;
 
   constructor(batchSize: number = 10) {

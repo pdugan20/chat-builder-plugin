@@ -1,4 +1,4 @@
-export class JsonParserService {
+export default class JsonParserService {
   private static instance: JsonParserService;
   private worker: Worker | null = null;
   private pendingRequests = new Map<
@@ -121,7 +121,7 @@ export class JsonParserService {
     }
   }
 
-  private handleWorkerError(error: ErrorEvent): void {
+  private handleWorkerError(): void {
     // Worker error occurred
     this.pendingRequests.forEach(({ reject }) => {
       reject(new Error('Worker error occurred'));

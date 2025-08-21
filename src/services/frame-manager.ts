@@ -2,7 +2,7 @@ import COLORS from '../constants/colors';
 import { VARIABLES } from '../constants/components';
 import MODE_ID from '../constants/collections';
 
-export class FrameManager {
+export default class FrameManager {
   private static instance: FrameManager;
   private frameCreationQueue: Array<() => Promise<ComponentNode>> = [];
   private isProcessing = false;

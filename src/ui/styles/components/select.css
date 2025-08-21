@@ -6,3 +6,9 @@
 button.fp-SelectTrigger {
   min-width: 65px;
 }
+
+/* Ensure dropdown appears above navigation bar */
+.fp-SelectContent,
+.fp-MenuContent {
+  z-index: 20 !important;
+}

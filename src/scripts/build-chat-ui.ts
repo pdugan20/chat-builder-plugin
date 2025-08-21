@@ -115,8 +115,8 @@ async function createFrameComponent(tempFrame: FrameNode, x?: number): Promise<C
   frameComponent.counterAxisSizingMode = tempFrame.counterAxisSizingMode;
   frameComponent.paddingLeft = tempFrame.paddingLeft;
   frameComponent.paddingRight = tempFrame.paddingRight;
-  frameComponent.paddingTop = tempFrame.paddingTop;
-  frameComponent.paddingBottom = tempFrame.paddingBottom;
+  frameComponent.paddingTop = 0;
+  frameComponent.paddingBottom = 0;
   frameComponent.itemSpacing = tempFrame.itemSpacing;
 
   return frameComponent;

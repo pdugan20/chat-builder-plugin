@@ -3,10 +3,11 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const { DefinePlugin } = require('webpack');
 
 const paths = require('./paths.js');
 
-module.exports = {
+module.exports = (env, argv) => ({
   entry: {
     ui: paths.uiIndex,
     plugin: paths.pluginIndex,
@@ -43,6 +44,9 @@ module.exports = {
     new CleanWebpackPlugin(),
     new CaseSensitivePathsPlugin(),
     new ForkTsCheckerWebpackPlugin(),
+    new DefinePlugin({
+      'process.env.NODE_ENV': JSON.stringify(argv.mode || 'development'),
+    }),
     new HtmlWebpackPlugin({
       template: paths.uiHtml,
       filename: 'ui.html',
@@ -52,4 +56,4 @@ module.exports = {
     }),
     new HtmlWebpackInlineSourcePlugin(HtmlWebpackPlugin),
   ],
-};
+});

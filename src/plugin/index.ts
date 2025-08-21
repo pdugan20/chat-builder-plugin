@@ -82,6 +82,14 @@ figma.ui.onmessage = (msg) => {
       initializeUI();
       break;
 
+    case MESSAGE_TYPE.CLEAR_CLIENT_STORAGE:
+      // Clear all client storage (development only)
+      figma.clientStorage.keysAsync().then(keys => {
+        keys.forEach(key => figma.clientStorage.deleteAsync(key));
+        figma.notify('Client storage cleared');
+      });
+      break;
+
     default:
       break;
   }

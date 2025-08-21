@@ -5,7 +5,7 @@ import { ChatItem, BuildChatUserInterfaceProps } from '../types/chat';
 import { MessageInstanceProps } from '../types/chat/components';
 import { buildFrame } from '../utils/frame';
 import { getFirstChatItemDateTime, isLastChatItemSender, getRecipientName } from '../utils/chat';
-import { yieldToMainThread, processInChunks } from '../utils/yield';
+import { yieldToMainThread } from '../utils/yield';
 import {
   loadComponentSets,
   updateEmojiKeyIds,
@@ -43,17 +43,15 @@ function getNextChatPosition(): number {
   // If no existing components or prototypes found, start at origin, otherwise add spacing
   if (rightmostX === -Infinity) {
     return 0; // Start at origin for first component
-  } else {
-    return rightmostX + 200; // Add spacing after existing components/prototypes
   }
+  return rightmostX + 200; // Add spacing after existing components/prototypes
 }
 
 // Simple hash function to consistently map names to indices
 export function hashNameToIndex(name: string, maxValue: number): number {
   let hash = 0;
-  for (let i = 0; i < name.length; i++) {
-    hash = (hash << 5) - hash + name.charCodeAt(i);
-    hash = hash & hash; // Convert to 32-bit integer
+  for (let i = 0; i < name.length; i += 1) {
+    hash = (hash * 31 + name.charCodeAt(i)) % 2147483647; // Use modulo instead of bitwise
   }
   return Math.abs(hash) % maxValue;
 }
@@ -82,16 +80,16 @@ function findThreadComponentSet(): ComponentSetNode | undefined {
   if (componentSetCache.has('Thread')) {
     return componentSetCache.get('Thread');
   }
-  
+
   const allNodes = figma.root.findAll();
   const threadSet = allNodes.find((node) => node.type === 'COMPONENT_SET' && node.name === 'Thread') as
     | ComponentSetNode
     | undefined;
-  
+
   if (threadSet) {
     componentSetCache.set('Thread', threadSet);
   }
-  
+
   return threadSet;
 }
 
@@ -283,12 +281,14 @@ function createSenderInstance(props: MessageInstanceProps, chatItems: ChatItem[]
 
   if (isLastMessageInChat) {
     // Detect if it's a group chat to determine the delivery message
-    const uniqueRecipients = new Set(chatItems.filter((item) => item.role === 'recipient').map((item) => item.name));
-    const isGroupChat = uniqueRecipients.size > 1;
+    const deliveryUniqueRecipients = new Set(
+      chatItems.filter((chatItem) => chatItem.role === 'recipient').map((chatItem) => chatItem.name)
+    );
+    const deliveryIsGroupChat = deliveryUniqueRecipients.size > 1;
 
     const mustacheProps = {
       'Has mustache text': 'Yes',
-      'Mustache#129:16': isGroupChat ? 'Delivered' : 'Delivered Quietly',
+      'Mustache#129:16': deliveryIsGroupChat ? 'Delivered' : 'Delivered Quietly',
     };
 
     // Only set mustache properties that exist
@@ -372,14 +372,16 @@ async function createMessageInstance(
   }
 
   // Detect if it's a group chat by counting unique recipient names
-  const uniqueRecipients = new Set(chatItems.filter((item) => item.role === 'recipient').map((item) => item.name));
-  const isGroupChat = uniqueRecipients.size > 1;
+  const messageUniqueRecipients = new Set(
+    chatItems.filter((chatItem) => chatItem.role === 'recipient').map((chatItem) => chatItem.name)
+  );
+  const messageIsGroupChat = messageUniqueRecipients.size > 1;
 
   // For message groups, check if ANY message in the group has an emoji reaction
   let groupEmojiReaction = emojiReaction;
   if (messagesInGroup > 1) {
     // Look ahead in the chat items to find any emoji reactions in this message group
-    for (let i = 0; i < messagesInGroup; i++) {
+    for (let i = 0; i < messagesInGroup; i += 1) {
       const groupMessage = chatItems[index + i];
       if (groupMessage && groupMessage.emojiReaction && groupMessage.role === role && groupMessage.name === name) {
         groupEmojiReaction = groupMessage.emojiReaction;
@@ -401,7 +403,9 @@ async function createMessageInstance(
   };
 
   const instance =
-    role === 'sender' ? createSenderInstance(props, chatItems) : createRecipientInstance(props, chatItems, isGroupChat);
+    role === 'sender'
+      ? createSenderInstance(props, chatItems)
+      : createRecipientInstance(props, chatItems, messageIsGroupChat);
 
   messages.push(message);
   return instance;
@@ -508,12 +512,18 @@ export default async function buildChatUserInterface({
   }
 
   if (!threadVariant) {
-    console.error('Could not find thread variant:', isGroupChat ? 'Group' : '1:1');
+    figma.ui.postMessage({
+      type: MESSAGE_TYPE.POST_API_ERROR,
+      error: `Could not find thread variant: ${isGroupChat ? 'Group' : '1:1'}`,
+      retryable: false,
+    });
     return;
   }
 
   // Yield before heavy frame operations
-  await new Promise((resolve) => setTimeout(resolve, 0));
+  await new Promise<void>((resolve) => {
+    setTimeout(() => resolve(), 0);
+  });
 
   // Create the frame component at the correct position immediately
   const frameComponent = await createFrameComponent(tempFrame, originalX);
@@ -521,7 +531,9 @@ export default async function buildChatUserInterface({
   originalX += includePrototype ? FRAME_OFFSET.WITH_PROTOTYPE : FRAME_OFFSET.WITHOUT_PROTOTYPE;
 
   // Yield before theme setting
-  await new Promise((resolve) => setTimeout(resolve, 0));
+  await new Promise<void>((resolve) => {
+    setTimeout(() => resolve(), 0);
+  });
 
   // Set theme and background on the frame component
   await setFrameThemeAndBackground(frameComponent, theme);
@@ -531,7 +543,9 @@ export default async function buildChatUserInterface({
 
   if (includePrototype) {
     // Yield before prototype building
-    await new Promise((resolve) => setTimeout(resolve, 0));
+    await new Promise<void>((resolve) => {
+      setTimeout(() => resolve(), 0);
+    });
     await buildPrototype(frameComponent, threadVariant, items, theme, isGroupChat);
 
     // Signal completion after prototype is built
@@ -540,7 +554,9 @@ export default async function buildChatUserInterface({
     });
   } else {
     // Yield before viewport operation
-    await new Promise((resolve) => setTimeout(resolve, 0));
+    await new Promise<void>((resolve) => {
+      setTimeout(() => resolve(), 0);
+    });
 
     // Focus viewport on the new components
     figma.viewport.scrollAndZoomIntoView([frameComponent]);

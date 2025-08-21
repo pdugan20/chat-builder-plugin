@@ -23,7 +23,7 @@ class NodeCache {
    */
   findComponentSet(name: string): ComponentSetNode | undefined {
     this.checkCacheAge();
-    
+
     // Check cache first
     if (this.componentSetCache.has(name)) {
       const cached = this.componentSetCache.get(name);
@@ -40,9 +40,9 @@ class NodeCache {
 
     // Not in cache, find it
     const allNodes = figma.root.findAll();
-    const found = allNodes.find(
-      (node) => node.type === 'COMPONENT_SET' && node.name === name
-    ) as ComponentSetNode | undefined;
+    const found = allNodes.find((node) => node.type === 'COMPONENT_SET' && node.name === name) as
+      | ComponentSetNode
+      | undefined;
 
     if (found) {
       this.componentSetCache.set(name, found);
@@ -106,14 +106,7 @@ export async function findRequiredComponentSets(): Promise<{
   threadSet: ComponentSetNode | null;
   personaSet: ComponentSetNode | null;
 }> {
-  const requiredSets = [
-    'Bubble Sender',
-    'Bubble Recipient',
-    'Status',
-    'Timestamp',
-    'Thread',
-    'Persona'
-  ];
+  const requiredSets = ['Bubble Sender', 'Bubble Recipient', 'Status', 'Timestamp', 'Thread', 'Persona'];
 
   const foundSets = nodeCache.findComponentSets(requiredSets);
 

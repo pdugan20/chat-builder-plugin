@@ -54,19 +54,25 @@
 
 /* Dot blink animation - instant on/off */
 @keyframes dot-blink {
-  0%, 80%, 100% {
+  0%,
+  80%,
+  100% {
     opacity: 0;
   }
-  20%, 70% {
-    opacity: 1;  /* Stay visible from 20% to 70% of the cycle */
+  20%,
+  70% {
+    opacity: 1; /* Stay visible from 20% to 70% of the cycle */
   }
 }
 
 @-webkit-keyframes dot-blink {
-  0%, 80%, 100% {
+  0%,
+  80%,
+  100% {
     opacity: 0;
   }
-  20%, 70% {
-    opacity: 1;  /* Stay visible from 20% to 70% of the cycle */
+  20%,
+  70% {
+    opacity: 1; /* Stay visible from 20% to 70% of the cycle */
   }
 }

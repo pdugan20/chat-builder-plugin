@@ -9,7 +9,7 @@ interface WorkerTask {
   data: any;
   resolve: (value: any) => void;
   reject: (error: Error) => void;
-  timeout?: NodeJS.Timeout;
+  timeout?: ReturnType<typeof setTimeout>;
 }
 
 export class WorkerPool {
@@ -82,24 +82,24 @@ export class WorkerPool {
     const blob = new Blob([this.workerScript], { type: 'application/javascript' });
     const workerUrl = URL.createObjectURL(blob);
 
-    for (let i = 0; i < this.maxWorkers; i++) {
+    for (let i = 0; i < this.maxWorkers; i += 1) {
       try {
         const worker = new Worker(workerUrl);
-        
+
         worker.addEventListener('message', (event) => {
           const { id, success, result, error } = event.data;
           const task = this.activeTasks.get(id);
-          
+
           if (task) {
             this.activeTasks.delete(id);
             if (task.timeout) clearTimeout(task.timeout);
-            
+
             if (success) {
               task.resolve(result);
             } else {
               task.reject(new Error(error));
             }
-            
+
             // Return worker to pool
             this.availableWorkers.push(worker);
             this.processNextTask();
@@ -107,7 +107,7 @@ export class WorkerPool {
         });
 
         worker.addEventListener('error', (error) => {
-          console.error('Worker error:', error);
+          // Worker error handled by rejection
           // Recreate the worker if it errors
           this.replaceWorker(worker);
         });
@@ -115,7 +115,7 @@ export class WorkerPool {
         this.workers.push(worker);
         this.availableWorkers.push(worker);
       } catch (error) {
-        console.warn(`Failed to create worker ${i + 1}:`, error);
+        // Failed to create worker, continue with remaining workers
       }
     }
   }
@@ -126,12 +126,12 @@ export class WorkerPool {
       try {
         faultyWorker.terminate();
       } catch {}
-      
+
       // Create a new worker
       const blob = new Blob([this.workerScript], { type: 'application/javascript' });
       const workerUrl = URL.createObjectURL(blob);
       const newWorker = new Worker(workerUrl);
-      
+
       this.workers[index] = newWorker;
       this.availableWorkers.push(newWorker);
     }
@@ -180,7 +180,7 @@ export class WorkerPool {
   }
 
   async executeMany<T>(tasks: Array<{ type: string; data: any }>): Promise<T[]> {
-    return Promise.all(tasks.map(task => this.execute<T>(task.type, task.data)));
+    return Promise.all(tasks.map((task) => this.execute<T>(task.type, task.data)));
   }
 
   getStatus(): {
@@ -198,12 +198,12 @@ export class WorkerPool {
   }
 
   terminate(): void {
-    this.workers.forEach(worker => {
+    this.workers.forEach((worker) => {
       try {
         worker.terminate();
       } catch {}
     });
-    
+
     this.workers = [];
     this.availableWorkers = [];
     this.taskQueue = [];
@@ -216,14 +216,14 @@ function parseJSONFunction(input: string): any {
   let cleaned = input.trim();
   cleaned = cleaned.replace(/^```json?\s*/, '').replace(/```\s*$/, '');
   cleaned = cleaned.replace(/[\u0000-\u001F\u007F-\u009F]/g, '');
-  
+
   const jsonStart = cleaned.search(/[\[{]/);
   const jsonEnd = Math.max(cleaned.lastIndexOf(']'), cleaned.lastIndexOf('}'));
-  
+
   if (jsonStart !== -1 && jsonEnd !== -1) {
     cleaned = cleaned.substring(jsonStart, jsonEnd + 1);
   }
-  
+
   try {
     return JSON.parse(cleaned);
   } catch {
@@ -239,7 +239,7 @@ function processChatDataFunction(rawData: any): any {
   if (!Array.isArray(rawData)) {
     throw new Error('Chat data must be an array');
   }
-  
+
   return rawData.map((item, index) => ({
     ...item,
     role: item.role?.toLowerCase(),
@@ -254,7 +254,7 @@ function processChatDataFunction(rawData: any): any {
 function validateMessagesFunction(messages: any[]): any {
   const valid: any[] = [];
   const invalid: any[] = [];
-  
+
   for (const msg of messages) {
     if (msg.message.length > 5000) {
       invalid.push({ ...msg, error: 'Message too long' });
@@ -264,16 +264,16 @@ function validateMessagesFunction(messages: any[]): any {
       valid.push(msg);
     }
   }
-  
+
   return { valid, invalid };
 }
 
 function prepareBatchFunction(messages: any[], batchSize: number): any[][] {
   const batches: any[][] = [];
-  
+
   for (let i = 0; i < messages.length; i += batchSize) {
     batches.push(messages.slice(i, i + batchSize));
   }
-  
+
   return batches;
 }

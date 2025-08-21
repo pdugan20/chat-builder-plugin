@@ -1,4 +1,4 @@
-import { ChatItem, BuildChatUserInterfaceProps } from '../types/chat';
+import { BuildChatUserInterfaceProps } from '../types/chat';
 import { buildFrame } from '../utils/frame';
 import { getFirstChatItemDateTime, isLastChatItemSender, getRecipientName } from '../utils/chat';
 import {
@@ -7,7 +7,7 @@ import {
   createTimestampInstance,
   createStatusInstance,
 } from '../services/component';
-import { DEVICE_WIDTH, FRAME_OFFSET } from '../constants/dimensions';
+import { DEVICE_WIDTH } from '../constants/dimensions';
 import buildPrototype from './build-prototype';
 import { MESSAGE_TYPE } from '../constants/messages';
 
@@ -66,7 +66,7 @@ export default async function buildChatUserInterface({
       const instances = await messageBuilder.createMessageInstances(items, { senderSet, recipientSet }, bubbleStyle);
 
       // Update progress as messages are created
-      for (let i = 0; i < instances.length; i++) {
+      for (let i = 0; i < instances.length; i += 1) {
         progressTracker.incrementProgress();
         if (progressTracker.isCancelled()) {
           return null;
@@ -152,7 +152,7 @@ export default async function buildChatUserInterface({
       return frameComponent;
     });
   } catch (error) {
-    console.error('Error building chat UI:', error);
+    // Error already handled by posting to UI
     figma.ui.postMessage({
       type: MESSAGE_TYPE.POST_API_ERROR,
       error: error instanceof Error ? error.message : 'Failed to build chat UI',

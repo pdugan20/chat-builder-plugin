@@ -206,7 +206,7 @@ function PluginScreen({
 
   function renderFooter(): React.JSX.Element {
     const isDisabled = !prompt.trim() || loading;
-    
+
     return (
       <div className='footer'>
         <div className={`transition-opacity duration-200 ${isDisabled ? 'opacity-50' : 'opacity-100'}`}>

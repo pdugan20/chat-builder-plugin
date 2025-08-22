@@ -21,7 +21,7 @@ User Input → React UI → Plugin Messages → Anthropic API → JSON Parsing �
 1. **Form Fields Captured**:
    - Participants count (2, 3, or 4)
    - Max messages (5-50)
-   - UI style (light/dark)  
+   - UI style (light/dark)
    - Prompt text (conversation description)
    - Include prototype checkbox
 
@@ -38,12 +38,15 @@ User Input → React UI → Plugin Messages → Anthropic API → JSON Parsing �
 **Location**: `src/ui/hooks/use-chat-generation.ts`
 
 ### Test Data Path
+
 If `useTestData` is enabled:
+
 - Selects pre-built chat data based on participant count
 - Sends `BUILD_CHAT_UI` message directly to plugin
 - Skips API call entirely
 
-### API Path  
+### API Path
+
 For real generation:
 
 1. **API Request Setup**:
@@ -52,13 +55,14 @@ For real generation:
    - Initiates streaming request to Claude API
 
 2. **Streaming Response Handling**:
+
    ```typescript
    // Real-time message extraction from stream
    onStream: (chunk) => {
      // Extract individual messages as they arrive
      const messageMatch = chunk.match(/"message"\s*:\s*"([^"]+)"/);
      // Update UI with streaming progress
-   }
+   };
    ```
 
 3. **Response Processing**:
@@ -72,19 +76,21 @@ For real generation:
 The plugin receives messages via `figma.ui.onmessage`:
 
 ### Key Message Types:
+
 - `BUILD_CHAT_UI`: Direct build with structured data
 - `PARSE_AND_BUILD_CHAT`: Parse JSON then build
 - `UPDATE_ANTHROPIC_KEY`: Store/update API key
 - `POST_API_ERROR`: Display error notifications
 
 ### Message Processing:
+
 ```typescript
 case MESSAGE_TYPE.PARSE_AND_BUILD_CHAT:
   const parsedData = cleanAndParseJson(msg.rawResponse);
   await buildChatUserInterface({
     data: parsedData,
     theme: msg.style,
-    name: msg.prompt, 
+    name: msg.prompt,
     includePrototype: msg.includePrototype
   });
 ```
@@ -122,12 +128,15 @@ case MESSAGE_TYPE.PARSE_AND_BUILD_CHAT:
 **Location**: `src/scripts/build-chat-ui.ts`
 
 ### Initialization Phase:
+
 1. **Position Calculation**: `getNextChatPosition()` finds optimal placement
 2. **Component Loading**: `loadComponentSets()` loads required Figma components
 3. **Frame Creation**: `buildFrame()` creates container with theme and dimensions
 
 ### Message Processing:
+
 1. **Parallel Instance Creation**:
+
    ```typescript
    const messagePromises = items.map((item, index) => {
      const componentSet = item.role === 'sender' ? senderSet : recipientSet;
@@ -148,7 +157,9 @@ case MESSAGE_TYPE.PARSE_AND_BUILD_CHAT:
    - Yields to main thread for large message counts
 
 ### Visual Assembly:
+
 1. **Component Hierarchy**:
+
    ```
    Frame Component
    ├── Timestamp Instance
@@ -180,6 +191,7 @@ If `includePrototype` is enabled:
    - Positions next to the chat component
 
 2. **Interactive Prototype Frame**:
+
    ```typescript
    const prototypeFrame = figma.createFrame();
    prototypeFrame.name = 'Prototype';
@@ -200,16 +212,19 @@ If `includePrototype` is enabled:
 ## Phase 7: Completion and Cleanup
 
 ### UI Feedback:
+
 1. **Progress Indicators**: Streaming messages shown during generation
-2. **Error Handling**: API errors displayed with retry options  
+2. **Error Handling**: API errors displayed with retry options
 3. **Completion Signal**: `BUILD_COMPLETE` message sent to UI
 
 ### Viewport Management:
+
 - For chat-only: Focuses viewport on new component
 - For prototype: Includes both components in viewport
 - Proper spacing maintained between multiple generations
 
 ### Component Lifecycle:
+
 1. **Temporary Frame**: Created and hidden during construction
 2. **Final Component**: Converted to reusable Figma component
 3. **Cleanup**: Temporary elements removed after successful creation
@@ -218,16 +233,19 @@ If `includePrototype` is enabled:
 ## Error Handling Throughout Flow
 
 ### UI Layer Errors:
+
 - Missing API key → Show API key overlay
 - Invalid inputs → Disable generate button
 - Network issues → Display retry-able error banner
 
 ### API Layer Errors:
+
 - Rate limiting → Automatic retry with exponential backoff
 - Invalid API key → Clear stored key, show setup overlay
 - Malformed response → JSON parsing fallback and user notification
 
 ### Figma Layer Errors:
+
 - Missing components → Check components on plugin load
 - Missing fonts → Font loading with user notification
 - Component creation failures → Graceful error reporting
@@ -235,7 +253,7 @@ If `includePrototype` is enabled:
 ## Performance Considerations
 
 1. **Streaming UI Updates**: Batched every 100ms to prevent UI blocking
-2. **Parallel Processing**: All message instances created simultaneously  
+2. **Parallel Processing**: All message instances created simultaneously
 3. **Yielding Strategy**: Main thread yields during heavy operations
 4. **Memory Management**: Temporary components cleaned up promptly
 5. **Visual Optimization**: Components hidden during assembly to prevent flashing

@@ -1,4 +1,4 @@
-const CLAUDE_MODEL = 'claude-3-5-sonnet-20241022';
+const CLAUDE_MODEL = 'claude-3-7-sonnet-20250219';
 const MAX_TOKENS = 3000;
 const TEMPERATURE = 0.8;
 const MAX_RETRIES = 3;

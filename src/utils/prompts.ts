@@ -127,12 +127,14 @@ REQUIREMENTS:
 - emojiReaction: null OR one of: heart, haha, exclamation, thumbsUp, thumbsDown, question
 - Use emoji reactions SPARINGLY - only 2-4 total reactions per conversation, not on every message
 
-CONVERSATION STYLE:
-- Keep messages conversational and natural - like real text messages
-- Messages should be SHORT (typically 1-2 sentences, max 3)
-- Use casual language, contractions, and informal tone
-- Include natural reactions, questions, and responses between participants
-- Avoid overly formal or long-winded messages
+CONVERSATION STYLE - CRITICAL:
+- Write like REAL people texting - short, casual, natural
+- Messages should be VERY SHORT (usually 5-15 words, max 25 words)
+- Use casual language and contractions (don't, can't, I'm, etc.)
+- Think like you're typing quickly on a phone
+- NO formal language or complete paragraphs
+- Include natural interruptions, reactions, and quick back-and-forth
+- Avoid verbose, essay-like responses
 
 CRITICAL - messagesInGroup Logic:
 - messagesInGroup = total number of consecutive messages by the SAME person

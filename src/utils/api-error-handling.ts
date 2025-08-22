@@ -55,7 +55,7 @@ const handleAnthropicError = (error: AnthropicError): ErrorDetails => {
       case 'not_found_error':
         errorDetails = {
           type: 'not_found_error',
-          message: 'The requested resource was not found',
+          message: 'The AI model is not accessible with your API key. Please try a different API key.',
           retryable: false,
         };
         break;

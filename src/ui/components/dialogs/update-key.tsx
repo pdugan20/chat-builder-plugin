@@ -47,8 +47,7 @@ function UpdateKeyDialog({
     setKeyIsValid(false);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = () => {
     parent.postMessage({ pluginMessage: { type: MESSAGE_TYPE.UPDATE_ANTHROPIC_KEY, apiKey } }, '*');
     setKeyIsValid(false);
   };

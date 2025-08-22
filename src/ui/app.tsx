@@ -8,6 +8,7 @@ import { PluginProvider } from './context/plugin';
 import './styles/app.css';
 
 const USE_TEST_DATA = false;
+const SHOW_DEBUG = true;
 
 function App(): React.JSX.Element {
   return (
@@ -16,7 +17,7 @@ function App(): React.JSX.Element {
         <MemoryRouter initialEntries={['/PluginScreen']}>
           <Routes>
             <Route path='PluginScreen' element={<PluginScreen useTestData={USE_TEST_DATA} />} />
-            <Route path='SettingsScreen' element={<SettingsScreen />} />
+            <Route path='SettingsScreen' element={<SettingsScreen showDebug={SHOW_DEBUG} />} />
           </Routes>
         </MemoryRouter>
       </PluginProvider>

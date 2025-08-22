@@ -1,4 +1,4 @@
-export function hashNameToIndex(name: string, maxValue: number): number {
+function hashNameToIndex(name: string, maxValue: number): number {
   let hash = 0;
   for (let i = 0; i < name.length; i += 1) {
     hash = (hash * 31 + name.charCodeAt(i)) % 2147483647; // Use multiplication instead of bitwise
@@ -6,7 +6,7 @@ export function hashNameToIndex(name: string, maxValue: number): number {
   return Math.abs(hash) % maxValue;
 }
 
-export function getPersonaForRecipient(
+export default function getPersonaForRecipient(
   recipientName: string,
   recipientGender: string,
   personaVariants: ComponentNode[]

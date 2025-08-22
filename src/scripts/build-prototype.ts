@@ -3,7 +3,7 @@ import { FRAME_PADDING } from '../constants/dimensions';
 import { ChatItem } from '../types/chat';
 import { getRecipientName, getRecipientGender } from '../utils/chat';
 import { setFrameThemeAndBackground } from '../utils/frame';
-import { getPersonaForRecipient } from '../utils/persona';
+import getPersonaForRecipient from '../utils/persona';
 
 function createPrototypeFrame(tempThreadComponent: ComponentNode, frameComponent: ComponentNode): FrameNode {
   const prototypeFrame = figma.createFrame();
@@ -64,17 +64,10 @@ async function setGroupPersonaProperties(tempThreadComponent: ComponentNode, ite
   }
 
   // Find all Profile Photo components within the nav bar
-  // Note: This runs AFTER the photo type has been switched, so Group (4) should have 4 slots
-
   const profilePhotos =
     navBar && 'findAll' in navBar
       ? navBar.findAll((node) => node.name === 'Profile Photo' || node.name.toLowerCase().includes('profile'))
       : [];
-
-  // Check if we have enough profile photos for all recipients
-  // Silently handle if there are fewer photos than recipients
-
-  // Update all profile photos found - cycle through recipients if we have more slots than recipients
 
   // Map each profile photo slot to a recipient (cycling through recipients if needed)
   for (let i = 0; i < profilePhotos.length; i += 1) {
@@ -101,7 +94,6 @@ async function setGroupPersonaProperties(tempThreadComponent: ComponentNode, ite
     }
   }
 
-  // Log info about extra profile photos but don't hide them - they might be needed for the layout
   if (profilePhotos.length > recipients.length) {
     // Extra photos exist but we keep them for layout purposes
   }

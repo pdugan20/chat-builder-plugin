@@ -5,7 +5,7 @@ export const THREAD_PROPERTIES = {
   NAV_BAR: 'Thread Navigation Bar',
   CHAT_NAME: 'Chat name#424:0',
   PERSONA: 'Persona',
-  PHOTO_TYPE: 'Photo type#424:1', // This will need to be verified with logs
+  PHOTO_TYPE: 'Photo type#424:1',
 } as const;
 
 export const VARIABLES = {

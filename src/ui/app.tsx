@@ -8,7 +8,7 @@ import { PluginProvider } from './context/plugin';
 import './styles/app.css';
 
 const USE_TEST_DATA = false;
-const SHOW_DEBUG = true;
+const SHOW_DEBUG = false;
 
 function App(): React.JSX.Element {
   return (

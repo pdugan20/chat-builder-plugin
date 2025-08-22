@@ -1,13 +1,15 @@
-import { THREAD_PROPERTIES } from '../constants/components';
+import { THREAD_PROPERTIES, COMPONENT_NAMES, PHOTO_PROPERTIES, CHAT_ROLES } from '../constants/components';
 import { FRAME_PADDING } from '../constants/dimensions';
 import { ChatItem } from '../types/chat';
-import { getRecipientName, getRecipientGender } from '../utils/chat';
+import { getRecipientName, getRecipientsList, getUniqueRecipients } from '../utils/chat';
 import { setFrameThemeAndBackground } from '../utils/frame';
+import { findComponentSet, safeSetProperties } from '../services/component';
 import getPersonaForRecipient from '../utils/persona';
+import { NODE_MATCHERS } from '../utils/node-finder';
 
 function createPrototypeFrame(tempThreadComponent: ComponentNode, frameComponent: ComponentNode): FrameNode {
   const prototypeFrame = figma.createFrame();
-  prototypeFrame.name = 'Prototype';
+  prototypeFrame.name = COMPONENT_NAMES.PROTOTYPE;
   prototypeFrame.resize(tempThreadComponent.width, tempThreadComponent.height);
   prototypeFrame.x = frameComponent.x + frameComponent.width + 50;
   prototypeFrame.y = frameComponent.y;
@@ -18,46 +20,33 @@ function createPrototypeFrame(tempThreadComponent: ComponentNode, frameComponent
 
 async function setPersonaProperties(tempThreadComponent: ComponentNode, items: ChatItem[]): Promise<void> {
   const persona = tempThreadComponent.findOne((node) => node.name === THREAD_PROPERTIES.PERSONA);
-  const rootNodes = figma.root.findAll();
-  const personaSet = rootNodes.find((node) => node.type === 'COMPONENT_SET' && node.name === 'Persona');
+  const personaSet = findComponentSet(COMPONENT_NAMES.PERSONA);
 
   if (personaSet && persona && 'setProperties' in persona) {
-    const recipientGender = getRecipientGender(items).charAt(0).toUpperCase() + getRecipientGender(items).slice(1);
-    const personaVariants = (personaSet as ComponentSetNode).children as ComponentNode[];
-    const matchingVariants = personaVariants.filter((variant) => variant.name.includes(recipientGender));
+    // Get the first recipient's info
+    const recipients = getRecipientsList(items);
+    if (recipients.length > 0) {
+      const firstRecipient = recipients[0];
+      const personaVariants = personaSet.children as ComponentNode[];
+      const selectedVariant = getPersonaForRecipient(firstRecipient.name, firstRecipient.gender, personaVariants);
 
-    if (matchingVariants.length > 0) {
-      const randomVariant = matchingVariants[Math.floor(Math.random() * matchingVariants.length)];
-      (persona as InstanceNode).mainComponent = randomVariant;
+      if (selectedVariant) {
+        (persona as InstanceNode).mainComponent = selectedVariant;
+      }
     }
   }
 }
 
 async function setGroupPersonaProperties(tempThreadComponent: ComponentNode, items: ChatItem[]): Promise<void> {
-  const rootNodes = figma.root.findAll();
-  const personaSet = rootNodes.find((node) => node.type === 'COMPONENT_SET' && node.name === 'Persona');
+  const personaSet = findComponentSet(COMPONENT_NAMES.PERSONA);
 
   if (!personaSet) {
     return;
   }
 
-  // Get unique recipients with their genders - same logic as chat bubbles
-  const recipients = items
-    .filter((item) => item.role === 'recipient')
-    .reduce(
-      (unique, item) => {
-        if (!unique.some((u) => u.name === item.name)) {
-          unique.push({ name: item.name, gender: item.gender });
-        }
-        return unique;
-      },
-      [] as Array<{ name: string; gender: string }>
-    );
+  // Get unique recipients with their genders
+  const recipients = getRecipientsList(items);
 
-  // Sort recipients by name for consistent ordering - same as chat bubbles
-  recipients.sort((a, b) => a.name.localeCompare(b.name));
-
-  // Look for Profile Photo components in the nav bar, just like chat bubbles
   const navBar = tempThreadComponent.findOne((node) => node.name === THREAD_PROPERTIES.NAV_BAR);
   if (!navBar) {
     return;
@@ -65,20 +54,17 @@ async function setGroupPersonaProperties(tempThreadComponent: ComponentNode, ite
 
   // Find all Profile Photo components within the nav bar
   const profilePhotos =
-    navBar && 'findAll' in navBar
-      ? navBar.findAll((node) => node.name === 'Profile Photo' || node.name.toLowerCase().includes('profile'))
-      : [];
+    navBar && 'findAll' in navBar ? navBar.findAll(NODE_MATCHERS.profilePhoto(COMPONENT_NAMES.PROFILE_PHOTO)) : [];
 
   // Map each profile photo slot to a recipient (cycling through recipients if needed)
   for (let i = 0; i < profilePhotos.length; i += 1) {
-    const recipientIndex = i % recipients.length; // Cycle through recipients if we have more slots
+    const recipientIndex = i % recipients.length;
     const recipient = recipients[recipientIndex];
     const profilePhoto = profilePhotos[i];
 
-    // Find the nested Persona component within the Profile Photo (same as chat bubbles)
     const persona =
       'findOne' in profilePhoto
-        ? profilePhoto.findOne((node) => node.name === 'Persona' && node.type === 'INSTANCE')
+        ? profilePhoto.findOne((node) => node.name === COMPONENT_NAMES.PERSONA && node.type === 'INSTANCE')
         : null;
 
     if (persona && 'setProperties' in persona) {
@@ -106,7 +92,7 @@ async function createThreadComponent(
   isGroupChat: boolean
 ): Promise<ComponentNode> {
   const tempThreadComponent = figma.createComponent();
-  tempThreadComponent.name = 'Thread';
+  tempThreadComponent.name = COMPONENT_NAMES.THREAD;
   tempThreadComponent.resize(threadVariant.width, threadVariant.height);
 
   // Clone variant children
@@ -130,44 +116,33 @@ async function createThreadComponent(
       // Set chat name
       let chatName = recipientName;
       if (isGroupChat) {
-        const uniqueRecipients = new Set(items.filter((item) => item.role === 'recipient').map((item) => item.name));
-        const recipientCount = uniqueRecipients.size; // Only count recipients, not sender
+        const recipientCount = getUniqueRecipients(items).size;
         chatName = `${recipientCount} people`;
       }
 
-      navBarInstance.setProperties({ [THREAD_PROPERTIES.CHAT_NAME]: chatName });
+      try {
+        await safeSetProperties(navBarInstance, { [THREAD_PROPERTIES.CHAT_NAME]: chatName });
+      } catch (error) {
+        // Error already logged in safeSetProperties
+      }
 
-      // Set photo type for group chats - MUST be done before updating personas
+      // Set photo type for group chats
       if (isGroupChat) {
-        const uniqueRecipients = new Set(items.filter((item) => item.role === 'recipient').map((item) => item.name));
-        const recipientCount = uniqueRecipients.size; // Only count recipients
-        const photoType = recipientCount === 2 ? 'Group (3)' : 'Group (4)'; // 2 recipients = 3-person chat, 3 recipients = 4-person chat
+        const recipientCount = getUniqueRecipients(items).size;
+        // Determine photo type based on recipient count
+        // 2 recipients = 3-person chat (use Group (3))
+        // 3+ recipients = 4-person chat (use Group (4))
+        const photoType = recipientCount === 2 ? PHOTO_PROPERTIES.TWO_PHOTOS : PHOTO_PROPERTIES.THREE_PHOTOS;
 
         // Find the nested photo component within the navigation bar
         const photoComponent =
           navBar && 'findOne' in navBar
-            ? navBar.findOne(
-                (node) =>
-                  (node.name.toLowerCase().includes('photo') || node.name.toLowerCase().includes('avatar')) &&
-                  node.type === 'INSTANCE'
-              )
+            ? navBar.findOne((node) => NODE_MATCHERS.navigationPhoto()(node) && node.type === 'INSTANCE')
             : null;
 
         if (photoComponent && 'setProperties' in photoComponent) {
-          // Find the component set that contains the Group (3) and Group (4) variants
-          const rootNodes = figma.root.findAll();
-
-          // Show all component sets to help identify the correct one
-          const allComponentSets = rootNodes.filter((node) => node.type === 'COMPONENT_SET');
-          // Component sets inspection for debugging (currently unused)
-          // allComponentSets.forEach((cs) => {
-          //   const variants = (cs as ComponentSetNode).children.map((child) => child.name);
-          // });
-
           // Look specifically for "Navigation Bar Photo" component set
-          const photoComponentSet = allComponentSets.find((cs) => cs.name === 'Navigation Bar Photo') as
-            | ComponentSetNode
-            | undefined;
+          const photoComponentSet = findComponentSet(COMPONENT_NAMES.NAVIGATION_BAR_PHOTO);
 
           if (photoComponentSet) {
             const variants = photoComponentSet.children as ComponentNode[];
@@ -182,15 +157,13 @@ async function createThreadComponent(
         }
       }
     } catch (error) {
-      // Error setting group photo - continue execution
+      // Error setting group photo
     }
   }
 
-  // Set persona properties for 1:1 chats, handle differently for group chats
   if (!isGroupChat) {
     await setPersonaProperties(tempThreadComponent, items);
   } else {
-    // For group chats, set personas for each participant
     await setGroupPersonaProperties(tempThreadComponent, items);
   }
 
@@ -216,11 +189,10 @@ async function buildPrototype(
     frameInstance.paddingTop = FRAME_PADDING.top;
 
     // Check if last message is from recipient for extra bottom padding
-    // Recipients never have mustache text, so we add padding when last message is from recipient
     let bottomPadding = FRAME_PADDING.bottom;
     if (items && items.length > 0) {
       const lastItem = items[items.length - 1];
-      if (lastItem.role === 'recipient') {
+      if (lastItem.role === CHAT_ROLES.RECIPIENT) {
         bottomPadding += 5;
       }
     }

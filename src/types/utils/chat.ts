@@ -1,3 +1,5 @@
+import { CHAT_ROLES } from '../../constants/components';
+
 export interface ChatDateTime {
   date: string;
   time: string;
@@ -5,5 +7,5 @@ export interface ChatDateTime {
 
 export interface ChatParticipant {
   name: string;
-  role: 'sender' | 'recipient';
+  role: typeof CHAT_ROLES.SENDER | typeof CHAT_ROLES.RECIPIENT;
 }

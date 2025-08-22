@@ -205,16 +205,20 @@ function PluginScreen({
   }
 
   function renderFooter(): React.JSX.Element {
+    const isDisabled = !prompt.trim() || loading;
+    
     return (
       <div className='footer'>
-        <Button
-          variant='primary'
-          size='small'
-          disabled={!prompt.trim() || loading}
-          onClick={() => generateChat({ participants, maxMessages, prompt, style, includePrototype })}
-        >
-          Generate chat
-        </Button>
+        <div className={`transition-opacity duration-200 ${isDisabled ? 'opacity-50' : 'opacity-100'}`}>
+          <Button
+            variant='primary'
+            size='small'
+            disabled={isDisabled}
+            onClick={() => generateChat({ participants, maxMessages, prompt, style, includePrototype })}
+          >
+            Generate chat
+          </Button>
+        </div>
       </div>
     );
   }

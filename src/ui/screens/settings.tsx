@@ -10,11 +10,13 @@ import { MESSAGE_TYPE } from '../../constants/messages';
 interface SettingsScreenProps {
   screen?: string;
   pluginVersion?: string;
+  showDebug?: boolean;
 }
 
 function SettingsScreen({
   screen = 'settings',
   pluginVersion = PLUGIN_VERSION,
+  showDebug = false,
 }: SettingsScreenProps): React.JSX.Element {
   const { anthropicKey } = useAnthropic();
 
@@ -71,8 +73,8 @@ function SettingsScreen({
   }
 
   function renderDebugSection(): React.JSX.Element | null {
-    // Only show in development mode
-    if (process.env.NODE_ENV !== 'development') {
+    // Only show when showDebug flag is true
+    if (!showDebug) {
       return null;
     }
 

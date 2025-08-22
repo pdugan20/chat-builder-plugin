@@ -52,10 +52,20 @@ const handleAnthropicError = (error: AnthropicError): ErrorDetails => {
           retryable: false,
         };
         break;
+      case 'not_found_error':
+        errorDetails = {
+          type: 'not_found_error',
+          message: 'The requested resource was not found',
+          retryable: false,
+        };
+        break;
       default:
+        // Sanitize error message to remove technical details like model names
+        const rawMessage = error.error.error.message || 'An error occurred';
+        const sanitizedMessage = rawMessage.replace(/claude-[0-9]+-[a-z]+-[0-9-]+/gi, 'the AI model');
         errorDetails = {
           type: error.error.error.type,
-          message: error.error.error.message || 'An error occurred',
+          message: sanitizedMessage,
           retryable: true,
         };
     }

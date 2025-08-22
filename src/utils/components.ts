@@ -1,14 +1,14 @@
-import emojiKey from '../constants/emojis';
+import emojiKey, { EMOJI_STYLES, EMOJI_REACTIONS } from '../constants/emojis';
 
 export const transformStyleName = (style: string): string => {
-  if (style === 'transparent android') return 'transparentGreen';
-  if (style === 'transparent ios') return 'transparentBlue';
+  if (style === 'transparent android') return EMOJI_STYLES.TRANSPARENT_GREEN;
+  if (style === 'transparent ios') return EMOJI_STYLES.TRANSPARENT_BLUE;
   return style.toLowerCase();
 };
 
 export const transformEmojiName = (name: string): string => {
-  if (name === 'thumbs up') return 'thumbsUp';
-  if (name === 'thumbs down') return 'thumbsDown';
+  if (name === 'thumbs up') return EMOJI_REACTIONS.THUMBS_UP;
+  if (name === 'thumbs down') return EMOJI_REACTIONS.THUMBS_DOWN;
   return name.toLowerCase();
 };
 
@@ -24,11 +24,11 @@ export const findColorHeart = (
 };
 
 export const addHeartToStyles = (heartInfo: { key: string; id: string }) => {
-  ['color', 'transparentBlue', 'transparentGreen'].forEach((style) => {
+  Object.values(EMOJI_STYLES).forEach((style) => {
     if (!emojiKey[style]) {
       emojiKey[style] = {};
     }
-    emojiKey[style].heart = heartInfo;
+    emojiKey[style][EMOJI_REACTIONS.HEART] = heartInfo;
   });
 };
 
@@ -47,7 +47,7 @@ export const processComponent = async (component: ComponentNode | ComponentSetNo
   const emojiName = transformEmojiName(originalEmojiName);
 
   // Skip heart as it's already been added
-  if (emojiName === 'heart') return;
+  if (emojiName === EMOJI_REACTIONS.HEART) return;
 
   if (!emojiKey[style]) {
     emojiKey[style] = {};

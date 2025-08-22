@@ -1,4 +1,4 @@
-const HtmlWebpackInlineSourcePlugin = require('html-webpack-inline-source-plugin');
+const HtmlInlineScriptPlugin = require('html-inline-script-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
@@ -50,10 +50,11 @@ module.exports = (env, argv) => ({
     new HtmlWebpackPlugin({
       template: paths.uiHtml,
       filename: 'ui.html',
-      inlineSource: '.(js)$',
       chunks: ['ui'],
       cache: false,
     }),
-    new HtmlWebpackInlineSourcePlugin(HtmlWebpackPlugin),
+    new HtmlInlineScriptPlugin({
+      scriptMatchPattern: [/ui\.js$/],
+    }),
   ],
 });

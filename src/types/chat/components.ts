@@ -1,3 +1,5 @@
+import { CHAT_ROLES } from '../../constants/components';
+
 export interface ComponentSets {
   senderSet: ComponentSetNode;
   recipientSet: ComponentSetNode;
@@ -16,7 +18,7 @@ export interface BuildChatUserInterfaceProps {
 }
 
 export interface MessageInstanceProps {
-  role: 'sender' | 'recipient';
+  role: typeof CHAT_ROLES.SENDER | typeof CHAT_ROLES.RECIPIENT;
   message: string;
   emojiReaction: string | null;
   messagesInGroup: number;
@@ -30,7 +32,7 @@ export interface MessageInstanceProps {
 export interface ChatItem {
   name: string;
   gender: string;
-  role: 'sender' | 'recipient';
+  role: typeof CHAT_ROLES.SENDER | typeof CHAT_ROLES.RECIPIENT;
   message: string;
   time: string;
   date?: string;

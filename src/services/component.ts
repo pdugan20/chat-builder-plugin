@@ -1,4 +1,11 @@
-import { THREAD_COMPONENT_SETS } from '../constants/components';
+import {
+  THREAD_COMPONENT_SETS,
+  COMPONENT_NAMES,
+  BUBBLE_PROPERTIES,
+  PROPERTY_VALUES,
+  TIMESTAMP_BANNER_PROPERTIES,
+  STATUS_BANNER_PROPERTIES,
+} from '../constants/components';
 import { ComponentSets } from '../types/chat';
 import emojiKey from '../constants/emojis';
 import {
@@ -8,16 +15,53 @@ import {
   transformStyleName,
   transformEmojiName,
 } from '../utils/components';
+import getPersonaForRecipient from '../utils/persona';
+import { NODE_MATCHERS } from '../utils/node-finder';
+
+// Cache for component sets to avoid repeated traversals
+const componentSetCache = new Map<string, ComponentSetNode>();
+
+export function findComponentSet(name: string): ComponentSetNode | undefined {
+  // Check cache first
+  if (componentSetCache.has(name)) {
+    return componentSetCache.get(name);
+  }
+
+  const allNodes = figma.root.findAll();
+  const componentSet = allNodes.find((node) => node.type === 'COMPONENT_SET' && node.name === name) as
+    | ComponentSetNode
+    | undefined;
+
+  if (componentSet) {
+    componentSetCache.set(name, componentSet);
+  }
+
+  return componentSet;
+}
+
+export function findComponentVariant(componentSet: ComponentSetNode, variantName: string): ComponentNode | undefined {
+  const variants = componentSet.children as ComponentNode[];
+  return variants.find((variant) => variant.name === variantName);
+}
+
+export async function safeSetProperties(instance: InstanceNode, properties: Record<string, string>): Promise<void> {
+  try {
+    instance.setProperties(properties);
+  } catch (error) {
+    if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console
+      console.error('setProperties failed:', error);
+    }
+    throw error;
+  }
+}
 
 export async function loadComponentSets(): Promise<ComponentSets> {
-  const allNodes = figma.root.findAll();
-  const localComponentSets = allNodes.filter((node) => node.type === 'COMPONENT_SET');
-
-  // Find components by name since keys are null
-  const senderSet = localComponentSets.find((set) => set.name === THREAD_COMPONENT_SETS.SENDER_BUBBLE.name);
-  const recipientSet = localComponentSets.find((set) => set.name === THREAD_COMPONENT_SETS.RECIPIENT_BUBBLE.name);
-  const statusSet = localComponentSets.find((set) => set.name === THREAD_COMPONENT_SETS.STATUS_BANNER.name);
-  const timestampSet = localComponentSets.find((set) => set.name === THREAD_COMPONENT_SETS.TIMESTAMP.name);
+  // Use the new findComponentSet function with caching
+  const senderSet = findComponentSet(THREAD_COMPONENT_SETS.SENDER_BUBBLE.name);
+  const recipientSet = findComponentSet(THREAD_COMPONENT_SETS.RECIPIENT_BUBBLE.name);
+  const statusSet = findComponentSet(THREAD_COMPONENT_SETS.STATUS_BANNER.name);
+  const timestampSet = findComponentSet(THREAD_COMPONENT_SETS.TIMESTAMP.name);
 
   if (!senderSet || !recipientSet || !statusSet || !timestampSet) {
     throw new Error('Could not find all required component sets');
@@ -92,10 +136,10 @@ export async function createTimestampInstance(
   const timestampInstance: InstanceNode = timestampSet.defaultVariant.createInstance();
 
   const dateLabel = timestampInstance.findOne(
-    (node: { type: string; name: string }) => node.type === 'TEXT' && node.name === 'Date'
+    (node: { type: string; name: string }) => node.type === 'TEXT' && node.name === TIMESTAMP_BANNER_PROPERTIES.DATE
   ) as TextNode;
   const timeLabel = timestampInstance.findOne(
-    (node: { type: string; name: string }) => node.type === 'TEXT' && node.name === 'Time'
+    (node: { type: string; name: string }) => node.type === 'TEXT' && node.name === TIMESTAMP_BANNER_PROPERTIES.TIME
   ) as TextNode;
 
   if (dateLabel) {
@@ -118,7 +162,7 @@ export async function createStatusInstance(
   const availableProps = statusSet.componentPropertyDefinitions;
 
   const notificationLabel = statusInstance.findOne(
-    (node: { type: string; name: string }) => node.type === 'TEXT' && node.name === 'Notification Text'
+    (node: { type: string; name: string }) => node.type === 'TEXT' && node.name === STATUS_BANNER_PROPERTIES.BANNER_TEXT
   ) as TextNode;
 
   if (notificationLabel) {
@@ -126,11 +170,51 @@ export async function createStatusInstance(
   }
 
   // Only set the property if it exists in the component
-  if ('Has action' in availableProps) {
+  if (BUBBLE_PROPERTIES.HAS_ACTION in availableProps) {
     statusInstance.setProperties({
-      'Has action': hasAction ? 'Yes' : 'No',
+      [BUBBLE_PROPERTIES.HAS_ACTION]: hasAction ? PROPERTY_VALUES.YES : PROPERTY_VALUES.NO,
     });
   }
 
   return statusInstance;
+}
+
+export async function setPersonaForInstance(
+  instance: InstanceNode | SceneNode,
+  recipientName: string,
+  recipientGender: string
+): Promise<void> {
+  // Find the Profile Photo component instance
+  const profilePhoto =
+    'findOne' in instance ? instance.findOne(NODE_MATCHERS.profilePhoto(COMPONENT_NAMES.PROFILE_PHOTO)) : null;
+
+  if (!profilePhoto) {
+    return;
+  }
+
+  // Look for the nested Persona component within the Profile Photo
+  const persona =
+    'findOne' in profilePhoto
+      ? profilePhoto.findOne((node) => node.name === COMPONENT_NAMES.PERSONA && node.type === 'INSTANCE')
+      : null;
+
+  if (!persona || !('setProperties' in persona)) {
+    return;
+  }
+
+  // Find the Persona component set
+  const personaSet = findComponentSet(COMPONENT_NAMES.PERSONA);
+  if (!personaSet) {
+    return;
+  }
+
+  const personaInstance = persona as InstanceNode;
+  const personaVariants = personaSet.children as ComponentNode[];
+
+  // Use existing getPersonaForRecipient utility
+  const selectedVariant = getPersonaForRecipient(recipientName, recipientGender, personaVariants);
+
+  if (selectedVariant) {
+    personaInstance.mainComponent = selectedVariant;
+  }
 }

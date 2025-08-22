@@ -92,8 +92,7 @@ src/
 ├── services/      # Service classes and utilities
 ├── types/         # TypeScript type definitions
 ├── ui/            # React UI components
-├── utils/         # Utility functions
-└── workers/       # WebWorker implementations
+└── utils/         # Shared utility functions and helpers
 ```
 
 ## Available Scripts
@@ -105,6 +104,12 @@ src/
 - `npm test` - Run tests
 - `npm run test:watch` - Run tests in watch mode
 - `npm run test:coverage` - Generate test coverage report
+
+## Future Improvements
+
+- **WebWorkers**: Implement WebWorkers for heavy JSON parsing and validation to improve UI responsiveness during large API response processing
+- **Enhanced Caching**: Expand component caching strategies for better performance with large chat generations
+- **Batch Operations**: Further optimize bulk property setting and component manipulation operations
 
 ## Contributing
 

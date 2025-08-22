@@ -17,6 +17,14 @@ This is a Figma plugin called "iMessage AI Chat Builder" that generates realisti
 
 - `npm run lint:fix` - Fix ESLint issues automatically
 - `npm run style:write` - Format code with Prettier
+- `npx tsc --noEmit --skipLibCheck` - Check for TypeScript type errors
+
+**Important**: When checking for errors, always run ALL three checks:
+1. `npm run style:write` - Format code with Prettier
+2. `npm run lint:fix` - Fix ESLint issues
+3. `npx tsc --noEmit --skipLibCheck` - Check TypeScript types
+
+ESLint only checks code style/quality rules, NOT TypeScript type errors. You must run the TypeScript compiler separately to catch type-related issues.
 
 ### Testing
 

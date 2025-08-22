@@ -9,7 +9,7 @@ import {
 } from '../constants/components';
 import { MUSTACHE_TEXT_VALUES } from '../constants/strings';
 import flipHorizontal from '../utils/transform';
-import emojiKey from '../constants/emojis';
+import emojiKey, { EMOJI_STYLES } from '../constants/emojis';
 import { ChatItem, BuildChatUserInterfaceProps } from '../types/chat';
 import { MessageInstanceProps } from '../types/chat/components';
 import { buildFrame } from '../utils/frame';
@@ -115,7 +115,7 @@ async function createFrameComponent(tempFrame: FrameNode, x?: number): Promise<C
 function handleEmojiReaction(instance: InstanceNode, props: MessageInstanceProps): void {
   if (instance.exposedInstances.length > 0 && props.emojiReaction) {
     const emojiInstance: InstanceNode = instance.exposedInstances[0];
-    const emojiStyle = props.role === CHAT_ROLES.SENDER ? 'color' : 'transparentBlue';
+    const emojiStyle = props.role === CHAT_ROLES.SENDER ? EMOJI_STYLES.COLOR : EMOJI_STYLES.TRANSPARENT_BLUE;
     const emoji = emojiKey[emojiStyle]?.[props.emojiReaction];
 
     if (props.role === CHAT_ROLES.RECIPIENT) {

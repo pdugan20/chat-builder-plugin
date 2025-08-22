@@ -7,7 +7,7 @@ import {
   STATUS_BANNER_PROPERTIES,
 } from '../constants/components';
 import { ComponentSets } from '../types/chat';
-import emojiKey from '../constants/emojis';
+import emojiKey, { EMOJI_REACTIONS } from '../constants/emojis';
 import {
   findColorHeart,
   addHeartToStyles,
@@ -113,7 +113,7 @@ export async function updateEmojiKeyIds(): Promise<void> {
     const emojiName = transformEmojiName(originalEmojiName);
 
     // Skip heart as it's already been added
-    if (emojiName === 'heart') return;
+    if (emojiName === EMOJI_REACTIONS.HEART) return;
 
     if (!emojiKey[style]) {
       emojiKey[style] = {};

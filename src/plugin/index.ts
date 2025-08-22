@@ -9,11 +9,6 @@ import { MESSAGE_TYPE } from '../constants/messages';
 import { PLUGIN_WIDTH, PLUGIN_HEIGHT } from '../constants/dimensions';
 
 async function initializePlugin() {
-  // Give the UI a moment to initialize
-  await new Promise<void>((resolve) => {
-    setTimeout(resolve, 100);
-  });
-
   await getAnthropicKey();
   await loadFonts();
   await checkIfHasLibrary();
@@ -22,6 +17,12 @@ async function initializePlugin() {
 
 async function initializeUI() {
   figma.showUI(__html__, { themeColors: true, width: PLUGIN_WIDTH, height: PLUGIN_HEIGHT });
+
+  // Wait for UI to mount and set up event listeners
+  await new Promise<void>((resolve) => {
+    setTimeout(resolve, 300);
+  });
+
   await initializePlugin();
 }
 
@@ -84,8 +85,8 @@ figma.ui.onmessage = (msg) => {
 
     case MESSAGE_TYPE.CLEAR_CLIENT_STORAGE:
       // Clear all client storage (development only)
-      figma.clientStorage.keysAsync().then(keys => {
-        keys.forEach(key => figma.clientStorage.deleteAsync(key));
+      figma.clientStorage.keysAsync().then((keys) => {
+        keys.forEach((key) => figma.clientStorage.deleteAsync(key));
         figma.notify('Client storage cleared');
       });
       break;

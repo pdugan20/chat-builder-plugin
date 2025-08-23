@@ -20,6 +20,7 @@ import {
   isGroupChat,
   getFirstName,
 } from '../utils/chat';
+import { clearPersonaCache } from '../utils/persona';
 import { yieldToMainThread } from '../utils/yield';
 import { NODE_MATCHERS } from '../utils/node-finder';
 import {
@@ -359,6 +360,9 @@ export default async function buildChatUserInterface({
   data,
   includePrototype = false,
 }: BuildChatUserInterfaceProps): Promise<void> {
+  // Clear persona cache for fresh assignments in this chat
+  clearPersonaCache();
+
   // Get the correct position for this new chat
   originalX = getNextChatPosition();
 

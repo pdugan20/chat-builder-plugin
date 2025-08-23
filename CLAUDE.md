@@ -20,6 +20,7 @@ This is a Figma plugin called "iMessage AI Chat Builder" that generates realisti
 - `npx tsc --noEmit --skipLibCheck` - Check for TypeScript type errors
 
 **Important**: When checking for errors, always run ALL three checks:
+
 1. `npm run style:write` - Format code with Prettier
 2. `npm run lint:fix` - Fix ESLint issues
 3. `npx tsc --noEmit --skipLibCheck` - Check TypeScript types

@@ -99,22 +99,13 @@ All pushes and PRs are automatically checked for code quality using Prettier, ES
 
 #### Local Development
 
-1. **Enable pre-commit hooks** (recommended):
+**Enable pre-commit hooks** (recommended):
 
-   ```bash
-   ./scripts/setup-hooks.sh
-   ```
+```bash
+./scripts/setup-hooks.sh
+```
 
-   This will automatically run all checks before each commit.
-
-2. **Manual checks**:
-   ```bash
-   ./scripts/check-all.sh           # Run all checks
-   npm run style:write              # Format code with Prettier
-   npm run lint:fix                 # Fix ESLint issues
-   npx tsc --noEmit --skipLibCheck  # TypeScript type check
-   npm test                         # Run tests
-   ```
+This will automatically run all checks before each commit.
 
 ## Usage
 

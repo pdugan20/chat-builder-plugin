@@ -60,52 +60,15 @@ This will automatically rebuild the plugin when you make changes to the code.
 
 ### Development Environment Setup
 
-For contributors and active development, set up the full development environment with automated code quality checks:
-
-#### Automated Setup (Recommended)
+**For contributors:** Run the full development setup with automated code quality checks:
 
 ```bash
 ./scripts/install.sh
 ```
 
-This script will:
+This configures pre-commit hooks, runs initial checks, and sets up the complete development environment.
 
-- Verify Node.js 18+ installation
-- Install all dependencies
-- Run initial code quality checks
-- Set up pre-commit hooks for automatic code formatting and linting
-- Configure the development environment
-
-#### Manual Setup
-
-If you prefer manual setup:
-
-```bash
-# Install dependencies (if not already done)
-npm install
-
-# Set up git hooks for code quality
-./scripts/setup-hooks.sh
-
-# Run all code quality checks
-./scripts/check-all.sh
-```
-
-### Code Quality Checks
-
-#### Automatic Checks (GitHub Actions)
-
-All pushes and PRs are automatically checked for code quality using Prettier, ESLint, and TypeScript.
-
-#### Local Development
-
-**Enable pre-commit hooks** (recommended):
-
-```bash
-./scripts/setup-hooks.sh
-```
-
-This will automatically run all checks before each commit.
+**Code quality:** All pushes and PRs are automatically checked via GitHub Actions using Prettier, ESLint, and TypeScript.
 
 ## Usage
 

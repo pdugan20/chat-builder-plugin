@@ -1,0 +1,24 @@
+#!/bin/sh
+
+# Add common Node.js paths
+export PATH="/usr/local/bin:/opt/homebrew/bin:$PATH"
+
+# Also source user's shell profile for nvm/node if available
+if [ -f "$HOME/.nvm/nvm.sh" ]; then
+    . "$HOME/.nvm/nvm.sh"
+fi
+
+echo "Running prettier check..."
+npm run style:write || { echo "Prettier check failed. Run 'npm run style:write' to fix formatting."; exit 1; }
+
+echo "Running eslint check..."
+npm run lint:fix || { echo "ESLint check failed. Run 'npm run lint:fix' to fix issues."; exit 1; }
+
+echo "Running TypeScript type check..."
+npx tsc --noEmit --skipLibCheck || { echo "TypeScript check failed. Fix type errors before committing."; exit 1; }
+
+echo "Running tests..."
+npm test -- --passWithNoTests || { echo "Tests failed. Fix failing tests before committing."; exit 1; }
+
+echo "All checks passed!"
+exit 0

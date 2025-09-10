@@ -58,17 +58,15 @@ npm run watch
 
 This will automatically rebuild the plugin when you make changes to the code.
 
-### Development Environment Setup
+### Setup Git Hooks
 
-**For contributors:** Run the full development setup with automated code quality checks:
+Set up pre-commit hooks for automated code quality checks:
 
 ```bash
-./scripts/install.sh
+npm run setup-hooks
 ```
 
-This configures pre-commit hooks, runs initial checks, and sets up the complete development environment.
-
-**Code quality:** All pushes and PRs are automatically checked via GitHub Actions using Prettier, ESLint, and TypeScript.
+This configures git to use local pre-commit hooks that will automatically run linting, formatting, and type checking before each commit.
 
 ## Usage
 
@@ -113,6 +111,7 @@ src/
 
 - `npm run build` - Build the plugin for production
 - `npm run watch` - Start development mode with hot reloading
+- `npm run setup-hooks` - Set up pre-commit hooks for code quality checks
 - `npm run lint:fix` - Fix linting issues
 - `npm run style:write` - Format code with Prettier
 - `npm test` - Run tests
@@ -125,13 +124,6 @@ src/
 - **Enhanced Caching**: Expand component caching strategies for better performance with large chat generations
 - **Batch Operations**: Further optimize bulk property setting and component manipulation operations
 
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
 
 ## License
 

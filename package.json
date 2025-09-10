@@ -13,7 +13,8 @@
     "style:write": "prettier --write .",
     "test": "jest",
     "test:watch": "jest --watchAll",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "setup-hooks": "chmod +x scripts/setup-hooks.sh .githooks/pre-commit && ./scripts/setup-hooks.sh"
   },
   "devDependencies": {
     "@create-figma-plugin/ui": "^4.0.1",

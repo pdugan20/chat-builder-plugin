@@ -1,4 +1,4 @@
-# iMessage AI Chat Builder - Figma Plugin
+# iMessage Chat Builder
 
 [![CI Status](https://github.com/pdugan20/chat-builder-plugin/actions/workflows/lint-and-format.yml/badge.svg)](https://github.com/pdugan20/chat-builder-plugin/actions/workflows/lint-and-format.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
@@ -156,7 +156,7 @@ To enable test data mode:
 
 ## Architecture
 
-### Service Layer (New in v1.0.7)
+### Service Layer
 
 The plugin uses a modular service architecture for maintainability and testability:
 
@@ -176,10 +176,6 @@ The plugin uses a modular service architecture for maintainability and testabili
 - **Code Quality**: ESLint, Prettier, TypeScript strict mode
 
 ## Testing
-
-This project has comprehensive test coverage for the service layer and integration points.
-
-**87 tests** covering 456 lines of service code with **85-100% coverage**.
 
 ### Running Tests
 
@@ -206,34 +202,6 @@ Run tests in CI mode:
 ```bash
 npm run test:ci
 ```
-
-### Coverage Thresholds
-
-The project enforces 80% minimum coverage for:
-
-- Branches
-- Functions
-- Lines
-- Statements
-
-### Test Organization
-
-- **Unit tests**: `src/**/__tests__/**/*.test.ts`
-- **Service tests**: `src/services/__tests__/*.test.ts`
-- **Component tests**: `src/ui/components/**/__tests__/*.test.tsx`
-- **Hook tests**: `src/ui/hooks/__tests__/*.test.tsx`
-
-### Test Coverage
-
-| Service/Component        | Tests | Coverage Target |
-| ------------------------ | ----- | --------------- |
-| ValidationService        | 20    | 100%            |
-| LoadingStateManager      | 18    | 100%            |
-| PluginMessengerService   | 10    | 95%             |
-| APIService               | 13    | 90%             |
-| ChatGenerationService    | 10    | 90%             |
-| use-chat-generation hook | 5     | 80%             |
-| LoadingOverlay component | 7     | 85%             |
 
 ## Documentation
 

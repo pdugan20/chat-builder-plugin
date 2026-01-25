@@ -7,8 +7,9 @@ module.exports = {
     'plugin:@typescript-eslint/recommended',
     'plugin:prettier/recommended',
     'plugin:tailwindcss/recommended',
+    'plugin:@figma/figma-plugins/recommended',
   ],
-  plugins: ['prettier', 'react', '@typescript-eslint', 'testing-library', 'react-hooks'],
+  plugins: ['prettier', 'react', '@typescript-eslint', 'testing-library', 'react-hooks', '@figma/figma-plugins'],
   env: {
     browser: true,
     es2021: true,
@@ -26,6 +27,8 @@ module.exports = {
   },
   rules: {
     'react/prop-types': 'off',
+    'react/react-in-jsx-scope': 'off',
+    'react/jsx-uses-react': 'off',
     'no-param-reassign': 'off',
     'tailwindcss/no-custom-classname': ['off'],
     'jsx-a11y/anchor-is-valid': ['off'],

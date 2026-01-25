@@ -17,6 +17,10 @@ export function isLastChatItemSender(chatItems: ChatItem[]): boolean {
 export function getRecipientName(chatItems: ChatItem[], isFirst = true): string {
   const recipientItem = chatItems.find((item) => item.role === CHAT_ROLES.RECIPIENT);
 
+  if (!recipientItem) {
+    return 'Unknown';
+  }
+
   if (isFirst) {
     return getFirstName(recipientItem.name);
   }

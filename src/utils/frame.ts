@@ -14,7 +14,7 @@ async function getThreadBackgroundVariable(): Promise<Variable | null> {
   if (localColorCollection) {
     const variablePromises = localColorCollection.variableIds.map((id) => figma.variables.getVariableByIdAsync(id));
     const variables = await Promise.all(variablePromises);
-    return variables.find((v) => v.name === VARIABLES.THREAD_BACKGROUND) || null;
+    return variables.find((v) => v !== null && v.name === VARIABLES.THREAD_BACKGROUND) || null;
   }
 
   return null;
@@ -100,7 +100,7 @@ export async function setFrameThemeAndBackground(
     // Get and set the background color
     const variablePromises = localColorCollection.variableIds.map((id) => figma.variables.getVariableByIdAsync(id));
     const variables = await Promise.all(variablePromises);
-    const threadBackground = variables.find((v) => v.name === VARIABLES.THREAD_BACKGROUND);
+    const threadBackground = variables.find((v) => v !== null && v.name === VARIABLES.THREAD_BACKGROUND);
 
     if (threadBackground) {
       frame.fills = [

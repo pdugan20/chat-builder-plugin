@@ -29,12 +29,15 @@ function PluginScreen({
   defaultMaxMessages = '15',
   defaultPrompt = '',
   useTestData = false,
-}: PluginScreenProps): React.JSX.Element {
+}: PluginScreenProps): React.JSX.Element | null {
   const { anthropicKey, isLoading: isAnthropicLoading } = useAnthropic();
   const {
     state: { hasComponentLibrary, hasLocalComponents, isLoading: isPluginLoading, hasFonts },
   } = usePlugin();
-  const { loading, streaming, streamingMessages, generateChat } = useChatGeneration({ anthropicKey, useTestData });
+  const { loading, streaming, streamingMessages, generateChat } = useChatGeneration({
+    anthropicKey: anthropicKey || '',
+    useTestData,
+  });
   const [style, setStyle] = useState(defaultStyle);
   const [participants, setParticipants] = useState(defaultParticipants);
   const [maxMessages, setMaxMessages] = useState(defaultMaxMessages);

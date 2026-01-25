@@ -145,7 +145,7 @@ Assigns profile photos to participants.
 
 The prototype consists of:
 
-```
+```text
 Prototype Frame (rounded corners)
 └── Thread Instance
     ├── Navigation Bar

@@ -37,6 +37,70 @@ ESLint only checks code style/quality rules, NOT TypeScript type errors. You mus
 
 - `npm run update-version` - Update plugin version across all files
 
+## Code Quality Standards
+
+### Commit Message Format
+
+All commits must follow Conventional Commits format enforced by commitlint:
+
+```text
+<type>(<scope>): <subject>
+
+Types:
+- feat:     New feature
+- fix:      Bug fix
+- docs:     Documentation changes
+- style:    Code formatting (no logic changes)
+- refactor: Code restructuring (no behavior change)
+- perf:     Performance improvement
+- test:     Adding or updating tests
+- chore:    Maintenance, dependencies, config
+- build:    Build system changes
+- ci:       CI/CD changes
+
+Examples:
+  feat(ui): add dark mode toggle
+  fix(api): handle network timeout correctly
+  docs: update installation instructions
+  refactor(services): extract message builder class
+```
+
+The commit-msg hook validates format automatically.
+
+### Markdown Standards
+
+All markdown files must pass markdownlint rules:
+
+- **MD041**: First line must be H1 heading
+- **MD032**: Blank lines around lists
+- **MD031**: Blank lines around code blocks
+- **MD040**: Code blocks must specify language
+- **MD022**: Blank lines around headings
+
+Run `npm run lint:md:fix` to auto-fix most issues.
+
+### TypeScript Standards
+
+TypeScript strict mode is enabled. All code must:
+
+- Have explicit types where inference is unclear
+- Handle null/undefined cases explicitly (strictNullChecks)
+- Avoid `any` types (use `unknown` with type guards)
+- Have no unused locals or parameters
+- Handle all code paths (noImplicitReturns)
+- Pass type checking: `npx tsc --noEmit --skipLibCheck`
+
+### Figma Plugin Standards
+
+The project uses `@figma/eslint-plugin-figma-plugins` for plugin-specific rules:
+
+- Async functions must use `await` properly
+- Dynamic page finding methods must be used correctly
+- Plugin API patterns must follow Figma best practices
+- Component manipulation should follow safe property handling patterns
+
+ESLint with the Figma plugin will catch these issues automatically.
+
 ## Architecture Overview
 
 ### Core Structure

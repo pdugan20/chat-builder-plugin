@@ -26,7 +26,7 @@ function SettingsScreen({
 
   function renderKeyBody(): React.JSX.Element {
     if (!anthropicKey) {
-      return <UpdateKeyDialog dialogTitle='Add key' anthropicKey={anthropicKey} />;
+      return <UpdateKeyDialog dialogTitle='Add key' anthropicKey='' />;
     }
     return <Text className='subtitle truncated'>{anthropicKey}</Text>;
   }

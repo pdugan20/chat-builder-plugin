@@ -25,7 +25,7 @@ function ApiKeyOverlay({ showLogo = false }: ApiKeyOverlayProps): React.JSX.Elem
         <AlertDialog.Root>
           <UpdateKeyDialog
             dialogTitle='Add key'
-            anthropicKey={anthropicKey}
+            anthropicKey={anthropicKey || ''}
             actionLabel='Add key'
             buttonVariant='primary'
           />

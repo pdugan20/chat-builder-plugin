@@ -8,7 +8,7 @@ The plugin follows a layered architecture with clear separation between the UI (
 
 ## Complete Flow Diagram
 
-```
+```text
 User Input → React UI → Plugin Messages → Anthropic API → JSON Parsing → Figma Components → Prototype Creation
      ↓           ↓            ↓               ↓               ↓                ↓                  ↓
   Form Data   Validation   Message Bus   Claude Stream   Chat Structure   Component Tree    Interactive UI
@@ -75,14 +75,14 @@ For real generation:
 
 The plugin receives messages via `figma.ui.onmessage`:
 
-### Key Message Types:
+### Key Message Types
 
 - `BUILD_CHAT_UI`: Direct build with structured data
 - `PARSE_AND_BUILD_CHAT`: Parse JSON then build
 - `UPDATE_ANTHROPIC_KEY`: Store/update API key
 - `POST_API_ERROR`: Display error notifications
 
-### Message Processing:
+### Message Processing
 
 ```typescript
 case MESSAGE_TYPE.PARSE_AND_BUILD_CHAT:
@@ -110,6 +110,7 @@ case MESSAGE_TYPE.PARSE_AND_BUILD_CHAT:
    - Returns null if parsing fails
 
 3. **Expected JSON Structure**:
+
    ```json
    [
      {
@@ -127,13 +128,13 @@ case MESSAGE_TYPE.PARSE_AND_BUILD_CHAT:
 
 **Location**: `src/scripts/build-chat-ui.ts`
 
-### Initialization Phase:
+### Initialization Phase
 
 1. **Position Calculation**: `getNextChatPosition()` finds optimal placement
 2. **Component Loading**: `loadComponentSets()` loads required Figma components
 3. **Frame Creation**: `buildFrame()` creates container with theme and dimensions
 
-### Message Processing:
+### Message Processing
 
 1. **Parallel Instance Creation**:
 
@@ -156,11 +157,11 @@ case MESSAGE_TYPE.PARSE_AND_BUILD_CHAT:
    - Batch appending for smoother visual assembly
    - Yields to main thread for large message counts
 
-### Visual Assembly:
+### Visual Assembly
 
 1. **Component Hierarchy**:
 
-   ```
+   ```text
    Frame Component
    ├── Timestamp Instance
    ├── Message Instance 1
@@ -211,19 +212,19 @@ If `includePrototype` is enabled:
 
 ## Phase 7: Completion and Cleanup
 
-### UI Feedback:
+### UI Feedback
 
 1. **Progress Indicators**: Streaming messages shown during generation
 2. **Error Handling**: API errors displayed with retry options
 3. **Completion Signal**: `BUILD_COMPLETE` message sent to UI
 
-### Viewport Management:
+### Viewport Management
 
 - For chat-only: Focuses viewport on new component
 - For prototype: Includes both components in viewport
 - Proper spacing maintained between multiple generations
 
-### Component Lifecycle:
+### Component Lifecycle
 
 1. **Temporary Frame**: Created and hidden during construction
 2. **Final Component**: Converted to reusable Figma component
@@ -232,19 +233,19 @@ If `includePrototype` is enabled:
 
 ## Error Handling Throughout Flow
 
-### UI Layer Errors:
+### UI Layer Errors
 
 - Missing API key → Show API key overlay
 - Invalid inputs → Disable generate button
 - Network issues → Display retry-able error banner
 
-### API Layer Errors:
+### API Layer Errors
 
 - Rate limiting → Automatic retry with exponential backoff
 - Invalid API key → Clear stored key, show setup overlay
 - Malformed response → JSON parsing fallback and user notification
 
-### Figma Layer Errors:
+### Figma Layer Errors
 
 - Missing components → Check components on plugin load
 - Missing fonts → Font loading with user notification

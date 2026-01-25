@@ -1,0 +1,19 @@
+#!/bin/sh
+
+# Add common Node.js paths
+export PATH="/usr/local/bin:/opt/homebrew/bin:$PATH"
+
+# Source user's shell profile for nvm/node if available
+if [ -f "$HOME/.nvm/nvm.sh" ]; then
+    . "$HOME/.nvm/nvm.sh"
+fi
+
+echo "[PRE-PUSH] Running full test suite with coverage..."
+
+npm run test:coverage || {
+    echo "[ERROR] Test suite failed. Fix failing tests before pushing."
+    exit 1
+}
+
+echo "[SUCCESS] All pre-push checks passed!"
+exit 0

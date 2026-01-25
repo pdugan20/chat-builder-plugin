@@ -68,6 +68,63 @@ npm run setup-hooks
 
 This configures git to use local pre-commit hooks that will automatically run linting, formatting, and type checking before each commit.
 
+## Code Quality Tools
+
+This project uses multiple code quality tools to ensure consistency and catch issues early:
+
+### Linting & Formatting
+
+- **Prettier** - Code formatting (JavaScript, TypeScript, JSON, Markdown)
+- **ESLint** - JavaScript/TypeScript linting with Airbnb style guide + Figma plugin rules
+- **markdownlint** - Markdown formatting and style
+- **TypeScript** - Static type checking with strict mode enabled
+
+Run all checks:
+
+```bash
+npm run check-all
+```
+
+### Git Hooks
+
+Pre-commit hooks automatically run on staged files:
+
+- Prettier formatting
+- ESLint with auto-fix
+- markdownlint with auto-fix
+- TypeScript type checking
+- Jest tests (only changed files)
+
+Commit message validation enforces [Conventional Commits](https://www.conventionalcommits.org/):
+
+```text
+<type>(<scope>): <subject>
+
+Examples:
+  feat(ui): add dark mode support
+  fix(api): handle retry logic correctly
+  docs: update installation guide
+```
+
+### Manual Commands
+
+```bash
+# Format code
+npm run style:write
+
+# Lint markdown
+npm run lint:md:fix
+
+# Fix ESLint issues
+npm run lint:fix
+
+# Type check
+npx tsc --noEmit --skipLibCheck
+
+# Run tests
+npm test
+```
+
 ## Usage
 
 1. Open your Figma file
@@ -96,7 +153,7 @@ To enable test data mode:
 
 ## Project Structure
 
-```
+```text
 src/
 ├── api/           # External API integrations (Anthropic)
 ├── constants/     # Configuration and constants
@@ -123,7 +180,6 @@ src/
 - **WebWorkers**: Implement WebWorkers for heavy JSON parsing and validation to improve UI responsiveness during large API response processing
 - **Enhanced Caching**: Expand component caching strategies for better performance with large chat generations
 - **Batch Operations**: Further optimize bulk property setting and component manipulation operations
-
 
 ## License
 

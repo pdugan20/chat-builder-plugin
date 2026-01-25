@@ -1,4 +1,4 @@
-import React, { JSX } from 'react';
+import { JSX } from 'react';
 import { Link } from 'figma-kit';
 import URLS from './urls';
 

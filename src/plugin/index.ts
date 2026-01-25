@@ -9,6 +9,8 @@ import { MESSAGE_TYPE } from '../constants/messages';
 import { PLUGIN_WIDTH, PLUGIN_HEIGHT } from '../constants/dimensions';
 
 async function initializePlugin() {
+  // Load all pages for dynamic-page access
+  await figma.loadAllPagesAsync();
   await getAnthropicKey();
   await loadFonts();
   await checkIfHasLibrary();

@@ -131,12 +131,7 @@ function handleEmojiReaction(instance: InstanceNode, props: MessageInstanceProps
   }
 }
 
-function setMessageGroupProperties(
-  instance: InstanceNode,
-  props: MessageInstanceProps,
-  bubbleKeys: string[],
-  chatItems: ChatItem[]
-): void {
+function setMessageGroupProperties(instance: InstanceNode, props: MessageInstanceProps, chatItems: ChatItem[]): void {
   // Find all text nodes in the instance
   const allTextNodes = instance.findAll((node) => node.type === 'TEXT') as TextNode[];
 
@@ -199,7 +194,7 @@ async function createSenderInstance(props: MessageInstanceProps, chatItems: Chat
     messageNode.characters = props.message;
   }
 
-  setMessageGroupProperties(instance, props, [], chatItems);
+  setMessageGroupProperties(instance, props, chatItems);
   handleEmojiReaction(instance, props);
 
   // Check if this bubble contains the very last message in the chat
@@ -246,7 +241,7 @@ async function createRecipientInstance(
   }
 
   await safeSetProperties(instance, properties);
-  setMessageGroupProperties(instance, props, [], chatItems);
+  setMessageGroupProperties(instance, props, chatItems);
 
   // Then set the recipient name for group chats AFTER messages are set
   if (groupChat && props.senderName) {
@@ -341,7 +336,7 @@ async function setFrameThemeAndBackground(frame: FrameNode | ComponentNode, them
     // Get and set the background color
     const variablePromises = localColorCollection.variableIds.map((id) => figma.variables.getVariableByIdAsync(id));
     const variables = await Promise.all(variablePromises);
-    const threadBackground = variables.find((v) => v.name === VARIABLES.THREAD_BACKGROUND);
+    const threadBackground = variables.find((v) => v !== null && v.name === VARIABLES.THREAD_BACKGROUND);
 
     if (threadBackground) {
       frame.fills = [
@@ -369,7 +364,7 @@ export default async function buildChatUserInterface({
   const messages: string[] = [];
   const items = data;
   const { senderSet, recipientSet, statusSet, timestampSet } = await loadComponentSets();
-  const tempFrame: FrameNode = await buildFrame(theme, width, itemSpacing, name);
+  const tempFrame: FrameNode = await buildFrame(theme, width, itemSpacing, name || 'Chat');
 
   // Hide frame during construction to prevent individual message flashing
   tempFrame.visible = false;

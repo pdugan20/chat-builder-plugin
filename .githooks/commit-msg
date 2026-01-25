@@ -1,0 +1,37 @@
+#!/bin/sh
+
+# Add common Node.js paths
+export PATH="/usr/local/bin:/opt/homebrew/bin:$PATH"
+
+# Source user's shell profile for nvm/node if available
+if [ -f "$HOME/.nvm/nvm.sh" ]; then
+    . "$HOME/.nvm/nvm.sh"
+fi
+
+echo "[COMMIT-MSG] Validating commit message format..."
+
+npx commitlint --edit "$1" || {
+    echo ""
+    echo "[ERROR] Commit message does not follow conventional commits format."
+    echo ""
+    echo "Expected format: <type>(<scope>): <subject>"
+    echo ""
+    echo "Valid types:"
+    echo "  feat:     New feature"
+    echo "  fix:      Bug fix"
+    echo "  docs:     Documentation changes"
+    echo "  style:    Code formatting (no logic changes)"
+    echo "  refactor: Code restructuring (no behavior change)"
+    echo "  test:     Adding or updating tests"
+    echo "  chore:    Maintenance, dependencies, config"
+    echo ""
+    echo "Examples:"
+    echo "  feat(ui): add dark mode toggle"
+    echo "  fix(api): handle network timeout correctly"
+    echo "  docs: update installation instructions"
+    echo ""
+    exit 1
+}
+
+echo "[SUCCESS] Commit message validated!"
+exit 0

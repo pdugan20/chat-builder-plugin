@@ -70,7 +70,7 @@ async function attemptRequest(
       if (text.includes('"message":')) {
         try {
           const messageMatch = currentMessage.match(/"message"\s*:\s*"([^"]+)"/);
-          if (messageMatch && messageMatch[1]) {
+          if (messageMatch && messageMatch[1] && messageMatch.index !== undefined) {
             onStream?.(messageMatch[1]);
             currentMessage = currentMessage.slice(messageMatch.index + messageMatch[0].length);
           }

@@ -146,6 +146,64 @@ To enable test data mode:
 2. Setting `USE_TEST_DATA = true` will only generate chats using local test data
 3. Setting `USE_TEST_DATA = false` will enable the plugin to query the Anthropic API
 
+## Testing
+
+This project has comprehensive test coverage for the service layer and integration points.
+
+### Running Tests
+
+Run all tests:
+
+```bash
+npm test
+```
+
+Run tests in watch mode:
+
+```bash
+npm run test:watch
+```
+
+Generate coverage report:
+
+```bash
+npm run test:coverage
+```
+
+Run tests in CI mode:
+
+```bash
+npm run test:ci
+```
+
+### Coverage Thresholds
+
+The project enforces 80% minimum coverage for:
+
+- Branches
+- Functions
+- Lines
+- Statements
+
+### Test Organization
+
+- **Unit tests**: `src/**/__tests__/**/*.test.ts`
+- **Service tests**: `src/services/__tests__/*.test.ts`
+- **Component tests**: `src/ui/components/**/__tests__/*.test.tsx`
+- **Hook tests**: `src/ui/hooks/__tests__/*.test.tsx`
+
+### Test Coverage
+
+| Service/Component        | Tests | Coverage Target |
+| ------------------------ | ----- | --------------- |
+| ValidationService        | 20    | 100%            |
+| LoadingStateManager      | 18    | 100%            |
+| PluginMessengerService   | 10    | 95%             |
+| APIService               | 13    | 90%             |
+| ChatGenerationService    | 10    | 90%             |
+| use-chat-generation hook | 5     | 80%             |
+| LoadingOverlay component | 7     | 85%             |
+
 ## Documentation
 
 - [End-to-End Flow](docs/END_TO_END_FLOW.md) - Detailed technical walkthrough of how user inputs become Figma components

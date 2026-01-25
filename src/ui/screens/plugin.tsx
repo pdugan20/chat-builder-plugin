@@ -12,6 +12,8 @@ import ApiKeyOverlay from '../components/overlays/api-key';
 import DisabledOverlay from '../components/overlays/disabled';
 import useChatGeneration from '../hooks/use-chat-generation';
 import { getAlertData, getDisabledLinkClass } from '../../utils/alerts';
+import { ValidationService } from '../../services/validation';
+import { MESSAGE_TYPE } from '../../constants/messages';
 
 interface PluginScreenProps {
   screen?: string;
@@ -43,7 +45,9 @@ function PluginScreen({
   const [maxMessages, setMaxMessages] = useState(defaultMaxMessages);
   const [prompt, setPrompt] = useState(defaultPrompt);
   const [includePrototype, setIncludePrototype] = useState(false);
+  const [validationError, setValidationError] = useState<string | null>(null);
 
+  const validationService = new ValidationService();
   const isLocalComponentsInitialized = hasLocalComponents !== undefined;
 
   function renderNav(): React.JSX.Element {
@@ -210,15 +214,36 @@ function PluginScreen({
   function renderFooter(): React.JSX.Element {
     const isDisabled = !prompt.trim() || loading;
 
+    const handleGenerateChat = () => {
+      // Clear any previous validation errors
+      setValidationError(null);
+
+      // Validate prompt
+      const validation = validationService.validatePrompt(prompt);
+      if (!validation.valid) {
+        setValidationError(validation.error || 'Validation failed');
+        // Send error to plugin
+        parent.postMessage(
+          {
+            pluginMessage: {
+              type: MESSAGE_TYPE.POST_API_ERROR,
+              error: validation.error || 'Validation failed',
+              retryable: false,
+            },
+          },
+          '*'
+        );
+        return;
+      }
+
+      generateChat({ participants, maxMessages, prompt: prompt.trim(), style, includePrototype });
+    };
+
     return (
       <div className='footer'>
+        {validationError && <div className='text-sm mb-2 text-[var(--figma-color-text-danger)]'>{validationError}</div>}
         <div className={`transition-opacity duration-200 ${isDisabled ? 'opacity-50' : 'opacity-100'}`}>
-          <Button
-            variant='primary'
-            size='small'
-            disabled={isDisabled}
-            onClick={() => generateChat({ participants, maxMessages, prompt, style, includePrototype })}
-          >
+          <Button variant='primary' size='small' disabled={isDisabled} onClick={handleGenerateChat}>
             Generate chat
           </Button>
         </div>

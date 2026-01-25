@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Text } from 'figma-kit';
 import loadingConstants from '../../../constants/loading';
+import { LoadingStateManager } from '../../../services/loading-state';
 
 interface LoadingOverlayProps {
   streamingMessages?: string;
   showStreamingText?: boolean;
   showSpinner?: boolean;
+  loadingManager?: LoadingStateManager;
 }
 
 interface AnimatedMessageProps {
@@ -42,11 +44,27 @@ function LoadingOverlay({
   streamingMessages = '',
   showStreamingText = false,
   showSpinner = false,
+  loadingManager,
 }: LoadingOverlayProps): React.JSX.Element {
   const [currentStage, setCurrentStage] = useState(0);
   const [isTimedOut, setIsTimedOut] = useState(false);
 
+  // Use loadingManager if provided, otherwise fall back to timer-based approach
+  let currentMessage: string;
+  if (loadingManager) {
+    currentMessage = loadingManager.getStageDescription();
+  } else if (isTimedOut) {
+    currentMessage = "We're still working. Please wait";
+  } else {
+    currentMessage = loadingStages[currentStage];
+  }
+
   useEffect(() => {
+    // Only use timer-based progression if loadingManager is not provided
+    if (loadingManager) {
+      return undefined;
+    }
+
     const timeoutId = setTimeout(() => {
       setIsTimedOut(true);
     }, loadingConstants.TIMEOUT_DURATION);
@@ -67,9 +85,7 @@ function LoadingOverlay({
       clearInterval(stageInterval);
       clearTimeout(timeoutId);
     };
-  }, []);
-
-  const currentMessage = isTimedOut ? "We're still working. Please wait" : loadingStages[currentStage];
+  }, [loadingManager]);
 
   return (
     <div className='loading-overlay fixed inset-0 z-50 flex items-center justify-center'>

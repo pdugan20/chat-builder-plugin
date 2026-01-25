@@ -1,7 +1,10 @@
-import { useState, useEffect } from 'react';
-import { MESSAGE_TYPE } from '../../constants/messages';
-import createChatQuery from '../../api/anthropic';
-import { CHAT_DATA_2, CHAT_DATA_3, CHAT_DATA_4 } from '../../constants/test-data';
+import { useState, useCallback, useRef, useEffect } from 'react';
+import { ChatItem } from '../../types/chat';
+import { ChatGenerationService } from '../../services/chat-generation';
+import { APIService } from '../../services/api';
+import { ValidationService } from '../../services/validation';
+import { LoadingStateManager } from '../../services/loading-state';
+import { useMessenger } from '../context/messenger';
 
 interface UseChatGenerationProps {
   anthropicKey: string;
@@ -12,6 +15,7 @@ interface UseChatGenerationReturn {
   loading: boolean;
   streaming: boolean;
   streamingMessages: string;
+  loadingManager: LoadingStateManager;
   generateChat: (params: {
     participants: string;
     maxMessages: string;
@@ -29,159 +33,74 @@ export default function useChatGeneration({
   const [streaming, setStreaming] = useState(false);
   const [streamingMessages, setStreamingMessages] = useState('');
 
+  const messenger = useMessenger();
+
+  // Create services (memoized via useRef to avoid recreation)
+  const servicesRef = useRef({
+    apiService: new APIService(),
+    validationService: new ValidationService(),
+    loadingManager: new LoadingStateManager(),
+  });
+
+  const chatService = useRef(
+    new ChatGenerationService(
+      servicesRef.current.apiService,
+      servicesRef.current.validationService,
+      messenger,
+      servicesRef.current.loadingManager
+    )
+  );
+
+  // Listen for build complete messages
   useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {
-      const { type } = event.data.pluginMessage;
-
-      if (type === MESSAGE_TYPE.BUILD_COMPLETE) {
-        setLoading(false);
-        setStreaming(false);
-      }
-    };
-
-    window.addEventListener('message', handleMessage);
-    return () => window.removeEventListener('message', handleMessage);
-  }, []);
-
-  const generateChat = async ({
-    participants,
-    maxMessages,
-    prompt,
-    style,
-    includePrototype,
-  }: {
-    participants: string;
-    maxMessages: string;
-    prompt: string;
-    style: string;
-    includePrototype: boolean;
-  }) => {
-    if (!anthropicKey) {
-      parent.postMessage(
-        {
-          pluginMessage: {
-            type: MESSAGE_TYPE.POST_API_ERROR,
-            error: 'API key is required',
-          },
-        },
-        '*'
-      );
-      return;
-    }
-
-    setLoading(true);
-    setStreaming(true);
-    setStreamingMessages('');
-
-    try {
-      if (useTestData) {
-        const testDataMap = {
-          '2': CHAT_DATA_2,
-          '3': CHAT_DATA_3,
-          '4': CHAT_DATA_4,
-        };
-        const data = testDataMap[participants as keyof typeof testDataMap] || CHAT_DATA_2;
-        parent.postMessage(
-          {
-            pluginMessage: { type: MESSAGE_TYPE.BUILD_CHAT_UI, data, style, prompt, includePrototype },
-          },
-          '*'
-        );
-        return;
-      }
-
-      // Use a buffer to batch streaming updates
-      let streamBuffer = '';
-      let bufferTimer: ReturnType<typeof setTimeout> | null = null;
-
-      const response = await createChatQuery({
-        apiKey: anthropicKey,
-        queryInputs: { participants, maxMessages, prompt },
-        onStream: (chunk) => {
-          streamBuffer += chunk;
-
-          // Batch updates every 100ms to reduce UI thread blocking
-          if (!bufferTimer) {
-            bufferTimer = setTimeout(() => {
-              setStreamingMessages((prev) => {
-                const newText = prev + streamBuffer;
-                parent.postMessage(
-                  {
-                    pluginMessage: {
-                      type: MESSAGE_TYPE.STREAM_UPDATE,
-                      chunk: streamBuffer,
-                      accumulatedText: newText,
-                    },
-                  },
-                  '*'
-                );
-                streamBuffer = '';
-                bufferTimer = null;
-                return newText;
-              });
-            }, 100);
-          }
-        },
-      });
-
-      // Flush any remaining buffered content
-      if (bufferTimer) {
-        clearTimeout(bufferTimer);
-        if (streamBuffer) {
-          setStreamingMessages((prev) => prev + streamBuffer);
-        }
-      }
-
-      // Stop streaming indicator
-      setStreaming(false);
-
-      if (!response?.content?.[0]?.text) {
-        parent.postMessage(
-          {
-            pluginMessage: {
-              type: MESSAGE_TYPE.POST_API_ERROR,
-              error: 'No response generated from API',
-              retryable: true,
-            },
-          },
-          '*'
-        );
-        return;
-      }
-
-      // Send raw response to plugin for parsing to avoid blocking UI thread
-      parent.postMessage(
-        {
-          pluginMessage: {
-            type: MESSAGE_TYPE.PARSE_AND_BUILD_CHAT,
-            rawResponse: response.content[0].text,
-            style,
-            prompt,
-            includePrototype,
-          },
-        },
-        '*'
-      );
-    } catch (error) {
+    const unsubscribe = messenger.onBuildComplete(() => {
       setLoading(false);
       setStreaming(false);
-      parent.postMessage(
-        {
-          pluginMessage: {
-            type: MESSAGE_TYPE.POST_API_ERROR,
-            error: error instanceof Error ? error.message : 'An error occurred while generating chat',
-            retryable: true,
-          },
+    });
+
+    return unsubscribe;
+  }, [messenger]);
+
+  const generateChat = useCallback(
+    async ({
+      participants,
+      prompt,
+      style,
+      includePrototype,
+    }: {
+      participants: string;
+      maxMessages: string;
+      prompt: string;
+      style: string;
+      includePrototype: boolean;
+    }) => {
+      // Clear previous streaming messages
+      setStreamingMessages('');
+
+      await chatService.current.generateChat(prompt, anthropicKey, style, includePrototype, useTestData, participants, {
+        onLoadingStateChange: setLoading,
+        onStreamingStateChange: setStreaming,
+        onMessagesUpdate: (messages: ChatItem[]) => {
+          // Convert messages to string for display (backward compatibility)
+          const messagesText = messages.map((m) => `${m.name}: ${m.message}`).join('\n');
+          setStreamingMessages(messagesText);
         },
-        '*'
-      );
-    }
-  };
+        onError: (error) => {
+          // eslint-disable-next-line no-console
+          console.error('[Chat Generation Error]', error);
+          setLoading(false);
+          setStreaming(false);
+        },
+      });
+    },
+    [anthropicKey, useTestData, messenger]
+  );
 
   return {
     loading,
     streaming,
     streamingMessages,
+    loadingManager: servicesRef.current.loadingManager,
     generateChat,
   };
 }

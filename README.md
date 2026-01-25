@@ -1,16 +1,24 @@
 # iMessage AI Chat Builder - Figma Plugin
 
-A Figma plugin that allows you to generate realistic iMessage chat interfaces using AI. Create engaging chat conversations with customizable participants, message counts, and styling options. ([View in Figma](https://www.figma.com/community/plugin/1519731262843198057/imessage-ai-chat-builder)).
+[![CI Status](https://github.com/pdugan20/chat-builder-plugin/actions/workflows/lint-and-format.yml/badge.svg)](https://github.com/pdugan20/chat-builder-plugin/actions/workflows/lint-and-format.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Version](https://img.shields.io/badge/version-1.0.7-green.svg)](https://github.com/pdugan20/chat-builder-plugin/releases)
+[![Figma Plugin](https://img.shields.io/badge/Figma-Community-purple.svg)](https://www.figma.com/community/plugin/1519731262843198057/imessage-ai-chat-builder)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.2-blue.svg)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-18.2-61dafb.svg)](https://reactjs.org/)
+
+A Figma plugin that allows you to generate realistic iMessage chat interfaces using AI. Create engaging chat conversations with customizable participants, message counts, and styling options.
 
 ## Features
 
-- Generate realistic iMessage chat conversations using AI
-- Customize number of participants (2+)
-- Control maximum number of messages
-- Choose between light and dark themes
-- Include interactive prototype view
-- Support for emoji reactions and message status indicators
-- Realistic iMessage UI components and styling
+- **AI-Powered Generation**: Generate realistic iMessage chat conversations using Claude API
+- **Customizable Participants**: Support for 2+ participants with unique names and personas
+- **Message Control**: Set maximum number of messages per conversation
+- **Theme Support**: Choose between light and dark iMessage themes
+- **Interactive Prototypes**: Include fully interactive prototype view
+- **Rich Interactions**: Support for emoji reactions and message status indicators
+- **Authentic UI**: Uses official iMessage UI components and styling
+- **Test Mode**: Built-in test data mode for development without API calls
 
 ## Prerequisites
 
@@ -146,9 +154,32 @@ To enable test data mode:
 2. Setting `USE_TEST_DATA = true` will only generate chats using local test data
 3. Setting `USE_TEST_DATA = false` will enable the plugin to query the Anthropic API
 
+## Architecture
+
+### Service Layer (New in v1.0.7)
+
+The plugin uses a modular service architecture for maintainability and testability:
+
+- **ValidationService**: Input validation for prompts, API keys, and chat data
+- **LoadingStateManager**: Progress tracking through generation stages
+- **PluginMessengerService**: Message passing between UI and plugin layers
+- **APIService**: Anthropic API integration with streaming support
+- **ChatGenerationService**: Orchestrates the chat generation workflow
+
+### Tech Stack
+
+- **Frontend**: React 18 + TypeScript 5.2
+- **Styling**: Tailwind CSS with custom Figma design system
+- **Build**: Webpack 5 with hot module replacement
+- **API**: Anthropic Claude API (Sonnet 3.5)
+- **Testing**: Jest + React Testing Library
+- **Code Quality**: ESLint, Prettier, TypeScript strict mode
+
 ## Testing
 
 This project has comprehensive test coverage for the service layer and integration points.
+
+**87 tests** covering 456 lines of service code with **85-100% coverage**.
 
 ### Running Tests
 
@@ -232,6 +263,33 @@ src/
 - `npm test` - Run tests
 - `npm run test:watch` - Run tests in watch mode
 - `npm run test:coverage` - Generate test coverage report
+
+## Dependency Management
+
+This project uses **Dependabot** for automated dependency updates:
+
+- Weekly dependency checks (Mondays at 9am ET)
+- Grouped minor/patch updates to reduce PR noise
+- Auto-merge for non-breaking updates after CI passes
+- Manual review required for major version updates
+
+## Contributing
+
+Contributions are welcome! Please follow these guidelines:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Run tests and quality checks (`npm test`, `npm run lint:fix`)
+4. Commit using [Conventional Commits](https://www.conventionalcommits.org/) format
+5. Push to your branch (`git push origin feature/amazing-feature`)
+6. Open a Pull Request
+
+All PRs must pass:
+
+- ESLint + Prettier checks
+- TypeScript type checking
+- Jest test suite with coverage thresholds
+- Markdown linting
 
 ## Future Improvements
 

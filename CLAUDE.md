@@ -101,6 +101,49 @@ The project uses `@figma/eslint-plugin-figma-plugins` for plugin-specific rules:
 
 ESLint with the Figma plugin will catch these issues automatically.
 
+### Testing Standards
+
+All new code should include tests. The project enforces coverage thresholds per file:
+
+**Service Layer** (85-100% coverage required):
+
+- **Unit tests**: Test services in isolation with mocked dependencies
+- **Mock external dependencies**: API calls, Figma API, window events
+- **Test all methods**: Public methods, error handling, edge cases
+- **Use test helpers**: `createMockChatItem()` for valid test data
+
+**Integration Layer** (70-85% coverage required):
+
+- **Integration tests**: Test hooks and components with real providers
+- **Mock service layer**: Use mocked services, real React context
+- **Test user flows**: Interactions, state changes, side effects
+- **Use custom render**: Import from `src/test-utils.tsx` for component tests
+
+**Running Tests**:
+
+```bash
+npm test              # Run all tests
+npm run test:watch    # Watch mode
+npm run test:coverage # Coverage report
+npm run test:ci       # CI mode with coverage
+```
+
+**Test Organization**:
+
+- Service tests: `src/services/__tests__/*.test.ts`
+- Hook tests: `src/ui/hooks/__tests__/*.test.tsx`
+- Component tests: `src/ui/components/**/__tests__/*.test.tsx`
+
+**Coverage Thresholds** (enforced in `jest.config.js`):
+
+| File                   | Branches | Functions | Lines | Statements |
+| ---------------------- | -------- | --------- | ----- | ---------- |
+| ValidationService      | 93%      | 100%      | 100%  | 100%       |
+| LoadingStateManager    | 100%     | 100%      | 100%  | 100%       |
+| PluginMessengerService | 95%      | 100%      | 95%   | 95%        |
+| APIService             | 85%      | 90%       | 90%   | 90%        |
+| ChatGenerationService  | 70%      | 90%       | 85%   | 85%        |
+
 ## Architecture Overview
 
 ### Core Structure

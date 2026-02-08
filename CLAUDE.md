@@ -117,7 +117,7 @@ All new code should include tests. The project enforces coverage thresholds per 
 - **Integration tests**: Test hooks and components with real providers
 - **Mock service layer**: Use mocked services, real React context
 - **Test user flows**: Interactions, state changes, side effects
-- **Use custom render**: Import from `src/test-utils.tsx` for component tests
+- **Use custom render**: Import from `src/test/test-helpers` for component tests
 
 **Running Tests**:
 

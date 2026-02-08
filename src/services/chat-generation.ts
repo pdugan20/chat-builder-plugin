@@ -1,8 +1,8 @@
 import { ChatItem } from '../types/chat';
 import { APIService, StreamCallbacks } from './api';
-import { ValidationService } from './validation';
+import ValidationService from './validation';
 import { PluginMessengerService } from './plugin-messenger';
-import { LoadingStateManager } from './loading-state';
+import LoadingStateManager from './loading-state';
 
 export interface GenerationCallbacks {
   onLoadingStateChange: (loading: boolean) => void;

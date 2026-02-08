@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Text } from 'figma-kit';
 import loadingConstants from '../../../constants/loading';
-import { LoadingStateManager } from '../../../services/loading-state';
+import LoadingStateManager from '../../../services/loading-state';
 
 interface LoadingOverlayProps {
   streamingMessages?: string;

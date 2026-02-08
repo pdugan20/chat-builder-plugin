@@ -1,15 +1,15 @@
 import { ChatItem } from '../types/chat';
 
-export interface ValidationResult {
+interface ValidationResult {
   valid: boolean;
   error?: string;
 }
 
-export interface ChatDataValidationResult extends ValidationResult {
+interface ChatDataValidationResult extends ValidationResult {
   data?: ChatItem[];
 }
 
-export class ValidationService {
+export default class ValidationService {
   private static readonly PROMPT_MIN_LENGTH = 20;
   private static readonly PROMPT_MAX_LENGTH = 150;
 

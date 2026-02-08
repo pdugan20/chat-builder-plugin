@@ -28,11 +28,6 @@ export function getRecipientName(chatItems: ChatItem[], isFirst = true): string 
   return recipientItem.name;
 }
 
-export function getRecipientGender(items: ChatItem[]): string {
-  const recipientItem = items.find((item) => item.role === CHAT_ROLES.RECIPIENT);
-  return recipientItem?.gender || 'Unknown';
-}
-
 export function getUniqueRecipients(items: ChatItem[]): Set<string> {
   return new Set(items.filter((item) => item.role === CHAT_ROLES.RECIPIENT).map((item) => item.name));
 }

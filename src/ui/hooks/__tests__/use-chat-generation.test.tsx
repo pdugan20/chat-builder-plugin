@@ -71,7 +71,7 @@ describe('useChatGeneration', () => {
 
     // Set initial streaming messages
     await act(async () => {
-      const createMockChatItem = (await import('../../../test-helpers')).default;
+      const createMockChatItem = (await import('../../../test/test-helpers')).default;
       mockChatService.generateChat = jest
         .fn()
         .mockImplementation(async (_, __, ___, ____, _____, ______, callbacks) => {
@@ -106,7 +106,7 @@ describe('useChatGeneration', () => {
 
   it('should update streaming messages when onMessagesUpdate is called', async () => {
     mockChatService.generateChat = jest.fn().mockImplementation(async (_, __, ___, ____, _____, ______, callbacks) => {
-      const createMockChatItem = (await import('../../../test-helpers')).default;
+      const createMockChatItem = (await import('../../../test/test-helpers')).default;
       callbacks.onMessagesUpdate([
         createMockChatItem({ name: 'Alice', message: 'Hello' }),
         createMockChatItem({ role: 'recipient', name: 'Bob', message: 'Hi there' }),

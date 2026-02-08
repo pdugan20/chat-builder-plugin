@@ -56,5 +56,5 @@ module.exports = {
       extends: ['plugin:testing-library/react'],
     },
   ],
-  ignorePatterns: ['node_modules/', 'dist', '**/*.js', 'setupTests.ts'],
+  ignorePatterns: ['node_modules/', 'dist', '**/*.js', 'src/test/setup.ts'],
 };

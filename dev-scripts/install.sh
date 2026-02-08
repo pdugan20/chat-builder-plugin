@@ -60,11 +60,11 @@ npm test -- --passWithNoTests || { echo "❌ Tests failed"; exit 1; }
 # Setup git hooks
 echo "⚙️  Setting up git hooks..."
 chmod +x .githooks/pre-commit
-chmod +x scripts/setup-hooks.sh
-./scripts/setup-hooks.sh
+chmod +x dev-scripts/setup-hooks.sh
+./dev-scripts/setup-hooks.sh
 
 # Make other scripts executable
-chmod +x scripts/*.sh
+chmod +x dev-scripts/*.sh
 
 echo "✅ Installation complete!"
 echo ""

@@ -26,7 +26,7 @@ async function getColorCollection(): Promise<VariableCollection | null> {
 }
 
 // Frame styling functions
-export async function setFrameBackgroundFill(frame: FrameNode): Promise<void> {
+async function setFrameBackgroundFill(frame: FrameNode): Promise<void> {
   const threadBackground = await getThreadBackgroundVariable();
 
   if (threadBackground) {
@@ -36,7 +36,7 @@ export async function setFrameBackgroundFill(frame: FrameNode): Promise<void> {
   }
 }
 
-export async function setFrameStyle(frame: FrameNode, theme: 'light' | 'dark'): Promise<void> {
+async function setFrameStyle(frame: FrameNode, theme: 'light' | 'dark'): Promise<void> {
   const collection = await getColorCollection();
 
   if (collection) {
@@ -45,11 +45,11 @@ export async function setFrameStyle(frame: FrameNode, theme: 'light' | 'dark'): 
 }
 
 // Frame layout functions
-export async function resizeFrame(frame: FrameNode, width: number): Promise<void> {
+async function resizeFrame(frame: FrameNode, width: number): Promise<void> {
   frame.resize(width, frame.height);
 }
 
-export function positionFrame(frame: FrameNode, width: number): void {
+function positionFrame(frame: FrameNode, width: number): void {
   frame.x = lastFrameX;
   frame.y = 0;
   lastFrameX += width + FRAME_SPACING;

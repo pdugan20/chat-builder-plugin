@@ -1,6 +1,6 @@
 import { render, screen, act } from '@testing-library/react';
 import LoadingOverlay from '../loading';
-import { LoadingStateManager } from '../../../../services/loading-state';
+import LoadingStateManager from '../../../../services/loading-state';
 
 // Mock LoadingStateManager
 jest.mock('../../../../services/loading-state');

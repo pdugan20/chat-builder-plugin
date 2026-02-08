@@ -297,4 +297,3 @@ const CHAT_DATA_4 = [
 ] as const;
 
 export { CHAT_DATA_2, CHAT_DATA_3, CHAT_DATA_4 };
-export default CHAT_DATA_2;

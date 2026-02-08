@@ -16,7 +16,7 @@ import {
   transformEmojiName,
 } from '../utils/components';
 import getPersonaForRecipient from '../utils/persona';
-import { NODE_MATCHERS } from '../utils/node-finder';
+import NODE_MATCHERS from '../utils/node-finder';
 
 // Cache for component sets to avoid repeated traversals
 const componentSetCache = new Map<string, ComponentSetNode>();

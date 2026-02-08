@@ -5,7 +5,7 @@ import { getRecipientName, getRecipientsList, getUniqueRecipients } from '../uti
 import { setFrameThemeAndBackground } from '../utils/frame';
 import { findComponentSet, safeSetProperties } from '../services/component';
 import getPersonaForRecipient from '../utils/persona';
-import { NODE_MATCHERS } from '../utils/node-finder';
+import NODE_MATCHERS from '../utils/node-finder';
 
 function createPrototypeFrame(tempThreadComponent: ComponentNode, frameComponent: ComponentNode): FrameNode {
   const prototypeFrame = figma.createFrame();

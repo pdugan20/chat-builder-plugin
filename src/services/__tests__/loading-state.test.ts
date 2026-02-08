@@ -1,4 +1,4 @@
-import { LoadingStateManager } from '../loading-state';
+import LoadingStateManager from '../loading-state';
 
 describe('LoadingStateManager', () => {
   let loadingManager: LoadingStateManager;

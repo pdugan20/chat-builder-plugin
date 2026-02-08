@@ -2,8 +2,8 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import { ChatItem } from '../../types/chat';
 import { ChatGenerationService } from '../../services/chat-generation';
 import { APIService } from '../../services/api';
-import { ValidationService } from '../../services/validation';
-import { LoadingStateManager } from '../../services/loading-state';
+import ValidationService from '../../services/validation';
+import LoadingStateManager from '../../services/loading-state';
 import { useMessenger } from '../context/messenger';
 
 interface UseChatGenerationProps {

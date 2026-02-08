@@ -1,4 +1,4 @@
-export function createNodeMatcher(exactName: string, fallbackPatterns: string[]) {
+function createNodeMatcher(exactName: string, fallbackPatterns: string[]) {
   return (node: { name: string }) => {
     // Primary exact match (most reliable)
     if (node.name === exactName) {
@@ -11,8 +11,10 @@ export function createNodeMatcher(exactName: string, fallbackPatterns: string[])
   };
 }
 
-export const NODE_MATCHERS = {
+const NODE_MATCHERS = {
   messageText: (exactName: string) => createNodeMatcher(exactName, ['message', 'bubble', 'text']),
   profilePhoto: (exactName: string) => createNodeMatcher(exactName, ['profile']),
   navigationPhoto: () => createNodeMatcher('', ['photo', 'avatar']),
 } as const;
+
+export default NODE_MATCHERS;

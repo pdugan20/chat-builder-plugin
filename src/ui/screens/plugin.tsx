@@ -12,7 +12,7 @@ import ApiKeyOverlay from '../components/overlays/api-key';
 import DisabledOverlay from '../components/overlays/disabled';
 import useChatGeneration from '../hooks/use-chat-generation';
 import { getAlertData, getDisabledLinkClass } from '../../utils/alerts';
-import { ValidationService } from '../../services/validation';
+import ValidationService from '../../services/validation';
 import { MESSAGE_TYPE } from '../../constants/messages';
 
 interface PluginScreenProps {

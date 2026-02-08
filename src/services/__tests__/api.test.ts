@@ -2,7 +2,7 @@ import { APIService, StreamCallbacks } from '../api';
 import createChatQuery from '../../api/anthropic';
 import { ChatItem } from '../../types/chat';
 import { CHAT_DATA_2, CHAT_DATA_3, CHAT_DATA_4 } from '../../constants/test-data';
-import createMockChatItem from '../../test-helpers';
+import createMockChatItem from '../../test/test-helpers';
 
 // Mock the anthropic API
 jest.mock('../../api/anthropic');

@@ -1,6 +1,6 @@
 import { MessageType, MESSAGE_TYPE } from '../../constants/messages';
 
-export interface BaseMessage {
+interface BaseMessage {
   type: MessageType;
 }
 
@@ -15,19 +15,3 @@ export interface UpdateKeyMessage extends BaseMessage {
   keyDidUpdate: boolean;
   key?: string;
 }
-
-export interface BuildChatUIMessage extends BaseMessage {
-  type: typeof MESSAGE_TYPE.BUILD_CHAT_UI;
-  data: unknown;
-  style: string;
-  prompt: string;
-}
-
-export interface PostApiErrorMessage extends BaseMessage {
-  type: typeof MESSAGE_TYPE.POST_API_ERROR;
-  errorType: string;
-  errorMessage: string;
-  retryable: boolean;
-}
-
-export type PluginMessage = HasKeyMessage | UpdateKeyMessage | BuildChatUIMessage | PostApiErrorMessage;

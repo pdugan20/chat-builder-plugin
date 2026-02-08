@@ -1,4 +1,4 @@
-import { ChatItem } from './types/chat';
+import { ChatItem } from '../types/chat';
 
 /**
  * Helper function to create valid ChatItem objects for testing

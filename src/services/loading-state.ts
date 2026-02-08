@@ -1,11 +1,11 @@
-export type LoadingStage = 'authenticating' | 'generating' | 'parsing' | 'building' | 'complete';
+type LoadingStage = 'authenticating' | 'generating' | 'parsing' | 'building' | 'complete';
 
 interface StageInfo {
   description: string;
   progress: number;
 }
 
-export class LoadingStateManager {
+export default class LoadingStateManager {
   private currentStage: LoadingStage = 'authenticating';
 
   private readonly stageInfo: Record<LoadingStage, StageInfo> = {

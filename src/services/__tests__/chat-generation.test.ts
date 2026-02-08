@@ -1,10 +1,10 @@
 import { ChatGenerationService, GenerationCallbacks } from '../chat-generation';
 import { APIService } from '../api';
-import { ValidationService } from '../validation';
+import ValidationService from '../validation';
 import { PluginMessengerService } from '../plugin-messenger';
-import { LoadingStateManager } from '../loading-state';
+import LoadingStateManager from '../loading-state';
 import { ChatItem } from '../../types/chat';
-import createMockChatItem from '../../test-helpers';
+import createMockChatItem from '../../test/test-helpers';
 
 // Mock dependencies
 jest.mock('../api');

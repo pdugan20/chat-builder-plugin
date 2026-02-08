@@ -24,7 +24,3 @@ export const MESSAGE_TYPE = {
 } as const;
 
 export type MessageType = (typeof MESSAGE_TYPE)[keyof typeof MESSAGE_TYPE];
-
-export function isValidMessageType(type: string): type is MessageType {
-  return Object.values(MESSAGE_TYPE).includes(type as MessageType);
-}

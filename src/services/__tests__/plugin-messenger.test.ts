@@ -1,7 +1,7 @@
 import { PluginMessengerService } from '../plugin-messenger';
 import { MESSAGE_TYPE } from '../../constants/messages';
 import { ChatItem } from '../../types/chat';
-import createMockChatItem from '../../test-helpers';
+import createMockChatItem from '../../test/test-helpers';
 
 describe('PluginMessengerService', () => {
   let messengerService: PluginMessengerService;

@@ -21,8 +21,8 @@ import {
   getFirstName,
 } from '../utils/chat';
 import { clearPersonaCache } from '../utils/persona';
-import { yieldToMainThread } from '../utils/yield';
-import { NODE_MATCHERS } from '../utils/node-finder';
+import yieldToMainThread from '../utils/yield';
+import NODE_MATCHERS from '../utils/node-finder';
 import {
   loadComponentSets,
   updateEmojiKeyIds,

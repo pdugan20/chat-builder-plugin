@@ -16,7 +16,7 @@ function AnimatedMessage({ message }: AnimatedMessageProps): React.JSX.Element {
   return (
     <Text
       key={message}
-      className='loading-stage text-sm animate-up min-w-[300px] text-center text-[var(--figma-color-text-secondary)]'
+      className='loading-stage animate-up text-sm min-w-[300px] text-center text-[var(--figma-color-text-secondary)]'
     >
       <span className='loading-message'>
         {message}

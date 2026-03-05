@@ -117,21 +117,33 @@ Loader and CLI major version bumps. These can break the build pipeline.
 
 **PR**: #21 | **Verification**: all passed
 
-## Phase 6: Tailwind CSS 4 (Evaluate)
+## Phase 6: Tailwind CSS 4
 
-Tailwind CSS 4 is a ground-up rewrite with a new engine and config format. This is the highest-effort upgrade and may not be worth doing depending on project roadmap.
+Tailwind CSS 4 is a ground-up rewrite with a new engine and config format. Uses CSS-native configuration with `@config` bridge for legacy JS presets.
 
 **Branch**: `chore/deps-tailwind-4`
 
-- [x] Evaluate effort vs. benefit for this project
-- [x] Decision: **deferred** - Tailwind 4 is a ground-up rewrite requiring config migration, plugin updates, and class auditing. Tailwind 3 is still maintained and working well for this project.
+- [x] Upgrade `tailwindcss` 3.4.19 to 4.2.1
+- [x] Add `@tailwindcss/postcss` 4.2.1 (replaces both `tailwindcss` and `autoprefixer` in PostCSS)
+- [x] Remove `autoprefixer` (handled by TW4 natively)
+- [x] Remove `@tailwindcss/aspect-ratio` (native in TW4)
+- [x] Remove `@tailwindcss/container-queries` (native in TW4)
+- [x] Extract figma-kit Tailwind preset to `src/ui/styles/figma-tailwind-preset.js`
+- [x] Update `tailwind.config.js` to use local preset, remove dropped plugins and `content`/`darkMode`
+- [x] Update `postcss.config.js` to use `@tailwindcss/postcss`
+- [x] Migrate `app.css` from `@tailwind` directives to `@import "tailwindcss"` + `@config` + `@plugin` + `@custom-variant`
+- [x] Remove `eslint-plugin-tailwindcss` (v4 beta too unstable; `prettier-plugin-tailwindcss` handles class sorting)
+- [x] Update `.prettierrc.yml` with `tailwindStylesheet` for TW4 class sorting
+- [x] Add `.npmrc` with `legacy-peer-deps=true` (fixes CI failure from figma-kit React 18 peer dep)
+- [x] All checks passing (lint, types, 88/88 tests, build)
+
+**PR**: pending | **Verification**: all passed
 
 ## Other Noted Upgrades (Deferred)
 
-- [ ] `tailwindcss` 3.x to 4.x - deferred (see Phase 6)
-- [ ] `@types/jest` 29.x to 30.x - requires Jest 30, defer until Jest upgrade
-- [ ] `eslint-plugin-react-hooks` 5.x to 7.x - working fine at 5.x, low priority
-- [ ] `figma-kit` - no real update available (stuck at 1.0.0-beta.22)
+- [ ] `eslint-plugin-tailwindcss` - re-add when v4 stable releases (currently at 4.0.0-beta.0, crashes on v4 configs)
+- [ ] `figma-kit` - no real update available (stuck at 1.0.0-beta.22, React 18 peer dep)
+- [ ] Convert figma-kit preset from JS `@config` bridge to CSS-native `@theme` (optional, bridge works fine)
 
 ## Completion Log
 
@@ -142,4 +154,4 @@ Tailwind CSS 4 is a ground-up rewrite with a new engine and config format. This 
 | Phase 3 | 2026-03-05 | PR #19. ESLint 9 flat config. Dropped airbnb, added typescript-eslint unified.          |
 | Phase 4 | 2026-03-05 | PR #20. React 19, testing-library 16. figma-kit works via legacy-peer-deps.             |
 | Phase 5 | 2026-03-05 | PR #21. css-loader 7, style-loader 4, postcss-loader 8, webpack-cli 6, webpack-merge 6. |
-| Phase 6 | 2026-03-05 | Deferred. Tailwind 4 is high-effort, low-value for this project right now.              |
+| Phase 6 | 2026-03-05 | PR pending. Tailwind 4, extracted preset, removed 3 deps, added .npmrc for CI fix.      |

@@ -1,16 +1,19 @@
-name: Lint and Format Check
+name: CI
 
 on:
   push:
-    branches: [main, master, develop]
+    branches: [main]
   pull_request:
-    branches: [main, master, develop]
+    branches: [main]
 
 jobs:
-  javascript-checks:
+  ci:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Validate CLAUDE.md
+        run: npx claude-code-lint@latest
 
       - name: Set up Node
         uses: actions/setup-node@v4

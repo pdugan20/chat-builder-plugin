@@ -31,7 +31,7 @@ ESLint only checks code style/quality rules, NOT TypeScript type errors. You mus
 
 - `npm test` - Run all tests
 - `npm run test:watch` - Run tests in watch mode
-- `npm test -- path/to/test.spec.ts` - Run a specific test file
+- `npm test -- <test-file>` - Run a specific test file
 
 ### Version Management
 

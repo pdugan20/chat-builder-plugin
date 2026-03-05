@@ -123,20 +123,15 @@ Tailwind CSS 4 is a ground-up rewrite with a new engine and config format. This 
 
 **Branch**: `chore/deps-tailwind-4`
 
-- [ ] Review Tailwind CSS 4 migration guide
-- [ ] Evaluate effort vs. benefit for this project
-- [ ] Decision: proceed or defer
-- [ ] If proceeding:
-  - [ ] Migrate `tailwind.config.js` to new format
-  - [ ] Update `@tailwindcss/*` plugins for v4 compatibility
-  - [ ] Audit all custom Tailwind classes for breaking changes
-  - [ ] Test all UI screens in Figma plugin
+- [x] Evaluate effort vs. benefit for this project
+- [x] Decision: **deferred** - Tailwind 4 is a ground-up rewrite requiring config migration, plugin updates, and class auditing. Tailwind 3 is still maintained and working well for this project.
 
-**Verification**: `npm run build`, visual regression check in Figma
+## Other Noted Upgrades (Deferred)
 
-## Other Noted Upgrades
-
-- [ ] `@types/jest` 29.x to 30.x - evaluate after Phase 5 (may require Jest 30)
+- [ ] `tailwindcss` 3.x to 4.x - deferred (see Phase 6)
+- [ ] `@types/jest` 29.x to 30.x - requires Jest 30, defer until Jest upgrade
+- [ ] `eslint-plugin-react-hooks` 5.x to 7.x - working fine at 5.x, low priority
+- [ ] `figma-kit` - no real update available (stuck at 1.0.0-beta.22)
 
 ## Completion Log
 
@@ -147,4 +142,4 @@ Tailwind CSS 4 is a ground-up rewrite with a new engine and config format. This 
 | Phase 3 | 2026-03-05 | PR #19. ESLint 9 flat config. Dropped airbnb, added typescript-eslint unified.          |
 | Phase 4 | 2026-03-05 | PR #20. React 19, testing-library 16. figma-kit works via legacy-peer-deps.             |
 | Phase 5 | 2026-03-05 | PR #21. css-loader 7, style-loader 4, postcss-loader 8, webpack-cli 6, webpack-merge 6. |
-| Phase 6 |            |                                                                                         |
+| Phase 6 | 2026-03-05 | Deferred. Tailwind 4 is high-effort, low-value for this project right now.              |

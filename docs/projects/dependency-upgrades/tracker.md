@@ -139,6 +139,21 @@ Tailwind CSS 4 is a ground-up rewrite with a new engine and config format. Uses 
 
 **PR**: #26 | **Verification**: all passed (CI green)
 
+## Phase 7: Jest 30
+
+Jest 30 with JSDOM v26, updated types, and ts-jest compatibility.
+
+**Branch**: `chore/deps-jest-30`
+
+- [x] Upgrade `jest` 29.7.0 to 30.2.0
+- [x] Upgrade `jest-environment-jsdom` 29.7.0 to 30.2.0
+- [x] Upgrade `@types/jest` 29.5.14 to 30.0.0
+- [x] `ts-jest` 29.4.6 compatible with Jest 30 (no upgrade needed)
+- [x] No config changes needed (`jest.config.js` unchanged)
+- [x] All checks passing (lint, types, 88/88 tests, build)
+
+**PR**: #24 | **Verification**: all passed
+
 ## Other Noted Upgrades (Deferred)
 
 - [ ] `eslint-plugin-tailwindcss` - re-add when v4 stable releases (currently at 4.0.0-beta.0, crashes on v4 configs)

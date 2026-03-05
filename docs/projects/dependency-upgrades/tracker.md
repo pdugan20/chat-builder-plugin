@@ -107,15 +107,15 @@ Loader and CLI major version bumps. These can break the build pipeline.
 
 **Branch**: `chore/deps-build-tooling`
 
-- [ ] Upgrade `css-loader` 6.11.0 to 7.x
-- [ ] Upgrade `style-loader` 3.3.4 to 4.x
-- [ ] Upgrade `postcss-loader` 7.3.4 to 8.x
-- [ ] Upgrade `webpack-cli` 5.1.4 to 6.x
-- [ ] Upgrade `webpack-merge` 5.10.0 to 6.x
-- [ ] Verify webpack config compatibility with new loader APIs
-- [ ] Test dev (`npm run watch`) and production (`npm run build`) builds
+- [x] Upgrade `css-loader` 6.11.0 to 7.x
+- [x] Upgrade `style-loader` 3.3.4 to 4.x
+- [x] Upgrade `postcss-loader` 7.3.4 to 8.x
+- [x] Upgrade `webpack-cli` 5.1.4 to 6.x
+- [x] Upgrade `webpack-merge` 5.10.0 to 6.x
+- [x] Webpack config compatible with new loader APIs (no changes needed)
+- [x] All checks passing (lint, types, 88/88 tests, build)
 
-**Verification**: `npm run build`, `npm run watch` (manual check), `npm test`
+**PR**: #21 | **Verification**: all passed
 
 ## Phase 6: Tailwind CSS 4 (Evaluate)
 
@@ -140,11 +140,11 @@ Tailwind CSS 4 is a ground-up rewrite with a new engine and config format. This 
 
 ## Completion Log
 
-| Phase   | Date       | Notes                                                                          |
-| ------- | ---------- | ------------------------------------------------------------------------------ |
-| Phase 1 | 2026-03-05 | PR #16. Closed dependabot PRs #5, #6, #7.                                      |
-| Phase 2 | 2026-03-05 | PR #18. commitlint 20, lint-staged 16, markdownlint-cli 0.48.                  |
-| Phase 3 | 2026-03-05 | PR #19. ESLint 9 flat config. Dropped airbnb, added typescript-eslint unified. |
-| Phase 4 | 2026-03-05 | PR #20. React 19, testing-library 16. figma-kit works via legacy-peer-deps.    |
-| Phase 5 |            |                                                                                |
-| Phase 6 |            |                                                                                |
+| Phase   | Date       | Notes                                                                                   |
+| ------- | ---------- | --------------------------------------------------------------------------------------- |
+| Phase 1 | 2026-03-05 | PR #16. Closed dependabot PRs #5, #6, #7.                                               |
+| Phase 2 | 2026-03-05 | PR #18. commitlint 20, lint-staged 16, markdownlint-cli 0.48.                           |
+| Phase 3 | 2026-03-05 | PR #19. ESLint 9 flat config. Dropped airbnb, added typescript-eslint unified.          |
+| Phase 4 | 2026-03-05 | PR #20. React 19, testing-library 16. figma-kit works via legacy-peer-deps.             |
+| Phase 5 | 2026-03-05 | PR #21. css-loader 7, style-loader 4, postcss-loader 8, webpack-cli 6, webpack-merge 6. |
+| Phase 6 |            |                                                                                         |

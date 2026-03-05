@@ -84,20 +84,22 @@ React 19 includes breaking changes (removed legacy APIs, new JSX transform requi
 
 **Branch**: `chore/deps-react-19`
 
-- [ ] Review React 19 migration guide and breaking changes
-- [ ] Upgrade `react` 18.3.1 to 19.x
-- [ ] Upgrade `react-dom` 18.3.1 to 19.x
-- [ ] Upgrade `@types/react` 18.3.28 to 19.x
-- [ ] Upgrade `@types/react-dom` 18.3.7 to 19.x
-- [ ] Upgrade `@testing-library/react` 14.3.1 to 16.x
-- [ ] Check `figma-kit` compatibility with React 19
-- [ ] Check `react-textarea-autosize` compatibility with React 19
-- [ ] Check `react-router` compatibility with React 19
-- [ ] Fix any breaking API changes in components
-- [ ] Run full test suite and manually test plugin in Figma
+- [x] Review React 19 migration guide and breaking changes
+- [x] Upgrade `react` 18.3.1 to 19.2.4
+- [x] Upgrade `react-dom` 18.3.1 to 19.2.4
+- [x] Upgrade `@types/react` 18.3.28 to 19.x
+- [x] Upgrade `@types/react-dom` 18.3.7 to 19.x
+- [x] Upgrade `@testing-library/react` 14.3.1 to 16.3.2
+- [x] Add `@testing-library/dom` (now a required peer dep of testing-library v16)
+- [x] Check `figma-kit` compatibility with React 19 (works via --legacy-peer-deps, peer dep still ^18)
+- [x] Check `react-textarea-autosize` compatibility (supports React 19 natively)
+- [x] Check `react-router` compatibility (supports React >=18)
+- [x] No breaking API changes needed in components
+- [x] All checks passing (lint, types, 88/88 tests, build)
 - [ ] Close Dependabot PR #10
+- [ ] Manual Figma plugin test (recommended before merging)
 
-**Verification**: `npm test`, `npm run build`, manual Figma plugin test
+**PR**: #20 | **Verification**: all automated checks passed
 
 ## Phase 5: Webpack and Build Tooling
 
@@ -143,6 +145,6 @@ Tailwind CSS 4 is a ground-up rewrite with a new engine and config format. This 
 | Phase 1 | 2026-03-05 | PR #16. Closed dependabot PRs #5, #6, #7.                                      |
 | Phase 2 | 2026-03-05 | PR #18. commitlint 20, lint-staged 16, markdownlint-cli 0.48.                  |
 | Phase 3 | 2026-03-05 | PR #19. ESLint 9 flat config. Dropped airbnb, added typescript-eslint unified. |
-| Phase 4 |            |                                                                                |
+| Phase 4 | 2026-03-05 | PR #20. React 19, testing-library 16. figma-kit works via legacy-peer-deps.    |
 | Phase 5 |            |                                                                                |
 | Phase 6 |            |                                                                                |

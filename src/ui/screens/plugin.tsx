@@ -36,7 +36,7 @@ function PluginScreen({
   const {
     state: { hasComponentLibrary, hasLocalComponents, isLoading: isPluginLoading, hasFonts },
   } = usePlugin();
-  const { loading, streaming, streamingMessages, loadingManager, generateChat } = useChatGeneration({
+  const { loading, streaming, streamingMessages, generateChat } = useChatGeneration({
     anthropicKey: anthropicKey || '',
     useTestData,
   });
@@ -276,9 +276,7 @@ function PluginScreen({
             );
           })()}
         </div>
-        {loading && (
-          <LoadingOverlay streamingMessages={streaming ? streamingMessages : ''} loadingManager={loadingManager} />
-        )}
+        {loading && <LoadingOverlay streamingMessages={streaming ? streamingMessages : ''} />}
       </div>
       {!anthropicKey && <ApiKeyOverlay />}
     </>

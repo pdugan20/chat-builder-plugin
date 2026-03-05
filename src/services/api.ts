@@ -27,12 +27,15 @@ export class APIService {
         },
       });
 
-      // Final flush
-      this.flushBuffer(callbacks, true);
+      // Extract JSON from the full response text (stream buffer only has
+      // individual message texts from onStream, not parseable JSON)
+      const fullText = response?.content?.[0]?.text || '';
+      const extracted = this.extractJsonFromStream(fullText);
 
-      // Check if we got a valid response
-      if (!response?.content?.[0]?.text) {
-        callbacks.onError('No response generated from API');
+      if (extracted) {
+        callbacks.onComplete(extracted);
+      } else {
+        callbacks.onError('Failed to parse API response');
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';

@@ -97,7 +97,7 @@ describe('APIService', () => {
       jest.runAllTimers();
       await promise;
 
-      expect(mockCallbacks.onError).toHaveBeenCalledWith('No response generated from API');
+      expect(mockCallbacks.onError).toHaveBeenCalledWith('Failed to parse API response');
     });
 
     it('should batch streaming updates with 100ms interval', async () => {
@@ -150,6 +150,48 @@ describe('APIService', () => {
 
       jest.runAllTimers();
       await promise;
+    });
+
+    it('should handle response with empty JSON array', async () => {
+      const mockResponse = {
+        content: [{ text: '[]' }],
+      };
+      (createChatQuery as jest.Mock).mockResolvedValue(mockResponse);
+
+      const promise = apiService.generateChat('Test prompt', 'sk-ant-key', mockCallbacks);
+      jest.runAllTimers();
+      await promise;
+
+      expect(mockCallbacks.onError).toHaveBeenCalledWith('Failed to parse API response');
+      expect(mockCallbacks.onComplete).not.toHaveBeenCalled();
+    });
+
+    it('should reset active buffer timeout when generateChat is called again', async () => {
+      const chatData: ChatItem[] = [createMockChatItem({ name: 'Alice', message: 'Hello' })];
+      const mockResponse = {
+        content: [{ text: JSON.stringify(chatData) }],
+      };
+
+      let onStreamCallback: ((chunk: string) => void) | undefined;
+      (createChatQuery as jest.Mock).mockImplementation(({ onStream }) => {
+        onStreamCallback = onStream;
+        return Promise.resolve(mockResponse);
+      });
+
+      // Start first generation and trigger a stream chunk to create a buffer timeout
+      const promise1 = apiService.generateChat('First prompt', 'sk-ant-key', mockCallbacks);
+      if (onStreamCallback) {
+        onStreamCallback('partial');
+      }
+
+      // Start second generation before buffer timeout fires (resets buffer)
+      const promise2 = apiService.generateChat('Second prompt', 'sk-ant-key', mockCallbacks);
+
+      jest.runAllTimers();
+      await promise1;
+      await promise2;
+
+      expect(mockCallbacks.onComplete).toHaveBeenCalled();
     });
 
     it('should not emit duplicate progress updates', async () => {

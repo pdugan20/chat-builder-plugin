@@ -14,13 +14,19 @@ export class APIService {
   private bufferTimeoutId: ReturnType<typeof setTimeout> | null = null;
   private lastEmittedMessages: ChatItem[] = [];
 
-  async generateChat(prompt: string, apiKey: string, callbacks: StreamCallbacks): Promise<void> {
+  async generateChat(
+    prompt: string,
+    apiKey: string,
+    participants: string,
+    maxMessages: string,
+    callbacks: StreamCallbacks
+  ): Promise<void> {
     this.resetBuffer();
 
     try {
       const response = await createChatQuery({
         apiKey,
-        queryInputs: { prompt, participants: '2', maxMessages: '15' },
+        queryInputs: { prompt, participants, maxMessages },
         onStream: (chunk: string) => {
           this.handleStreamChunk(chunk, callbacks);
         },

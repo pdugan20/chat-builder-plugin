@@ -62,6 +62,7 @@ export default function useChatGeneration({
   const generateChat = useCallback(
     async ({
       participants,
+      maxMessages,
       prompt,
       style,
       includePrototype,
@@ -75,22 +76,31 @@ export default function useChatGeneration({
       // Clear previous streaming messages
       setStreamingMessages('');
 
-      await chatService.current.generateChat(prompt, anthropicKey, style, includePrototype, useTestData, participants, {
-        onLoadingStateChange: setLoading,
-        onStreamingStateChange: setStreaming,
-        onMessagesUpdate: (messages: ChatItem[]) => {
-          // Convert messages to string for display (backward compatibility)
-          const messagesText = messages.map((m) => `${m.name}: ${m.message}`).join('\n');
-          setStreamingMessages(messagesText);
-        },
-        onError: (error) => {
-          console.error('[Chat Generation Error]', error);
-          setLoading(false);
-          setStreaming(false);
-        },
-      });
+      await chatService.current.generateChat(
+        prompt,
+        anthropicKey,
+        style,
+        includePrototype,
+        useTestData,
+        participants,
+        maxMessages,
+        {
+          onLoadingStateChange: setLoading,
+          onStreamingStateChange: setStreaming,
+          onMessagesUpdate: (messages: ChatItem[]) => {
+            // Convert messages to string for display (backward compatibility)
+            const messagesText = messages.map((m) => `${m.name}: ${m.message}`).join('\n');
+            setStreamingMessages(messagesText);
+          },
+          onError: (error) => {
+            console.error('[Chat Generation Error]', error);
+            setLoading(false);
+            setStreaming(false);
+          },
+        }
+      );
     },
-    [anthropicKey, useTestData, messenger]
+    [anthropicKey, useTestData]
   );
 
   return {

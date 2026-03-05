@@ -1,3 +1,6 @@
+// figma.loadAllPagesAsync() is called in initializePlugin() (plugin/index.ts)
+// before any code in this file executes. The ESLint rule cannot verify this statically.
+/* eslint-disable @figma/figma-plugins/dynamic-page-find-method-advice */
 import {
   THREAD_COMPONENT_SETS,
   COMPONENT_NAMES,
@@ -27,10 +30,8 @@ export function findComponentSet(name: string): ComponentSetNode | undefined {
     return componentSetCache.get(name);
   }
 
-  const allNodes = figma.root.findAll();
-  const componentSet = allNodes.find((node) => node.type === 'COMPONENT_SET' && node.name === name) as
-    | ComponentSetNode
-    | undefined;
+  const componentSets = figma.root.findAllWithCriteria({ types: ['COMPONENT_SET'] });
+  const componentSet = componentSets.find((node) => node.name === name);
 
   if (componentSet) {
     componentSetCache.set(name, componentSet);
@@ -74,12 +75,9 @@ export async function updateEmojiKeyIds(): Promise<void> {
   const hasChatBuilderLibrary = collections.some((collection) => collection.name === 'iMessage Chat Builder');
 
   if (!hasChatBuilderLibrary) {
-    const allNodes = figma.root.findAll();
-    const localComponents = allNodes.filter(
-      (node): node is ComponentNode | ComponentSetNode =>
-        (node.type === 'COMPONENT' || node.type === 'COMPONENT_SET') &&
-        (node.name.startsWith('System') || node.name.startsWith('iMessage'))
-    );
+    const localComponents = figma.root
+      .findAllWithCriteria({ types: ['COMPONENT', 'COMPONENT_SET'] })
+      .filter((node) => node.name.startsWith('System') || node.name.startsWith('iMessage'));
 
     const colorHeartInfo = findColorHeart(localComponents);
     if (colorHeartInfo) {
@@ -92,11 +90,9 @@ export async function updateEmojiKeyIds(): Promise<void> {
   }
 
   // Find all emoji components
-  const allNodes = figma.root.findAll();
-  const emojiComponents = allNodes.filter(
-    (node): node is ComponentNode =>
-      node.type === 'COMPONENT' && (node.name.startsWith('System/') || node.name.startsWith('iMessage/'))
-  );
+  const emojiComponents = figma.root
+    .findAllWithCriteria({ types: ['COMPONENT'] })
+    .filter((node) => node.name.startsWith('System/') || node.name.startsWith('iMessage/'));
 
   // Process each emoji component
   const promises = emojiComponents.map(async (component) => {

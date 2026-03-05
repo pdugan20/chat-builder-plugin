@@ -43,9 +43,11 @@ describe('useChatGeneration', () => {
   });
 
   it('should set loading state when generating', async () => {
-    mockChatService.generateChat = jest.fn().mockImplementation(async (_, __, ___, ____, _____, ______, callbacks) => {
-      callbacks.onLoadingStateChange(true);
-    });
+    mockChatService.generateChat = jest
+      .fn()
+      .mockImplementation(async (_, __, ___, ____, _____, ______, _______, callbacks) => {
+        callbacks.onLoadingStateChange(true);
+      });
 
     const { result } = renderHook(() => useChatGeneration({ anthropicKey: 'sk-ant-key' }), {
       wrapper,
@@ -74,7 +76,7 @@ describe('useChatGeneration', () => {
       const createMockChatItem = (await import('../../../test/test-helpers')).default;
       mockChatService.generateChat = jest
         .fn()
-        .mockImplementation(async (_, __, ___, ____, _____, ______, callbacks) => {
+        .mockImplementation(async (_, __, ___, ____, _____, ______, _______, callbacks) => {
           callbacks.onMessagesUpdate([createMockChatItem({ name: 'Alice', message: 'First' })]);
         });
 
@@ -105,13 +107,15 @@ describe('useChatGeneration', () => {
   });
 
   it('should update streaming messages when onMessagesUpdate is called', async () => {
-    mockChatService.generateChat = jest.fn().mockImplementation(async (_, __, ___, ____, _____, ______, callbacks) => {
-      const createMockChatItem = (await import('../../../test/test-helpers')).default;
-      callbacks.onMessagesUpdate([
-        createMockChatItem({ name: 'Alice', message: 'Hello' }),
-        createMockChatItem({ role: 'recipient', name: 'Bob', message: 'Hi there' }),
-      ]);
-    });
+    mockChatService.generateChat = jest
+      .fn()
+      .mockImplementation(async (_, __, ___, ____, _____, ______, _______, callbacks) => {
+        const createMockChatItem = (await import('../../../test/test-helpers')).default;
+        callbacks.onMessagesUpdate([
+          createMockChatItem({ name: 'Alice', message: 'Hello' }),
+          createMockChatItem({ role: 'recipient', name: 'Bob', message: 'Hi there' }),
+        ]);
+      });
 
     const { result } = renderHook(() => useChatGeneration({ anthropicKey: 'sk-ant-key' }), {
       wrapper,
@@ -152,6 +156,7 @@ describe('useChatGeneration', () => {
       false,
       true, // useTestData
       '3', // participants
+      '20', // maxMessages
       expect.objectContaining({
         onLoadingStateChange: expect.any(Function),
         onStreamingStateChange: expect.any(Function),

@@ -26,6 +26,7 @@ export class ChatGenerationService {
     includePrototype: boolean,
     useTestData: boolean,
     participants: string,
+    maxMessages: string,
     callbacks: GenerationCallbacks
   ): Promise<void> {
     // Reset loading state
@@ -68,7 +69,7 @@ export class ChatGenerationService {
       if (useTestData) {
         await this.apiService.generateChatWithTestData(participants, streamCallbacks);
       } else {
-        await this.apiService.generateChat(prompt, apiKey || '', streamCallbacks);
+        await this.apiService.generateChat(prompt, apiKey || '', participants, maxMessages, streamCallbacks);
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Generation failed';

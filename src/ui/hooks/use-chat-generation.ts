@@ -86,7 +86,6 @@ export default function useChatGeneration({
           setStreamingMessages(messagesText);
         },
         onError: (error) => {
-          // eslint-disable-next-line no-console
           console.error('[Chat Generation Error]', error);
           setLoading(false);
           setStreaming(false);

@@ -11,7 +11,6 @@ export interface GenerationCallbacks {
   onError: (error: string) => void;
 }
 
-// eslint-disable-next-line import/prefer-default-export
 export class ChatGenerationService {
   constructor(
     private apiService: APIService,

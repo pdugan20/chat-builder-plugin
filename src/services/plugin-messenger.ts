@@ -4,7 +4,6 @@ import { MESSAGE_TYPE } from '../constants/messages';
 type MessageCallback = () => void;
 type ErrorCallback = (error: string, retryable: boolean) => void;
 
-// eslint-disable-next-line import/prefer-default-export
 export class PluginMessengerService {
   private buildCompleteCallbacks: Set<MessageCallback> = new Set();
   private errorCallbacks: Set<ErrorCallback> = new Set();

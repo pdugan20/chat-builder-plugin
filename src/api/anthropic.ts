@@ -59,7 +59,6 @@ async function attemptRequest(
     ],
   });
 
-  // eslint-disable-next-line no-restricted-syntax
   for await (const message of stream) {
     if (message.type === 'content_block_delta' && message.delta?.type === 'text_delta' && message.delta?.text) {
       const { text } = message.delta;

@@ -9,14 +9,14 @@ Tracking the upgrade of all outdated dependencies across 6 phases ordered by ris
 
 These existing PRs need to be resolved (merged or closed) as part of this effort.
 
-| PR  | Description                                   | CI   | Merge Status | Action           |
-| --- | --------------------------------------------- | ---- | ------------ | ---------------- |
-| #5  | `actions/checkout` 4 to 6                     | Pass | Clean        | Merge in Phase 1 |
-| #6  | `actions/setup-node` 4 to 6                   | Pass | Clean        | Merge in Phase 1 |
-| #7  | Grouped dev deps (8 packages)                 | Pass | Conflicts    | Merge in Phase 1 |
-| #9  | `@figma/eslint-plugin-figma-plugins` 0.16-1.0 | Pass | Conflicts    | Close, Phase 3   |
-| #10 | React + @types/react                          | Fail | Conflicts    | Close, Phase 4   |
-| #11 | `@typescript-eslint/eslint-plugin` 6-8        | Fail | Conflicts    | Close, Phase 3   |
+| PR  | Description                                   | CI   | Merge Status | Action                       |
+| --- | --------------------------------------------- | ---- | ------------ | ---------------------------- |
+| #5  | `actions/checkout` 4 to 6                     | Pass | Clean        | Closed, superseded by PR #16 |
+| #6  | `actions/setup-node` 4 to 6                   | Pass | Clean        | Closed, superseded by PR #16 |
+| #7  | Grouped dev deps (8 packages)                 | Pass | Conflicts    | Closed, superseded by PR #16 |
+| #9  | `@figma/eslint-plugin-figma-plugins` 0.16-1.0 | Pass | Conflicts    | Close, Phase 3               |
+| #10 | React + @types/react                          | Fail | Conflicts    | Close, Phase 4               |
+| #11 | `@typescript-eslint/eslint-plugin` 6-8        | Fail | Conflicts    | Close, Phase 3               |
 
 ## Phase 1: CI Actions and Safe Dev Dependency Patches
 
@@ -24,9 +24,9 @@ Low-risk changes with passing CI. No breaking changes expected.
 
 **Branch**: `chore/deps-phase-1`
 
-- [ ] Merge PR #5 - `actions/checkout` 4 to 6
-- [ ] Merge PR #6 - `actions/setup-node` 4 to 6
-- [ ] Rebase and merge PR #7 - grouped dev dependencies:
+- [x] Merge PR #5 - `actions/checkout` 4 to 6 (superseded by PR #16)
+- [x] Merge PR #6 - `actions/setup-node` 4 to 6 (superseded by PR #16)
+- [x] Rebase and merge PR #7 - grouped dev dependencies (superseded by PR #16):
   - `@testing-library/jest-dom` 6.8.0 to 6.9.1
   - `eslint-plugin-prettier` 5.5.4 to 5.5.5
   - `eslint-plugin-testing-library` 7.6.6 to 7.15.4
@@ -35,8 +35,9 @@ Low-risk changes with passing CI. No breaking changes expected.
   - `ts-jest` 29.4.1 to 29.4.6
   - `ts-loader` 9.5.2 to 9.5.4
   - `webpack` 5.101.3 to 5.104.1
+- [x] All checks passing (lint, types, 88/88 tests, build)
 
-**Verification**: `npm test`, `npm run build`, `npm run lint:fix`
+**PR**: #16 | **Verification**: all passed
 
 ## Phase 2: Low-Risk Tool Bumps
 
@@ -132,11 +133,11 @@ Tailwind CSS 4 is a ground-up rewrite with a new engine and config format. This 
 
 ## Completion Log
 
-| Phase   | Date | Notes |
-| ------- | ---- | ----- |
-| Phase 1 |      |       |
-| Phase 2 |      |       |
-| Phase 3 |      |       |
-| Phase 4 |      |       |
-| Phase 5 |      |       |
-| Phase 6 |      |       |
+| Phase   | Date       | Notes                                     |
+| ------- | ---------- | ----------------------------------------- |
+| Phase 1 | 2026-03-05 | PR #16. Closed dependabot PRs #5, #6, #7. |
+| Phase 2 |            |                                           |
+| Phase 3 |            |                                           |
+| Phase 4 |            |                                           |
+| Phase 5 |            |                                           |
+| Phase 6 |            |                                           |

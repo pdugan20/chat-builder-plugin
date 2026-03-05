@@ -76,7 +76,7 @@ figma.ui.onmessage = (msg) => {
 
     case MESSAGE_TYPE.POST_API_ERROR:
       notifyUser({
-        errorMessage: msg.error,
+        errorMessage: msg.errorMessage || msg.error || 'An unexpected error occurred',
         retryable: msg.retryable ?? false,
       });
       break;

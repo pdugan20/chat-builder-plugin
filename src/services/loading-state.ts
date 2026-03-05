@@ -10,19 +10,19 @@ export default class LoadingStateManager {
 
   private readonly stageInfo: Record<LoadingStage, StageInfo> = {
     authenticating: {
-      description: 'Authenticating with Claude...',
+      description: 'Authenticating with Claude',
       progress: 10,
     },
     generating: {
-      description: 'Generating chat conversation...',
+      description: 'Generating chat conversation',
       progress: 30,
     },
     parsing: {
-      description: 'Parsing response...',
+      description: 'Parsing response',
       progress: 60,
     },
     building: {
-      description: 'Building UI components...',
+      description: 'Building UI components',
       progress: 80,
     },
     complete: {

@@ -18,7 +18,7 @@ describe('LoadingOverlay', () => {
 
   it('should render with loading manager', () => {
     const mockLoadingManager = new LoadingStateManager() as jest.Mocked<LoadingStateManager>;
-    mockLoadingManager.getStageDescription = jest.fn().mockReturnValue('Authenticating with Claude...');
+    mockLoadingManager.getStageDescription = jest.fn().mockReturnValue('Authenticating with Claude');
 
     render(<LoadingOverlay loadingManager={mockLoadingManager} />);
 
@@ -30,8 +30,8 @@ describe('LoadingOverlay', () => {
     const mockLoadingManager = new LoadingStateManager() as jest.Mocked<LoadingStateManager>;
     mockLoadingManager.getStageDescription = jest
       .fn()
-      .mockReturnValueOnce('Authenticating with Claude...')
-      .mockReturnValueOnce('Generating chat conversation...');
+      .mockReturnValueOnce('Authenticating with Claude')
+      .mockReturnValueOnce('Generating chat conversation');
 
     const { rerender } = render(<LoadingOverlay loadingManager={mockLoadingManager} />);
 

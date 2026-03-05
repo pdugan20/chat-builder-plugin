@@ -13,7 +13,7 @@ describe('LoadingStateManager', () => {
     });
 
     it('should have correct initial description', () => {
-      expect(loadingManager.getStageDescription()).toBe('Authenticating with Claude...');
+      expect(loadingManager.getStageDescription()).toBe('Authenticating with Claude');
     });
 
     it('should have correct initial progress', () => {
@@ -29,7 +29,7 @@ describe('LoadingStateManager', () => {
 
     it('should update description to generating', () => {
       loadingManager.onStreamStart();
-      expect(loadingManager.getStageDescription()).toBe('Generating chat conversation...');
+      expect(loadingManager.getStageDescription()).toBe('Generating chat conversation');
     });
 
     it('should update progress to 30', () => {
@@ -46,7 +46,7 @@ describe('LoadingStateManager', () => {
 
     it('should update description to parsing', () => {
       loadingManager.onStreamComplete();
-      expect(loadingManager.getStageDescription()).toBe('Parsing response...');
+      expect(loadingManager.getStageDescription()).toBe('Parsing response');
     });
 
     it('should update progress to 60', () => {
@@ -63,7 +63,7 @@ describe('LoadingStateManager', () => {
 
     it('should update description to building', () => {
       loadingManager.onBuildStart();
-      expect(loadingManager.getStageDescription()).toBe('Building UI components...');
+      expect(loadingManager.getStageDescription()).toBe('Building UI components');
     });
 
     it('should update progress to 80', () => {
@@ -100,7 +100,7 @@ describe('LoadingStateManager', () => {
     it('should reset description and progress', () => {
       loadingManager.onBuildComplete();
       loadingManager.reset();
-      expect(loadingManager.getStageDescription()).toBe('Authenticating with Claude...');
+      expect(loadingManager.getStageDescription()).toBe('Authenticating with Claude');
       expect(loadingManager.getProgress()).toBe(10);
     });
   });

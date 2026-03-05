@@ -7,6 +7,8 @@
   "author": "Patrick Dugan",
   "scripts": {
     "watch": "webpack --mode=development --watch",
+    "watch:test": "webpack --mode=development --watch --env testdata",
+    "watch:debug": "webpack --mode=development --watch --env debug",
     "build": "webpack --mode=production",
     "update-version": "node dev-scripts/update-version.js",
     "lint:fix": "eslint --ext .tsx --ext .ts .",

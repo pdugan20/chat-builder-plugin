@@ -11,6 +11,8 @@ This is a Figma plugin called "iMessage AI Chat Builder" that generates realisti
 ### Development
 
 - `npm run watch` - Run the plugin in development mode with hot reloading
+- `npm run watch:test` - Development mode with test data (no API calls needed)
+- `npm run watch:debug` - Development mode with debug panel enabled
 - `npm run build` - Create a production build
 
 ### Code Quality
@@ -35,7 +37,9 @@ ESLint only checks code style/quality rules, NOT TypeScript type errors. You mus
 
 ### Version Management
 
-- `npm run update-version` - Update plugin version across all files
+Versioning is automated via [release-please](https://github.com/googleapis/release-please). On push to `main`, release-please creates a Release PR based on conventional commits. Merging that PR bumps the version in `package.json` and `src/constants/plugin.ts`, creates a git tag, generates a CHANGELOG entry, and creates a GitHub Release with build artifacts.
+
+- `npm run update-version` - Manually sync version from `package.json` to `src/constants/plugin.ts` (convenience script; release-please handles this automatically)
 
 ## Code Quality Standards
 
@@ -198,6 +202,6 @@ The plugin follows a layered architecture:
 - The plugin requires specific Figma components to be available (checks on load)
 - Anthropic API key is stored in plugin clientStorage
 - Font loading (Apple SF Pro) happens asynchronously
-- Test data mode available for development without API calls
+- Test data mode available via `npm run watch:test` (injected at build time, no source code changes needed)
 - Chat rendering is optimized to prevent visual artifacts during assembly
 - ESLint configuration has been tuned for this codebase with appropriate rule exceptions

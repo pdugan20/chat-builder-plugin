@@ -8,8 +8,8 @@ import { MessengerProvider } from './context/messenger';
 
 import './styles/app.css';
 
-const USE_TEST_DATA = false;
-const SHOW_DEBUG = false;
+const USE_TEST_DATA = process.env.USE_TEST_DATA === 'true';
+const SHOW_DEBUG = process.env.SHOW_DEBUG === 'true';
 
 function App(): React.JSX.Element {
   return (

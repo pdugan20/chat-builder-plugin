@@ -46,6 +46,8 @@ module.exports = (env, argv) => ({
     new ForkTsCheckerWebpackPlugin(),
     new DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify(argv.mode || 'development'),
+      'process.env.USE_TEST_DATA': JSON.stringify(env?.testdata === true),
+      'process.env.SHOW_DEBUG': JSON.stringify(env?.debug === true),
     }),
     new HtmlWebpackPlugin({
       template: paths.uiHtml,

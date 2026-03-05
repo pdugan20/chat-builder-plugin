@@ -1,6 +1,9 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+
+@config '../../../tailwind.config.js';
+@plugin '@tailwindcss/typography';
+
+@custom-variant dark (&:where(.figma-dark, .figma-dark *));
 
 @import 'figma-kit/styles.css';
 @import './index.css';

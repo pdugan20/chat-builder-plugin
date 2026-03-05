@@ -3,7 +3,6 @@ import tseslint from 'typescript-eslint';
 import reactPlugin from 'eslint-plugin-react';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import prettierPlugin from 'eslint-plugin-prettier/recommended';
-import tailwindPlugin from 'eslint-plugin-tailwindcss';
 import testingLibraryPlugin from 'eslint-plugin-testing-library';
 import figmaPlugin from '@figma/eslint-plugin-figma-plugins';
 import globals from 'globals';
@@ -77,14 +76,6 @@ export default tseslint.config(
       'no-promise-executor-return': 'off',
       'no-case-declarations': 'off',
       'no-restricted-globals': 'off',
-    },
-  },
-
-  // Tailwind CSS
-  ...tailwindPlugin.configs['flat/recommended'],
-  {
-    rules: {
-      'tailwindcss/no-custom-classname': 'off',
     },
   },
 

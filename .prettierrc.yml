@@ -8,3 +8,5 @@ arrowParens: always
 
 plugins:
   - prettier-plugin-tailwindcss
+
+tailwindStylesheet: ./src/ui/styles/app.css

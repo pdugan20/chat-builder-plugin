@@ -1,4 +1,4 @@
-import figmaKitPreset from 'figma-kit/tailwind.preset.js';
+import figmaKitPreset from './src/ui/styles/figma-tailwind-preset.js';
 
 /** @type {import('tailwindcss').Config} */
 

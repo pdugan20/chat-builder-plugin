@@ -126,12 +126,24 @@ Tailwind CSS 4 is a ground-up rewrite with a new engine and config format. This 
 - [x] Evaluate effort vs. benefit for this project
 - [x] Decision: **deferred** - Tailwind 4 is a ground-up rewrite requiring config migration, plugin updates, and class auditing. Tailwind 3 is still maintained and working well for this project.
 
+## Phase 7: Extract figma-kit Tailwind Preset
+
+Decouple the Tailwind config from the figma-kit package by extracting the preset into the project. This unblocks a future Tailwind 4 migration independently of figma-kit.
+
+**Branch**: `chore/extract-figma-preset`
+
+- [x] Copy `figma-kit/tailwind.preset.js` to `src/ui/styles/figma-tailwind-preset.js`
+- [x] Update `tailwind.config.js` import to use local preset
+- [x] All checks passing (lint, types, 88/88 tests, build)
+
+**PR**: pending | **Verification**: all passed
+
 ## Other Noted Upgrades (Deferred)
 
-- [ ] `tailwindcss` 3.x to 4.x - deferred (see Phase 6)
-- [ ] `@types/jest` 29.x to 30.x - requires Jest 30, defer until Jest upgrade
+- [ ] `tailwindcss` 3.x to 4.x - deferred (see Phase 6), now unblocked from figma-kit
+- [ ] `jest` 29.x to 30.x, `jest-environment-jsdom` 29.x to 30.x, `@types/jest` 29.x to 30.x
 - [ ] `eslint-plugin-react-hooks` 5.x to 7.x - working fine at 5.x, low priority
-- [ ] `figma-kit` - no real update available (stuck at 1.0.0-beta.22)
+- [ ] `figma-kit` - no real update available (stuck at 1.0.0-beta.22, React 18 peer dep)
 
 ## Completion Log
 

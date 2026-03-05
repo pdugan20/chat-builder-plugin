@@ -1,10 +1,10 @@
 # iMessage Chat Builder
 
 [![CI](https://github.com/pdugan20/chat-builder-plugin/actions/workflows/ci.yml/badge.svg)](https://github.com/pdugan20/chat-builder-plugin/actions/workflows/ci.yml)
-[![Node.js](https://img.shields.io/badge/Node.js-18-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.2-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)](https://reactjs.org/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![Node.js](https://img.shields.io/badge/Node.js-20-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)](https://react.dev/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 [![Figma Plugin](https://img.shields.io/badge/Figma-Community-F24E1E?logo=figma&logoColor=white)](https://www.figma.com/community/plugin/1519731262843198057/imessage-ai-chat-builder)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?logo=opensourceinitiative&logoColor=white)](LICENSE)
 
@@ -20,7 +20,7 @@ A Figma plugin for generating realistic iMessage chat interfaces using AI. Creat
 
 ## Prerequisites
 
-- [Node.js](https://nodejs.org) v18+
+- [Node.js](https://nodejs.org) v20+
 - [Figma desktop app](https://figma.com/downloads/)
 - [Anthropic API key](https://docs.anthropic.com/en/api/overview)
 - [Apple SF Pro typeface](https://developer.apple.com/fonts/)
@@ -44,18 +44,17 @@ npm run watch         # Dev mode with hot reloading
 npm run watch:test    # Dev mode with test data (no API calls)
 npm run watch:debug   # Dev mode with debug panel enabled
 npm run setup-hooks   # Set up pre-commit hooks
-npm run check-all     # Run all quality checks
 npm test              # Run tests
 npm run test:ci       # Tests with coverage (CI mode)
 ```
 
 ## Tech Stack
 
-- **Frontend**: React 18, TypeScript 5.2, Tailwind CSS
+- **Frontend**: React 19, TypeScript 5.9, Tailwind CSS 4
 - **Build**: Webpack 5
 - **API**: Anthropic Claude API (Sonnet 4.6)
-- **Testing**: Jest, React Testing Library
-- **Quality**: ESLint (Airbnb), Prettier, markdownlint, Conventional Commits
+- **Testing**: Jest 30, React Testing Library
+- **Quality**: ESLint 9, Prettier, markdownlint, Conventional Commits
 
 ## Architecture
 
@@ -69,7 +68,9 @@ npm run test:ci       # Tests with coverage (CI mode)
 
 ## Documentation
 
-- [End-to-End Flow](docs/END_TO_END_FLOW.md) - Technical walkthrough of user inputs to Figma components
+- [End-to-End Flow](docs/architecture/end-to-end-flow.md) - Technical walkthrough of user inputs to Figma components
+- [Chat Building Architecture](docs/architecture/chat-building-architecture.md) - Component structure and rendering pipeline
+- [Prompt Engineering Guide](docs/architecture/prompt-engineering-guide.md) - AI prompt design and message generation
 - [Project Guide](CLAUDE.md) - Development setup, architecture, and coding guidelines
 
 ## Related

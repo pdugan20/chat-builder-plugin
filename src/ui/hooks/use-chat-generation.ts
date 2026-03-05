@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useMemo, useEffect } from 'react';
 import { ChatItem } from '../../types/chat';
 import { ChatGenerationService } from '../../services/chat-generation';
 import { APIService } from '../../services/api';
@@ -35,20 +35,18 @@ export default function useChatGeneration({
 
   const messenger = useMessenger();
 
-  // Create services (memoized via useRef to avoid recreation)
-  const servicesRef = useRef({
-    apiService: new APIService(),
-    validationService: new ValidationService(),
-    loadingManager: new LoadingStateManager(),
-  });
+  // Create services once (stable across re-renders)
+  const services = useMemo(
+    () => ({
+      apiService: new APIService(),
+      validationService: new ValidationService(),
+      loadingManager: new LoadingStateManager(),
+    }),
+    []
+  );
 
   const chatService = useRef(
-    new ChatGenerationService(
-      servicesRef.current.apiService,
-      servicesRef.current.validationService,
-      messenger,
-      servicesRef.current.loadingManager
-    )
+    new ChatGenerationService(services.apiService, services.validationService, messenger, services.loadingManager)
   );
 
   // Listen for build complete messages
@@ -99,7 +97,7 @@ export default function useChatGeneration({
     loading,
     streaming,
     streamingMessages,
-    loadingManager: servicesRef.current.loadingManager,
+    loadingManager: services.loadingManager,
     generateChat,
   };
 }

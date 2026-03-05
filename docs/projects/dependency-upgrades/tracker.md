@@ -154,6 +154,18 @@ Jest 30 with JSDOM v26, updated types, and ts-jest compatibility.
 
 **PR**: #24 | **Verification**: all passed
 
+## Phase 8: eslint-plugin-react-hooks 7
+
+Major version bump with new `react-hooks/refs` rule that catches ref access during render.
+
+**Branch**: `chore/deps-react-hooks-7`
+
+- [x] Upgrade `eslint-plugin-react-hooks` 5.2.0 to 7.0.1
+- [x] Fix `react-hooks/refs` violations in `use-chat-generation.ts` (replace `useRef` with `useMemo` for stable service instances)
+- [x] All checks passing (lint, types, 88/88 tests, build)
+
+**PR**: #25 | **Verification**: all passed
+
 ## Other Noted Upgrades (Deferred)
 
 - [ ] `eslint-plugin-tailwindcss` - re-add when v4 stable releases (currently at 4.0.0-beta.0, crashes on v4 configs)

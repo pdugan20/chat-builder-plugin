@@ -17,6 +17,8 @@ updates:
       - 'npm'
     reviewers:
       - 'pdugan20'
+    assignees:
+      - 'pdugan20'
     # Group non-major updates together
     groups:
       development-dependencies:
@@ -63,4 +65,6 @@ updates:
       - 'dependencies'
       - 'github-actions'
     reviewers:
+      - 'pdugan20'
+    assignees:
       - 'pdugan20'

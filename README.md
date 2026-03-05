@@ -75,7 +75,3 @@ npm run test:ci       # Tests with coverage (CI mode)
 ## Related
 
 - [chat-app-prototype](https://github.com/pdugan20/chat-app-prototype) - Demo iMessage app built with this plugin
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

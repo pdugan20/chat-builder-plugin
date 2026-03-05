@@ -56,7 +56,7 @@ function SettingsScreen({
     return (
       <div className='row-item'>
         <Text className='heading'>Model</Text>
-        <Text>Claude 3.7 Sonnet</Text>
+        <Text>Claude Sonnet 4.6</Text>
       </div>
     );
   }

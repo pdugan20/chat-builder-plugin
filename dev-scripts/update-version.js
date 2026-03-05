@@ -1,26 +1,25 @@
 const fs = require('fs');
 const path = require('path');
 
-// Read the plugin version from the constants file
+// Read the version from package.json (source of truth)
+const packageJsonPath = path.join(__dirname, '../package.json');
+const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+const version = packageJson.version;
+
+// Update the plugin constants file
 const pluginConstantsPath = path.join(__dirname, '../src/constants/plugin.ts');
 const pluginConstantsContent = fs.readFileSync(pluginConstantsPath, 'utf8');
 
-// Extract version using regex
-const versionMatch = pluginConstantsContent.match(/const PLUGIN_VERSION = ['"]([^'"]+)['"]/);
-if (!versionMatch) {
+const updatedContent = pluginConstantsContent.replace(
+  /const PLUGIN_VERSION = ['"][^'"]+['"](.*)/,
+  `const PLUGIN_VERSION = '${version}'$1`
+);
+
+if (updatedContent === pluginConstantsContent && !pluginConstantsContent.includes(version)) {
   console.error('Could not find PLUGIN_VERSION in constants file');
   process.exit(1);
 }
 
-const version = versionMatch[1];
+fs.writeFileSync(pluginConstantsPath, updatedContent);
 
-// Read and update package.json
-const packageJsonPath = path.join(__dirname, '../package.json');
-const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
-
-packageJson.version = version;
-
-// Write back to package.json
-fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2) + '\n');
-
-console.log(`Updated package.json version to ${version}`);
+console.log(`Updated plugin.ts version to ${version}`);

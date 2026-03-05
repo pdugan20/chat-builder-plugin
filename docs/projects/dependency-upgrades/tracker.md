@@ -45,13 +45,14 @@ Minor/major bumps for standalone dev tools unlikely to cause breakage.
 
 **Branch**: `chore/deps-phase-2`
 
-- [ ] `markdownlint-cli` 0.42.0 to 0.48.0
-- [ ] `@commitlint/cli` 19.8.1 to 20.x
-- [ ] `@commitlint/config-conventional` 19.8.1 to 20.x
-- [ ] `lint-staged` 15.5.2 to 16.x
-- [ ] Run full test suite and verify pre-commit hooks still work
+- [x] `markdownlint-cli` 0.42.0 to 0.48.0
+- [x] `@commitlint/cli` 19.8.1 to 20.4.3
+- [x] `@commitlint/config-conventional` 19.8.1 to 20.4.3
+- [x] `lint-staged` 15.5.2 to 16.3.2
+- [x] Run full test suite and verify pre-commit hooks still work
+- [x] All checks passing (lint, types, 88/88 tests, markdownlint, commitlint)
 
-**Verification**: `npm test`, `npm run lint:md`, test a sample commit
+**PR**: #17 | **Verification**: all passed
 
 ## Phase 3: ESLint 9 Migration
 
@@ -133,11 +134,11 @@ Tailwind CSS 4 is a ground-up rewrite with a new engine and config format. This 
 
 ## Completion Log
 
-| Phase   | Date       | Notes                                     |
-| ------- | ---------- | ----------------------------------------- |
-| Phase 1 | 2026-03-05 | PR #16. Closed dependabot PRs #5, #6, #7. |
-| Phase 2 |            |                                           |
-| Phase 3 |            |                                           |
-| Phase 4 |            |                                           |
-| Phase 5 |            |                                           |
-| Phase 6 |            |                                           |
+| Phase   | Date       | Notes                                                         |
+| ------- | ---------- | ------------------------------------------------------------- |
+| Phase 1 | 2026-03-05 | PR #16. Closed dependabot PRs #5, #6, #7.                     |
+| Phase 2 | 2026-03-05 | PR #18. commitlint 20, lint-staged 16, markdownlint-cli 0.48. |
+| Phase 3 |            |                                                               |
+| Phase 4 |            |                                                               |
+| Phase 5 |            |                                                               |
+| Phase 6 |            |                                                               |

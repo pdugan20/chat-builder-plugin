@@ -137,7 +137,7 @@ Tailwind CSS 4 is a ground-up rewrite with a new engine and config format. Uses 
 - [x] Add `.npmrc` with `legacy-peer-deps=true` (fixes CI failure from figma-kit React 18 peer dep)
 - [x] All checks passing (lint, types, 88/88 tests, build)
 
-**PR**: pending | **Verification**: all passed
+**PR**: #26 | **Verification**: all passed (CI green)
 
 ## Other Noted Upgrades (Deferred)
 
@@ -154,4 +154,4 @@ Tailwind CSS 4 is a ground-up rewrite with a new engine and config format. Uses 
 | Phase 3 | 2026-03-05 | PR #19. ESLint 9 flat config. Dropped airbnb, added typescript-eslint unified.          |
 | Phase 4 | 2026-03-05 | PR #20. React 19, testing-library 16. figma-kit works via legacy-peer-deps.             |
 | Phase 5 | 2026-03-05 | PR #21. css-loader 7, style-loader 4, postcss-loader 8, webpack-cli 6, webpack-merge 6. |
-| Phase 6 | 2026-03-05 | PR pending. Tailwind 4, extracted preset, removed 3 deps, added .npmrc for CI fix.      |
+| Phase 6 | 2026-03-05 | PR #26. Tailwind 4, extracted preset, removed 3 deps, added .npmrc, Node 20. CI green.  |

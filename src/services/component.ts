@@ -49,7 +49,6 @@ export async function safeSetProperties(instance: InstanceNode, properties: Reco
     instance.setProperties(properties);
   } catch (error) {
     if (process.env.NODE_ENV === 'development') {
-      // eslint-disable-next-line no-console
       console.error('setProperties failed:', error);
     }
     throw error;

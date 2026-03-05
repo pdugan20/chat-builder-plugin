@@ -14,9 +14,9 @@ These existing PRs need to be resolved (merged or closed) as part of this effort
 | #5  | `actions/checkout` 4 to 6                     | Pass | Clean        | Closed, superseded by PR #16 |
 | #6  | `actions/setup-node` 4 to 6                   | Pass | Clean        | Closed, superseded by PR #16 |
 | #7  | Grouped dev deps (8 packages)                 | Pass | Conflicts    | Closed, superseded by PR #16 |
-| #9  | `@figma/eslint-plugin-figma-plugins` 0.16-1.0 | Pass | Conflicts    | Close, Phase 3               |
+| #9  | `@figma/eslint-plugin-figma-plugins` 0.16-1.0 | Pass | Conflicts    | Closed, superseded by PR #19 |
 | #10 | React + @types/react                          | Fail | Conflicts    | Close, Phase 4               |
-| #11 | `@typescript-eslint/eslint-plugin` 6-8        | Fail | Conflicts    | Close, Phase 3               |
+| #11 | `@typescript-eslint/eslint-plugin` 6-8        | Fail | Conflicts    | Closed, superseded by PR #19 |
 
 ## Phase 1: CI Actions and Safe Dev Dependency Patches
 
@@ -60,19 +60,23 @@ Major ecosystem change. ESLint 9 requires flat config (`eslint.config.js`) repla
 
 **Branch**: `chore/deps-eslint-9`
 
-- [ ] Research ESLint 8 to 9 migration guide
-- [ ] Audit current `.eslintrc` config and all plugin compatibility
-- [ ] Upgrade `eslint` 8.57.1 to 9.x
-- [ ] Upgrade `@typescript-eslint/eslint-plugin` 6.21.0 to 8.x
-- [ ] Upgrade `@typescript-eslint/parser` 6.21.0 to 8.x
-- [ ] Upgrade `eslint-config-airbnb-typescript` 17.1.0 to 18.x
-- [ ] Upgrade `eslint-plugin-react-hooks` 4.6.2 to 7.x
-- [ ] Upgrade `@figma/eslint-plugin-figma-plugins` 0.16.1 to 1.0.0
-- [ ] Migrate `.eslintrc` to `eslint.config.js` (flat config)
-- [ ] Verify all lint rules still apply correctly
-- [ ] Close Dependabot PRs #9 and #11
+- [x] Research ESLint 8 to 9 migration guide
+- [x] Audit current `.eslintrc` config and all plugin compatibility
+- [x] Upgrade `eslint` 8.57.1 to 9.x
+- [x] Upgrade `@typescript-eslint/eslint-plugin` 6.21.0 to 8.x
+- [x] Upgrade `@typescript-eslint/parser` 6.21.0 to 8.x
+- [x] Drop `eslint-config-airbnb` and `eslint-config-airbnb-typescript` (incompatible with ts-eslint v8; rules already covered by individual plugins)
+- [x] Drop `eslint-plugin-import` and `eslint-plugin-jsx-a11y` (airbnb dependencies, not used directly)
+- [x] Upgrade `eslint-plugin-react-hooks` 4.6.2 to 5.x
+- [x] Upgrade `@figma/eslint-plugin-figma-plugins` 0.16.1 to 1.0.0
+- [x] Add `typescript-eslint` unified package, `@eslint/js`, `globals`
+- [x] Migrate `.eslintrc.js` to `eslint.config.mjs` (flat config)
+- [x] Remove stale eslint-disable comments (import/prefer-default-export, no-console, no-restricted-syntax)
+- [x] Verify all lint rules still apply correctly (0 errors, 4 pre-existing warnings)
+- [x] Close Dependabot PRs #9 and #11
+- [x] All checks passing (lint, types, 88/88 tests, build)
 
-**Verification**: `npm run lint:fix`, `npx tsc --noEmit --skipLibCheck`, `npm test`
+**PR**: #19 | **Verification**: all passed
 
 ## Phase 4: React 19
 
@@ -134,11 +138,11 @@ Tailwind CSS 4 is a ground-up rewrite with a new engine and config format. This 
 
 ## Completion Log
 
-| Phase   | Date       | Notes                                                         |
-| ------- | ---------- | ------------------------------------------------------------- |
-| Phase 1 | 2026-03-05 | PR #16. Closed dependabot PRs #5, #6, #7.                     |
-| Phase 2 | 2026-03-05 | PR #18. commitlint 20, lint-staged 16, markdownlint-cli 0.48. |
-| Phase 3 |            |                                                               |
-| Phase 4 |            |                                                               |
-| Phase 5 |            |                                                               |
-| Phase 6 |            |                                                               |
+| Phase   | Date       | Notes                                                                          |
+| ------- | ---------- | ------------------------------------------------------------------------------ |
+| Phase 1 | 2026-03-05 | PR #16. Closed dependabot PRs #5, #6, #7.                                      |
+| Phase 2 | 2026-03-05 | PR #18. commitlint 20, lint-staged 16, markdownlint-cli 0.48.                  |
+| Phase 3 | 2026-03-05 | PR #19. ESLint 9 flat config. Dropped airbnb, added typescript-eslint unified. |
+| Phase 4 |            |                                                                                |
+| Phase 5 |            |                                                                                |
+| Phase 6 |            |                                                                                |

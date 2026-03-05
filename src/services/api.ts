@@ -8,7 +8,6 @@ export interface StreamCallbacks {
   onError: (error: string) => void;
 }
 
-// eslint-disable-next-line import/prefer-default-export
 export class APIService {
   private static readonly BUFFER_INTERVAL = 100; // ms
   private streamBuffer = '';

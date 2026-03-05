@@ -1,5 +1,28 @@
 # Changelog
 
+## [1.2.0](https://github.com/pdugan20/chat-builder-plugin/compare/imessage-chat-builder-v1.1.0...imessage-chat-builder-v1.2.0) (2026-03-05)
+
+
+### Features
+
+* **api:** improve prompt engineering and fix parameter threading ([33f83ba](https://github.com/pdugan20/chat-builder-plugin/commit/33f83bac25b82d74237b4835b1373840070d3136))
+* **deps:** upgrade to React 19 and testing-library 16 ([fbd524b](https://github.com/pdugan20/chat-builder-plugin/commit/fbd524bd0363ba9e8c733bc6415f61b3d6d26469))
+* **deps:** upgrade to React 19 and testing-library 16 ([19d5754](https://github.com/pdugan20/chat-builder-plugin/commit/19d5754c1a7a0515d94bc18a750dbb299b8f1560))
+
+
+### Refactoring
+
+* **lint:** migrate to ESLint 9 flat config ([3c74303](https://github.com/pdugan20/chat-builder-plugin/commit/3c74303d79b78e2ac952ce6db8f2db267068cf48))
+* **lint:** migrate to ESLint 9 flat config ([e8d2a3b](https://github.com/pdugan20/chat-builder-plugin/commit/e8d2a3bec479b2f7b4baad8e526f02559853d3bc))
+
+
+### Documentation
+
+* finalize dependency upgrade tracker ([9b4223a](https://github.com/pdugan20/chat-builder-plugin/commit/9b4223a0ede660c73a54fdff81457f7b20e187ce))
+* finalize dependency upgrade tracker ([0a7c1f9](https://github.com/pdugan20/chat-builder-plugin/commit/0a7c1f9690feb69bbcbcdefa41d92067cc028db0))
+* reorganize docs folder and add dependency upgrade tracker ([8eba182](https://github.com/pdugan20/chat-builder-plugin/commit/8eba182a176990e44e3ced4a46cc424f554ee128))
+* update README badges, versions, and doc links ([c02b702](https://github.com/pdugan20/chat-builder-plugin/commit/c02b70230038cbbc15788b8b3b53f6dbb1238be0))
+
 ## [1.1.0](https://github.com/pdugan20/chat-builder-plugin/compare/imessage-chat-builder-v1.0.7...imessage-chat-builder-v1.1.0) (2026-03-05)
 
 

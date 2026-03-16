@@ -43,159 +43,27 @@ Versioning is automated via [release-please](https://github.com/googleapis/relea
 
 ## Code Quality Standards
 
-### Commit Message Format
+### Commit Messages
 
-All commits must follow Conventional Commits format enforced by commitlint:
-
-```text
-<type>(<scope>): <subject>
-
-Types:
-- feat:     New feature
-- fix:      Bug fix
-- docs:     Documentation changes
-- style:    Code formatting (no logic changes)
-- refactor: Code restructuring (no behavior change)
-- perf:     Performance improvement
-- test:     Adding or updating tests
-- chore:    Maintenance, dependencies, config
-- build:    Build system changes
-- ci:       CI/CD changes
-
-Examples:
-  feat(ui): add dark mode toggle
-  fix(api): handle network timeout correctly
-  docs: update installation instructions
-  refactor(services): extract message builder class
-```
-
-The commit-msg hook validates format automatically.
-
-### Markdown Standards
-
-All markdown files must pass markdownlint rules:
-
-- **MD041**: First line must be H1 heading
-- **MD032**: Blank lines around lists
-- **MD031**: Blank lines around code blocks
-- **MD040**: Code blocks must specify language
-- **MD022**: Blank lines around headings
-
-Run `npm run lint:md:fix` to auto-fix most issues.
-
-### TypeScript Standards
-
-TypeScript strict mode is enabled. All code must:
-
-- Have explicit types where inference is unclear
-- Handle null/undefined cases explicitly (strictNullChecks)
-- Avoid `any` types (use `unknown` with type guards)
-- Have no unused locals or parameters
-- Handle all code paths (noImplicitReturns)
-- Pass type checking: `npx tsc --noEmit --skipLibCheck`
-
-### Figma Plugin Standards
-
-The project uses `@figma/eslint-plugin-figma-plugins` for plugin-specific rules:
-
-- Async functions must use `await` properly
-- Dynamic page finding methods must be used correctly
-- Plugin API patterns must follow Figma best practices
-- Component manipulation should follow safe property handling patterns
-
-ESLint with the Figma plugin will catch these issues automatically.
+Conventional Commits format enforced by commitlint (commit-msg hook validates automatically). Run `npm run lint:md:fix` to auto-fix markdown issues.
 
 ### Testing Standards
 
-All new code should include tests. The project enforces coverage thresholds per file:
+All new code should include tests. Per-file coverage thresholds are enforced in `jest.config.js`.
 
-**Service Layer** (85-100% coverage required):
-
-- **Unit tests**: Test services in isolation with mocked dependencies
-- **Mock external dependencies**: API calls, Figma API, window events
-- **Test all methods**: Public methods, error handling, edge cases
-- **Use test helpers**: `createMockChatItem()` for valid test data
-
-**Integration Layer** (70-85% coverage required):
-
-- **Integration tests**: Test hooks and components with real providers
-- **Mock service layer**: Use mocked services, real React context
-- **Test user flows**: Interactions, state changes, side effects
-- **Use custom render**: Import from `src/test/test-helpers` for component tests
-
-**Running Tests**:
-
-```bash
-npm test              # Run all tests
-npm run test:watch    # Watch mode
-npm run test:coverage # Coverage report
-npm run test:ci       # CI mode with coverage
-```
-
-**Test Organization**:
-
-- Service tests: `src/services/__tests__/*.test.ts`
-- Hook tests: `src/ui/hooks/__tests__/*.test.tsx`
-- Component tests: `src/ui/components/**/__tests__/*.test.tsx`
-
-**Coverage Thresholds** (enforced in `jest.config.js`):
-
-| File                   | Branches | Functions | Lines | Statements |
-| ---------------------- | -------- | --------- | ----- | ---------- |
-| ValidationService      | 93%      | 100%      | 100%  | 100%       |
-| LoadingStateManager    | 100%     | 100%      | 100%  | 100%       |
-| PluginMessengerService | 95%      | 100%      | 95%   | 95%        |
-| APIService             | 85%      | 90%       | 90%   | 90%        |
-| ChatGenerationService  | 70%      | 90%       | 85%   | 85%        |
+- **Service tests**: `src/services/__tests__/*.test.ts` — test in isolation with mocked dependencies
+- **Hook/component tests**: `src/ui/hooks/__tests__/*.test.tsx`, `src/ui/components/**/__tests__/*.test.tsx` — use custom render from `src/test/test-helpers`
+- **Test data helpers**: Use `createMockChatItem()` for valid test data
 
 ## Architecture Overview
 
-### Core Structure
+Layered architecture: Plugin (`src/plugin/`) &rarr; Scripts (`src/scripts/`) &rarr; API (`src/api/`), with a React UI (`src/ui/`) communicating via `postMessage`. See `docs/architecture/` for detailed flow diagrams.
 
-The plugin follows a layered architecture:
+### Key Rules
 
-1. **Plugin Layer** (`src/plugin/index.ts`) - Figma plugin API interface
-2. **UI Layer** (`src/ui/`) - React application with routing
-3. **Scripts Layer** (`src/scripts/`) - Core business logic for chat generation
-4. **API Layer** (`src/api/`) - External service integrations (Anthropic)
-
-### Key Components
-
-- **Chat Generation**: `src/scripts/build-chat-ui.ts` handles the main chat UI creation with optimized rendering
-- **Anthropic Integration**: `src/api/anthropic.ts` manages Claude API with streaming and retry logic
-- **Service Classes**: `src/services/` contains modular service classes for component management with caching and safe property handling
-- **Utilities**: `src/utils/` provides shared utility functions including chat analysis, component helpers, and node finding patterns
-- **Constants**: `src/constants/` contains organized constants including component properties, string values, and configuration options
-- **State Management**: React Context providers in `src/ui/context/`
-- **Component Library**: Checks for required Figma components via `src/scripts/check-components.ts`
-
-### Message Flow
-
-1. UI sends messages to plugin via `parent.postMessage`
-2. Plugin processes in `index.ts` and delegates to appropriate scripts
-3. Scripts interact with Figma API and external services
-4. Results sent back to UI via `figma.ui.postMessage`
-
-## Development Workflow
-
-### Adding New Features
-
-1. UI changes go in `src/ui/components/` or `src/ui/screens/`
-2. Plugin logic goes in `src/scripts/`
-3. Update types in `src/types/` as needed
-4. Use existing patterns from similar components
-
-### Working with Figma API
-
-- All Figma API calls must be in `src/plugin/` or `src/scripts/`
-- UI layer cannot directly access Figma API
-- Use message passing between UI and plugin layers
-
-### Styling
-
-- Use Tailwind CSS classes
-- Custom styles in `src/ui/styles/`
-- Follow existing component patterns for consistency
+- All Figma API calls must be in `src/plugin/` or `src/scripts/` (UI cannot access Figma API directly)
+- Use Tailwind CSS classes; custom styles in `src/ui/styles/`
+- State management via React Context providers in `src/ui/context/`
 
 ## Important Notes
 

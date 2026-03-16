@@ -8,10 +8,26 @@ The plugin follows a layered architecture with clear separation between the UI (
 
 ## Complete Flow Diagram
 
-```text
-User Input → React UI → Plugin Messages → Anthropic API → JSON Parsing → Figma Components → Prototype Creation
-     ↓           ↓            ↓               ↓               ↓                ↓                  ↓
-  Form Data   Validation   Message Bus   Claude Stream   Chat Structure   Component Tree    Interactive UI
+```mermaid
+sequenceDiagram
+    actor User
+    participant UI as React UI
+    participant Plugin as Plugin Layer
+    participant API as Anthropic API
+    participant Figma as Figma Canvas
+
+    User->>UI: Fill form (participants, messages, theme, prompt)
+    UI->>UI: Validate inputs
+    UI->>API: Stream chat generation request
+    API-->>UI: Streaming message chunks
+    UI->>Plugin: PARSE_AND_BUILD_CHAT (raw JSON)
+    Plugin->>Plugin: Clean and parse JSON
+    Plugin->>Figma: Create message instances (parallel)
+    Plugin->>Figma: Assemble frame and apply theme
+    opt Include Prototype
+        Plugin->>Figma: Build prototype with thread component
+    end
+    Plugin-->>UI: BUILD_COMPLETE
 ```
 
 ## Phase 1: User Input Collection
@@ -118,11 +134,15 @@ case MESSAGE_TYPE.PARSE_AND_BUILD_CHAT:
        "name": "Person Name",
        "gender": "male|female",
        "message": "Message content",
+       "time": "3:15 PM",
+       "date": "Thursday, March 12",
        "messagesInGroup": 1,
-       "emojiReaction": "thumbs_up" // optional
+       "emojiReaction": "thumbsUp"
      }
    ]
    ```
+
+   Note: `date` and `emojiReaction` are optional; all other fields are required.
 
 ## Phase 5: Figma Component Creation
 

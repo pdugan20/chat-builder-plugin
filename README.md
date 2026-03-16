@@ -50,21 +50,10 @@ npm run test:ci       # Tests with coverage (CI mode)
 
 ## Tech Stack
 
-- **Frontend**: React 19, TypeScript 5.9, Tailwind CSS 4
 - **Build**: Webpack 5
-- **API**: Anthropic Claude API (Sonnet 4.6)
+- **API**: Anthropic Claude API (Haiku 4.5)
 - **Testing**: Jest 30, React Testing Library
 - **Quality**: ESLint 9, Prettier, markdownlint, Conventional Commits
-
-## Architecture
-
-- `src/api/` - Anthropic API integration
-- `src/scripts/` - Core plugin functionality
-- `src/services/` - Service layer (validation, loading state, messaging, chat generation)
-- `src/ui/` - React UI components
-- `src/types/` - TypeScript type definitions
-- `src/constants/` - Configuration and constants
-- `src/utils/` - Shared utilities
 
 ## Documentation
 

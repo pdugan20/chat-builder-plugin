@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.2.1](https://github.com/pdugan20/chat-builder-plugin/compare/imessage-chat-builder-v1.2.0...imessage-chat-builder-v1.2.1) (2026-03-17)
+
+
+### Documentation
+
+* consolidate documentation and fix inaccuracies ([#33](https://github.com/pdugan20/chat-builder-plugin/issues/33)) ([63ba850](https://github.com/pdugan20/chat-builder-plugin/commit/63ba850a402d59ad80d300ebd0be7dd6ad79599b))
+* replace end-to-end flow prose with mermaid architecture diagram ([aabbdf0](https://github.com/pdugan20/chat-builder-plugin/commit/aabbdf0a9906efb0e662e4831048f793aff223a8))
+
 ## [1.2.0](https://github.com/pdugan20/chat-builder-plugin/compare/imessage-chat-builder-v1.1.0...imessage-chat-builder-v1.2.0) (2026-03-05)
 
 

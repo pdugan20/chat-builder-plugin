@@ -19,9 +19,11 @@ function ApiKeyOverlay({ showLogo = false }: ApiKeyOverlayProps): React.JSX.Elem
           Get started
         </Text>
         <Text>In order to use this plugin, you must have an Anthropic account with an API key.</Text>
-        <Link href='https://docs.anthropic.com/en/api/overview' target='_blank' className='mb-4'>
-          Learn more
-        </Link>
+        <div className='mt-1 mb-3'>
+          <Link href='https://docs.anthropic.com/en/api/overview' target='_blank'>
+            Learn more
+          </Link>
+        </div>
         <AlertDialog.Root>
           <UpdateKeyDialog
             dialogTitle='Add key'

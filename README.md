@@ -1,12 +1,9 @@
 # iMessage Chat Builder
 
 [![CI](https://github.com/pdugan20/chat-builder-plugin/actions/workflows/ci.yml/badge.svg)](https://github.com/pdugan20/chat-builder-plugin/actions/workflows/ci.yml)
-[![Node.js](https://img.shields.io/badge/Node.js-20-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)](https://react.dev/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![Release](https://img.shields.io/github/v/release/pdugan20/chat-builder-plugin?logo=github&logoColor=white)](https://github.com/pdugan20/chat-builder-plugin/releases/latest)
 [![Figma Plugin](https://img.shields.io/badge/Figma-Community-F24E1E?logo=figma&logoColor=white)](https://www.figma.com/community/plugin/1519731262843198057/imessage-ai-chat-builder)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?logo=opensourceinitiative&logoColor=white)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?logo=opensourceinitiative&logoColor=white)](LICENSE)
 
 A Figma plugin for generating realistic iMessage chat interfaces using AI. Create engaging conversations with customizable participants, message counts, and styling options.
 

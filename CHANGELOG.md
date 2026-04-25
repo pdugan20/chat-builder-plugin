@@ -1,5 +1,50 @@
 # Changelog
 
+## [1.3.0](https://github.com/pdugan20/chat-builder-plugin/compare/imessage-chat-builder-v1.2.0...imessage-chat-builder-v1.3.0) (2026-04-25)
+
+
+### Features
+
+* **api:** improve prompt engineering and fix parameter threading ([33f83ba](https://github.com/pdugan20/chat-builder-plugin/commit/33f83bac25b82d74237b4835b1373840070d3136))
+* **deps:** upgrade to React 19 and testing-library 16 ([fbd524b](https://github.com/pdugan20/chat-builder-plugin/commit/fbd524bd0363ba9e8c733bc6415f61b3d6d26469))
+* **deps:** upgrade to React 19 and testing-library 16 ([19d5754](https://github.com/pdugan20/chat-builder-plugin/commit/19d5754c1a7a0515d94bc18a750dbb299b8f1560))
+* upgrade to Claude Sonnet 4.6 and add automated release pipeline ([2405136](https://github.com/pdugan20/chat-builder-plugin/commit/24051365b4855b32e31e869fbab803a729feb390))
+
+
+### Bug Fixes
+
+* add spacing between Learn more link and Add key button ([689d148](https://github.com/pdugan20/chat-builder-plugin/commit/689d148ea9c0c9823b426687da52beb02c46a002))
+* resolve API response parsing and restore loading overlay ([08a9ec2](https://github.com/pdugan20/chat-builder-plugin/commit/08a9ec2b813f96a110ca1e1fed5fc7844ef604f1))
+* resolve double ellipsis, error handling mismatch, and env flag injection ([7193ffd](https://github.com/pdugan20/chat-builder-plugin/commit/7193ffd1fc2df5ef21a7cb525aa38f0005234df3))
+
+
+### Refactoring
+
+* **hooks:** refactor use-chat-generation to use services (Sprint 5) ([301af9f](https://github.com/pdugan20/chat-builder-plugin/commit/301af9f555cfb103eca34bd3a6cab47be49bf5ae))
+* **lint:** migrate to ESLint 9 flat config ([3c74303](https://github.com/pdugan20/chat-builder-plugin/commit/3c74303d79b78e2ac952ce6db8f2db267068cf48))
+* **lint:** migrate to ESLint 9 flat config ([e8d2a3b](https://github.com/pdugan20/chat-builder-plugin/commit/e8d2a3bec479b2f7b4baad8e526f02559853d3bc))
+* remove dead code, unused deps, and reorganize project structure ([7119f16](https://github.com/pdugan20/chat-builder-plugin/commit/7119f16184c4a5f39f3859e046e0cacf710c203a))
+* replace hardcoded dev flags with build-time env injection ([9498a62](https://github.com/pdugan20/chat-builder-plugin/commit/9498a62deeb1ca10e5e649eeeb628844325b87af))
+* **services:** create APIService (Sprint 3) ([68c28ac](https://github.com/pdugan20/chat-builder-plugin/commit/68c28acf09d55b1682470a38353d070323b1f164))
+* **services:** create ChatGenerationService (Sprint 4) ([317a41e](https://github.com/pdugan20/chat-builder-plugin/commit/317a41e1503813954ca409da965f7af969a03864))
+* **services:** create PluginMessengerService and context (Sprint 2) ([f3291a1](https://github.com/pdugan20/chat-builder-plugin/commit/f3291a1470892fe899d9319207a042741033781b))
+* **services:** create ValidationService and LoadingStateManager (Sprint 1) ([65a55b1](https://github.com/pdugan20/chat-builder-plugin/commit/65a55b18a97063efe065bf54747cc30defd2aec3))
+
+
+### Documentation
+
+* clean up README - remove test coverage details and simplify title ([b937d98](https://github.com/pdugan20/chat-builder-plugin/commit/b937d98f0fdadfab4a421f214f1771885dc3930a))
+* consolidate documentation and fix inaccuracies ([#33](https://github.com/pdugan20/chat-builder-plugin/issues/33)) ([63ba850](https://github.com/pdugan20/chat-builder-plugin/commit/63ba850a402d59ad80d300ebd0be7dd6ad79599b))
+* enhance documentation with badges and contribution guidelines ([a69cd4a](https://github.com/pdugan20/chat-builder-plugin/commit/a69cd4af085697e009d416b886dd268c424d6182))
+* finalize dependency upgrade tracker ([9b4223a](https://github.com/pdugan20/chat-builder-plugin/commit/9b4223a0ede660c73a54fdff81457f7b20e187ce))
+* finalize dependency upgrade tracker ([0a7c1f9](https://github.com/pdugan20/chat-builder-plugin/commit/0a7c1f9690feb69bbcbcdefa41d92067cc028db0))
+* remove extra license section from README ([c50bf97](https://github.com/pdugan20/chat-builder-plugin/commit/c50bf97d525976e06c4ba1725e1c0f51498420a7))
+* reorganize docs folder and add dependency upgrade tracker ([8eba182](https://github.com/pdugan20/chat-builder-plugin/commit/8eba182a176990e44e3ced4a46cc424f554ee128))
+* replace end-to-end flow prose with mermaid architecture diagram ([aabbdf0](https://github.com/pdugan20/chat-builder-plugin/commit/aabbdf0a9906efb0e662e4831048f793aff223a8))
+* restore clean concise README ([c6a747c](https://github.com/pdugan20/chat-builder-plugin/commit/c6a747c4f8278524bfdb2a1cdec74e5db4f040f7))
+* trim README badges to CI, Release, Figma Community, License ([4caa534](https://github.com/pdugan20/chat-builder-plugin/commit/4caa5340a1b5db24b3606a0d9a81ed07f0d308ab))
+* update README badges, versions, and doc links ([c02b702](https://github.com/pdugan20/chat-builder-plugin/commit/c02b70230038cbbc15788b8b3b53f6dbb1238be0))
+
 ## [1.2.0](https://github.com/pdugan20/chat-builder-plugin/compare/imessage-chat-builder-v1.1.0...imessage-chat-builder-v1.2.0) (2026-03-05)
 
 

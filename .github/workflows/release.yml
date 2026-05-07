@@ -15,7 +15,14 @@ jobs:
       release_created: ${{ steps.release.outputs.release_created }}
       tag_name: ${{ steps.release.outputs.tag_name }}
     steps:
-      - uses: googleapis/release-please-action@v5
+      # Pinned to v4: v5 introduced stricter conventional-commits parsing that
+      # rejects Dependabot's grouped-update commit format
+      # (`chore(deps)(deps-dev): ...` — double-paren scope). Several such commits
+      # exist in main's history. v4 still works (Node 20 runtime; deprecation
+      # warning on 2026-06-02 cutover, removed fall 2026). Revisit once stale
+      # problematic commits roll off the release window or v5 grows a backwards-
+      # compat parsing flag.
+      - uses: googleapis/release-please-action@v4
         id: release
         with:
           config-file: release-please-config.json

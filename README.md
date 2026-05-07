@@ -17,7 +17,7 @@ A Figma plugin for generating realistic iMessage chat interfaces using AI. Creat
 
 ## Prerequisites
 
-- [Node.js](https://nodejs.org) v20+
+- [Node.js](https://nodejs.org) v22+
 - [Figma desktop app](https://figma.com/downloads/)
 - [Anthropic API key](https://docs.anthropic.com/en/api/overview)
 - [Apple SF Pro typeface](https://developer.apple.com/fonts/)

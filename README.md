@@ -5,15 +5,7 @@
 [![Figma Plugin](https://img.shields.io/badge/Figma-Community-F24E1E?logo=figma&logoColor=white)](https://www.figma.com/community/plugin/1519731262843198057/imessage-ai-chat-builder)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?logo=opensourceinitiative&logoColor=white)](LICENSE)
 
-A Figma plugin for generating realistic iMessage chat interfaces using AI. Create engaging conversations with customizable participants, message counts, and styling options.
-
-## Features
-
-- AI-powered chat generation using Claude API
-- Support for 2+ participants with unique names and personas
-- Light and dark iMessage themes
-- Interactive prototype view with emoji reactions and status indicators
-- Built-in test data mode for development without API calls
+A Figma plugin that generates realistic iMessage chat interfaces using Claude. Supports 2+ participants with unique personas, light and dark iMessage themes, and an interactive prototype view with emoji reactions and status indicators. A test data mode lets you iterate without hitting the API.
 
 ## Prerequisites
 

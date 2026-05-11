@@ -22,7 +22,7 @@ jobs:
       # warning on 2026-06-02 cutover, removed fall 2026). Revisit once stale
       # problematic commits roll off the release window or v5 grows a backwards-
       # compat parsing flag.
-      - uses: googleapis/release-please-action@v4
+      - uses: googleapis/release-please-action@v5
         id: release
         with:
           config-file: release-please-config.json

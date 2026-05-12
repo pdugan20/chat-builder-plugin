@@ -10,7 +10,11 @@ updates:
       timezone: 'America/New_York'
     open-pull-requests-limit: 5
     commit-message:
-      prefix: 'chore(deps)'
+      # `prefix: chore` + `include: scope` produces `chore(deps):` /
+      # `chore(deps-dev):` titles. The earlier `prefix: chore(deps)` literal
+      # caused Dependabot to emit `chore(deps)(deps-dev):` double scopes,
+      # which the conventional-commits parser used by PR Lint rejects.
+      prefix: 'chore'
       include: 'scope'
     labels:
       - 'dependencies'
@@ -19,6 +23,10 @@ updates:
       - 'pdugan20'
     assignees:
       - 'pdugan20'
+    # Skip major-version bumps — they regularly break CI and need a human.
+    ignore:
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
     # Group non-major updates together
     groups:
       development-dependencies:

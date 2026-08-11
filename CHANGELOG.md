@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.1](https://github.com/pdugan20/figma-chat-builder/compare/v1.3.0...v1.3.1) (2026-08-11)
+
+
+### Bug Fixes
+
+* **release:** use plain version tags ([#107](https://github.com/pdugan20/figma-chat-builder/issues/107)) ([14e4525](https://github.com/pdugan20/figma-chat-builder/commit/14e4525ec90dd82b3b26983d0ff63d6cdf8dc2f6))
+
 ## [1.3.0](https://github.com/pdugan20/figma-chat-builder/compare/v1.2.0...v1.3.0) (2026-07-21)
 
 ### Features

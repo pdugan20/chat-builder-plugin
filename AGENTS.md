@@ -69,6 +69,16 @@ Layered architecture: Plugin (`src/plugin/`) &rarr; Scripts (`src/scripts/`) &ra
 - Use Tailwind CSS classes; custom styles in `src/ui/styles/`
 - State management via React Context providers in `src/ui/context/`
 
+## Code Review Rules
+
+- Flag Figma API access from the UI thread or changes to the plugin/UI `postMessage`
+  contract that lack runtime validation on both sides.
+- Flag Anthropic credentials or conversation content in console output, debug panels,
+  fixtures, exported Figma node metadata, or network destinations other than the intended
+  provider request.
+- Flag chat assembly changes that mutate the document before required components/fonts
+  are resolved or that leave a partially built conversation after failure.
+
 ## Important Notes
 
 - The plugin requires specific Figma components to be available (checks on load)

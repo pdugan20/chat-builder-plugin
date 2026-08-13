@@ -1,9 +1,8 @@
-# Chat Builder Figma Plugin
+# figma-chat-builder
 
-[![CI](https://github.com/pdugan20/figma-chat-builder/actions/workflows/ci.yml/badge.svg)](https://github.com/pdugan20/figma-chat-builder/actions/workflows/ci.yml)
-[![Release](https://img.shields.io/github/v/release/pdugan20/figma-chat-builder?logo=github&logoColor=white)](https://github.com/pdugan20/figma-chat-builder/releases/latest)
-[![Figma Plugin](https://img.shields.io/badge/Figma-Community-F24E1E?logo=figma&logoColor=white)](https://www.figma.com/community/plugin/1519731262843198057/imessage-ai-chat-builder)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?logo=opensourceinitiative&logoColor=white)](LICENSE)
+[![CI](https://github.com/pdugan20/figma-chat-builder/actions/workflows/ci.yml/badge.svg?branch=main&event=push)](https://github.com/pdugan20/figma-chat-builder/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/pdugan20/figma-chat-builder)](https://github.com/pdugan20/figma-chat-builder/releases/latest)
+[![License](https://img.shields.io/github/license/pdugan20/figma-chat-builder)](LICENSE)
 
 A Figma plugin that generates realistic iMessage chat interfaces using Claude. Supports 2+ participants with unique personas, light and dark iMessage themes, and an interactive prototype view with emoji reactions and status indicators. A test data mode lets you iterate without hitting the API.
 

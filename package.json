@@ -78,7 +78,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "0.116.0",
-    "figma-kit": "^1.0.0-beta.23",
+    "figma-kit": "^1.0.0-beta.26",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-router": "^7.18.2",

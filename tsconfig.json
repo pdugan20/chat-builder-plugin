@@ -1,13 +1,14 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "es2017",
     "lib": ["dom", "dom.iterable", "esnext"],
+    "types": ["plugin-typings", "jest"],
     "typeRoots": ["./node_modules/@types", "./node_modules/@figma", "src/@types"],
     "jsx": "react-jsx",
     "module": "esnext",
     "esModuleInterop": true,
     "resolveJsonModule": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,

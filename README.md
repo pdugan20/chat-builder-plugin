@@ -7,14 +7,6 @@
 
 A Figma plugin that generates realistic iMessage chat interfaces using Claude. Supports 2+ participants with unique personas, light and dark iMessage themes, and an interactive prototype view with emoji reactions and status indicators. A test data mode lets you iterate without hitting the API.
 
-## Prerequisites
-
-- [Node.js](https://nodejs.org) v22+
-- [Figma desktop app](https://figma.com/downloads/)
-- [Anthropic API key](https://docs.anthropic.com/en/api/overview)
-- [Apple SF Pro typeface](https://developer.apple.com/fonts/)
-- [iMessage Chat Builder UI kit](https://www.figma.com/community/file/1519446101653617639/imessage-chat-builder)
-
 ## Getting Started
 
 ```bash
@@ -43,7 +35,3 @@ npm run test:ci       # Tests with coverage (CI mode)
 - [Chat Building Architecture](docs/architecture/chat-building-architecture.md) - Component structure and rendering pipeline
 - [Prompt Engineering Guide](docs/architecture/prompt-engineering-guide.md) - AI prompt design and message generation
 - [Project Guide](CLAUDE.md) - Development setup, architecture, and coding guidelines
-
-## Related
-
-- [chat-app-prototype](https://github.com/pdugan20/chat-app-prototype) - Demo iMessage app built with this plugin

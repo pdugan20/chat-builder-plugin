@@ -1,5 +1,22 @@
 # Changelog
 
+## [2.0.0](https://github.com/pdugan20/figma-chat-builder/compare/v1.3.1...v2.0.0) (2026-08-13)
+
+
+### ⚠ BREAKING CHANGES
+
+* standardize on Node 24 and TypeScript 6 ([#111](https://github.com/pdugan20/figma-chat-builder/issues/111))
+
+### Documentation
+
+* standardize README title and badges ([#112](https://github.com/pdugan20/figma-chat-builder/issues/112)) ([e789df1](https://github.com/pdugan20/figma-chat-builder/commit/e789df1933831a376dca967931b747ddc495c866))
+* streamline readme ([6692b3e](https://github.com/pdugan20/figma-chat-builder/commit/6692b3eee712ead88ad898d6a00324f3e7759061))
+
+
+### Miscellaneous
+
+* standardize on Node 24 and TypeScript 6 ([#111](https://github.com/pdugan20/figma-chat-builder/issues/111)) ([6bdc718](https://github.com/pdugan20/figma-chat-builder/commit/6bdc718ab68cdd53e6e0415ed8b8cd3b3d3cf816))
+
 ## [1.3.1](https://github.com/pdugan20/figma-chat-builder/compare/v1.3.0...v1.3.1) (2026-08-11)
 
 

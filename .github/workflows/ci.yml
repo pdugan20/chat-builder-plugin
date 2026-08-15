@@ -6,32 +6,38 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+
 jobs:
   ci:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
-
-      - name: Validate CLAUDE.md
-        run: npx claude-code-lint@latest
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Set up Node
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version-file: '.nvmrc'
           cache: 'npm'
 
+      - name: Verify dependency automation policy
+        run: node --test scripts/automation-policy.test.mjs
+
+      - name: Validate CLAUDE.md
+        run: npx --yes claude-code-lint@0.8.0
+
       - name: Install dependencies
         run: npm ci
 
-      - name: Run Prettier
-        run: npm run style:write
+      - name: Run Prettier check
+        run: npm run style:check
 
       - name: Run markdownlint
         run: npm run lint:md
 
       - name: Run ESLint
-        run: npm run lint:fix
+        run: npm run lint
 
       - name: Run TypeScript type check
         run: npx tsc --noEmit --skipLibCheck

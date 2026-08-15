@@ -122,6 +122,10 @@ const EXPECTED_RUN_BODIES = {
     'npm run build',
     'npm run test:ci',
   ],
+  // SECURITY CONTROL, not tidiness: pr-lint.yml is the one workflow allowed
+  // to use pull_request_target, and checked-out untrusted PR code there is
+  // inert ONLY because no run step is permitted. Adding any entry to this
+  // list converts that exemption into a live pwn-request vector.
   'pr-lint.yml': [],
   'release.yml': ['npm ci', 'npm run build', 'gh release upload "$TAG_NAME" dist/plugin.js dist/ui.html --clobber'],
 };

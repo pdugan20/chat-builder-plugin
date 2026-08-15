@@ -12,10 +12,122 @@ const read = (path) => readFileSync(join(ROOT, path), 'utf8');
 
 const CANONICAL_RENOVATE = `{
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "enabled": false,
-  "enabledManagers": ["npm", "github-actions"]
+  "enabledManagers": ["npm", "github-actions"],
+  "timezone": "America/New_York",
+  "semanticCommits": "enabled",
+  "semanticCommitType": "chore",
+  "dependencyDashboard": true,
+  "labels": ["dependencies", "renovate"],
+  "minimumReleaseAge": "7 days",
+  "vulnerabilityAlerts": { "enabled": false },
+  "packageRules": [
+    {
+      "matchManagers": ["npm"],
+      "matchUpdateTypes": ["patch", "minor"],
+      "matchCurrentVersion": ">=1.0.0",
+      "automerge": true
+    },
+    {
+      "matchUpdateTypes": ["major"],
+      "dependencyDashboardApproval": true
+    },
+    {
+      "matchCurrentVersion": "<1.0.0",
+      "automerge": false,
+      "dependencyDashboardApproval": true
+    },
+    {
+      "matchPackageNames": ["figma-kit"],
+      "automerge": false,
+      "dependencyDashboardApproval": true
+    },
+    {
+      "matchUpdateTypes": ["pin", "digest", "pinDigest", "rollback", "replacement"],
+      "automerge": false,
+      "dependencyDashboardApproval": true
+    }
+  ]
 }
 `;
+
+const CANONICAL_DEPENDABOT = `version: 2
+updates:
+  # Renovate owns routine npm and GitHub Actions updates. These entries are
+  # security-only customization: open-pull-requests-limit 0 disables version
+  # PRs while keeping commit prefixes and labels conforming for the security
+  # updates Dependabot still owns.
+  - package-ecosystem: 'npm'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+      time: '09:00'
+      timezone: 'America/New_York'
+    open-pull-requests-limit: 0
+    commit-message:
+      # \`prefix: chore\` + \`include: scope\` produces \`chore(deps):\` /
+      # \`chore(deps-dev):\` titles. The earlier \`prefix: chore(deps)\` literal
+      # caused Dependabot to emit \`chore(deps)(deps-dev):\` double scopes,
+      # which the conventional-commits parser used by PR Lint rejects.
+      prefix: 'chore'
+      include: 'scope'
+    labels:
+      - 'dependencies'
+      - 'npm'
+    reviewers:
+      - 'pdugan20'
+    assignees:
+      - 'pdugan20'
+
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+      time: '09:00'
+      timezone: 'America/New_York'
+    open-pull-requests-limit: 0
+    commit-message:
+      prefix: 'chore(ci)'
+    labels:
+      - 'dependencies'
+      - 'github-actions'
+    reviewers:
+      - 'pdugan20'
+    assignees:
+      - 'pdugan20'
+`;
+
+const EXPECTED_RENOVATE_KEYS = [
+  '$schema',
+  'enabledManagers',
+  'timezone',
+  'semanticCommits',
+  'semanticCommitType',
+  'dependencyDashboard',
+  'labels',
+  'minimumReleaseAge',
+  'vulnerabilityAlerts',
+  'packageRules',
+];
+
+// Keys that re-enable unattended or scheduled behavior anywhere in the tree.
+// Scanned recursively and independently of the canonical constant, so a
+// lockstep edit of file and constant together still fails closed.
+const FORBIDDEN_RENOVATE_KEYS = [
+  'extends',
+  'schedule',
+  'prCreation',
+  'platformAutomerge',
+  'automergeType',
+  'automergeSchedule',
+  'ignoreTests',
+  'internalChecksFilter',
+  'osvVulnerabilityAlerts',
+  'respectLatest',
+  'prConcurrentLimit',
+  'prHourlyLimit',
+];
 
 const EXPECTED_WORKFLOWS = ['ci.yml', 'pr-lint.yml', 'release.yml'];
 
@@ -56,6 +168,18 @@ const EXPECTED_PERMISSIONS = {
   'release.yml': 'permissions:\n  contents: write\n  pull-requests: write\n\n',
 };
 
+function valuesForKey(value, target, found = []) {
+  if (Array.isArray(value)) {
+    for (const child of value) valuesForKey(child, target, found);
+  } else if (value !== null && typeof value === 'object') {
+    for (const [key, child] of Object.entries(value)) {
+      if (key === target) found.push(child);
+      valuesForKey(child, target, found);
+    }
+  }
+  return found;
+}
+
 function renovateErrors(contents) {
   let parsed;
   try {
@@ -64,16 +188,103 @@ function renovateErrors(contents) {
     return ['renovate.json must be valid JSON'];
   }
   const errors = [];
-  const expected = {
-    $schema: 'https://docs.renovatebot.com/renovate-schema.json',
-    enabled: false,
-    enabledManagers: ['npm', 'github-actions'],
-  };
-  if (JSON.stringify(parsed) !== JSON.stringify(expected)) {
-    errors.push('Renovate must remain exactly disabled with the reserved manager scope');
+  if (JSON.stringify(Object.keys(parsed)) !== JSON.stringify(EXPECTED_RENOVATE_KEYS)) {
+    errors.push('renovate.json keys or key order changed');
+  }
+  if (JSON.stringify(parsed.enabledManagers) !== JSON.stringify(['npm', 'github-actions'])) {
+    errors.push('Renovate manager scope changed');
+  }
+  if (parsed.semanticCommits !== 'enabled' || parsed.semanticCommitType !== 'chore') {
+    errors.push('semantic commit style must stay pinned for the title check');
+  }
+  if (parsed.dependencyDashboard !== true) {
+    errors.push('the Dependency Dashboard must stay on');
+  }
+  if (JSON.stringify(parsed.vulnerabilityAlerts) !== JSON.stringify({ enabled: false })) {
+    errors.push('security PRs must stay with Dependabot');
+  }
+  // Constant-independent invariants: survive lockstep edits of the file and
+  // the canonical constant together.
+  // The literal checks below are inline on purpose — a list constant can be
+  // edited in the same lockstep.
+  if (parsed.enabled !== undefined) {
+    errors.push('renovate.json must not carry an enabled key (activation is its absence)');
+  }
+  for (const key of FORBIDDEN_RENOVATE_KEYS) {
+    if (valuesForKey(parsed, key).length > 0) {
+      errors.push(`renovate.json must not contain ${key}`);
+    }
+  }
+  if (JSON.stringify(valuesForKey(parsed, 'minimumReleaseAge')) !== JSON.stringify(['7 days'])) {
+    errors.push('exactly one release-age quarantine, set to 7 days');
+  }
+  const automerges = valuesForKey(parsed, 'automerge');
+  if (automerges.filter((v) => v === true).length !== 1) {
+    errors.push('exactly one admission rule may automerge');
+  }
+  let gatedDigestRuleExists = false;
+  for (const rules of valuesForKey(parsed, 'packageRules')) {
+    for (const entry of rules) {
+      if (entry.automerge === true) {
+        if (JSON.stringify(entry.matchManagers) !== JSON.stringify(['npm'])) {
+          errors.push('automerge is limited to the npm manager');
+        }
+        if (
+          !Array.isArray(entry.matchUpdateTypes) ||
+          entry.matchUpdateTypes.length === 0 ||
+          !entry.matchUpdateTypes.every((t) => t === 'patch' || t === 'minor')
+        ) {
+          errors.push('automerge is limited to patch and minor updates');
+        }
+        if (entry.matchCurrentVersion !== '>=1.0.0') {
+          errors.push('automerge is limited to stable releases');
+        }
+      }
+      if ((entry.matchUpdateTypes ?? []).includes('digest')) {
+        if (entry.automerge !== false || entry.dependencyDashboardApproval !== true) {
+          errors.push('digest updates must stay dashboard-gated');
+        } else {
+          gatedDigestRuleExists = true;
+        }
+      }
+    }
+  }
+  if (!gatedDigestRuleExists) {
+    errors.push('a dashboard-gated digest rule must exist');
+  }
+  for (const rules of valuesForKey(parsed, 'packageRules')) {
+    for (const entry of rules) {
+      if (entry.automerge !== true && entry.dependencyDashboardApproval !== true) {
+        errors.push('every non-automerge admission rule must be dashboard-gated');
+      }
+    }
   }
   if (contents !== CANONICAL_RENOVATE) {
-    errors.push('renovate.json must match the canonical bootstrap bytes');
+    errors.push('renovate.json must match the canonical activation bytes');
+  }
+  return errors;
+}
+
+function dependabotErrors(contents) {
+  const errors = [];
+  const ecosystems = contents.match(/package-ecosystem: '([^']+)'/g) ?? [];
+  if (
+    JSON.stringify(ecosystems) !== JSON.stringify(["package-ecosystem: 'npm'", "package-ecosystem: 'github-actions'"])
+  ) {
+    errors.push('Dependabot must keep exactly the npm and github-actions security stubs');
+  }
+  const limitLines = contents
+    .split('\n')
+    .map((line) => line.trim())
+    .filter((line) => line.startsWith('open-pull-requests-limit:'));
+  if (limitLines.length !== 2 || !limitLines.every((line) => line === 'open-pull-requests-limit: 0')) {
+    errors.push('every Dependabot ecosystem must have open-pull-requests-limit 0');
+  }
+  if (contents.includes('target-branch')) {
+    errors.push('target-branch is forbidden: it detaches security-PR customization');
+  }
+  if (contents !== CANONICAL_DEPENDABOT) {
+    errors.push('dependabot.yml must match the canonical security-stub bytes');
   }
   return errors;
 }
@@ -222,28 +433,102 @@ function permissionsErrors(name, source) {
   return errors;
 }
 
-test('repository has the exact disabled Renovate bootstrap', () => {
+test('repository has the exact Renovate activation contract', () => {
   assert.deepEqual(renovateErrors(read('renovate.json')), []);
 });
 
-test('renovate.json mutations fail closed', () => {
+test('dependabot keeps security-only stubs', () => {
+  assert.deepEqual(dependabotErrors(read('.github/dependabot.yml')), []);
+});
+
+test('dependabot scope regrowth fails closed', () => {
   const mutations = {
-    'activation flip': CANONICAL_RENOVATE.replace('"enabled": false', '"enabled": true'),
-    'enabled removal': CANONICAL_RENOVATE.replace('  "enabled": false,\n', ''),
-    'manager narrowing': CANONICAL_RENOVATE.replace('["npm", "github-actions"]', '["npm"]'),
+    'version PRs re-enabled': CANONICAL_DEPENDABOT.replace(
+      'open-pull-requests-limit: 0',
+      'open-pull-requests-limit: 5'
+    ),
+    'ecosystem added': CANONICAL_DEPENDABOT.replace(
+      "  - package-ecosystem: 'npm'",
+      "  - package-ecosystem: 'pip'\n    directory: '/'\n  - package-ecosystem: 'npm'"
+    ),
+    'ecosystem dropped': CANONICAL_DEPENDABOT.replace(/\n {2}- package-ecosystem: 'github-actions'[\s\S]*$/, '\n'),
+    'comment-satisfied limit trick': CANONICAL_DEPENDABOT.replace(
+      /open-pull-requests-limit: 0/g,
+      'open-pull-requests-limit: 5'
+    ).replace(
+      "  - package-ecosystem: 'npm'",
+      "  # open-pull-requests-limit: 0\n  # open-pull-requests-limit: 0\n  - package-ecosystem: 'npm'"
+    ),
+    'target-branch injection': CANONICAL_DEPENDABOT.replace(
+      '    open-pull-requests-limit: 0\n    commit-message:',
+      "    open-pull-requests-limit: 0\n    target-branch: 'develop'\n    commit-message:"
+    ),
+  };
+  for (const [name, mutation] of Object.entries(mutations)) {
+    assert.notEqual(mutation, CANONICAL_DEPENDABOT, `${name} fixture no longer applies`);
+    assert.ok(dependabotErrors(mutation).length > 0, `${name} must be rejected`);
+  }
+});
+
+test('renovate activation weakening fails closed', () => {
+  const mutations = {
+    're-disabling': CANONICAL_RENOVATE.replace('  "enabledManagers":', '  "enabled": false,\n  "enabledManagers":'),
     'manager expansion': CANONICAL_RENOVATE.replace(
       '["npm", "github-actions"]',
-      '["npm", "github-actions", "dockerfile"]'
+      '["npm", "github-actions", "pip_requirements"]'
     ),
-    'automerge injection': CANONICAL_RENOVATE.replace(
-      '  "enabled": false,\n',
-      '  "enabled": false,\n  "automerge": true,\n'
+    'dashboard off': CANONICAL_RENOVATE.replace('"dependencyDashboard": true', '"dependencyDashboard": false'),
+    'vulnerability re-enable': CANONICAL_RENOVATE.replace(
+      '"vulnerabilityAlerts": { "enabled": false }',
+      '"vulnerabilityAlerts": { "enabled": true }'
     ),
-    'duplicate enabled key': CANONICAL_RENOVATE.replace(
-      '  "enabled": false,\n',
-      '  "enabled": true,\n  "enabled": false,\n'
+    'age shrink': CANONICAL_RENOVATE.replace('"minimumReleaseAge": "7 days"', '"minimumReleaseAge": "1 day"'),
+    'age removal': CANONICAL_RENOVATE.replace('  "minimumReleaseAge": "7 days",\n', ''),
+    'semantic drift': CANONICAL_RENOVATE.replace('"semanticCommits": "enabled"', '"semanticCommits": "auto"'),
+    'automerge manager widening': CANONICAL_RENOVATE.replace(
+      '"matchManagers": ["npm"]',
+      '"matchManagers": ["npm", "github-actions"]'
     ),
-    'whitespace drift': CANONICAL_RENOVATE.trimEnd(),
+    'automerge manager drop': CANONICAL_RENOVATE.replace('      "matchManagers": ["npm"],\n', ''),
+    'automerge major': CANONICAL_RENOVATE.replace(
+      '"matchUpdateTypes": ["major"],\n      "dependencyDashboardApproval": true',
+      '"matchUpdateTypes": ["major"],\n      "automerge": true'
+    ),
+    'stability drop': CANONICAL_RENOVATE.replace('      "matchCurrentVersion": ">=1.0.0",\n', ''),
+    'digest ungated': CANONICAL_RENOVATE.replace(
+      '"matchUpdateTypes": ["pin", "digest", "pinDigest", "rollback", "replacement"],\n      "automerge": false',
+      '"matchUpdateTypes": ["pin", "digest", "pinDigest", "rollback", "replacement"],\n      "automerge": true'
+    ),
+    'digest removal': CANONICAL_RENOVATE.replace('"pin", "digest", ', '"pin", '),
+    'extends injection': CANONICAL_RENOVATE.replace(
+      '  "packageRules": [',
+      '  "extends": [":automergeAll"],\n  "packageRules": ['
+    ),
+    'schedule injection': CANONICAL_RENOVATE.replace(
+      '  "packageRules": [',
+      '  "schedule": ["at any time"],\n  "packageRules": ['
+    ),
+    'ignoreTests injection': CANONICAL_RENOVATE.replace(
+      '  "packageRules": [',
+      '  "ignoreTests": true,\n  "packageRules": ['
+    ),
+    'checks filter off': CANONICAL_RENOVATE.replace(
+      '  "packageRules": [',
+      '  "internalChecksFilter": "none",\n  "packageRules": ['
+    ),
+    'pr limit zeroing': CANONICAL_RENOVATE.replace(
+      '  "packageRules": [',
+      '  "prConcurrentLimit": 0,\n  "packageRules": ['
+    ),
+    'automerge type-list removal': CANONICAL_RENOVATE.replace('      "matchUpdateTypes": ["patch", "minor"],\n', ''),
+    'figma-kit gate removal': CANONICAL_RENOVATE.replace(
+      '    {\n      "matchPackageNames": ["figma-kit"],\n      "automerge": false,\n      "dependencyDashboardApproval": true\n    },\n',
+      ''
+    ),
+    'pre-1.0 gate loss': CANONICAL_RENOVATE.replace(
+      '      "matchCurrentVersion": "<1.0.0",\n      "automerge": false,\n      "dependencyDashboardApproval": true',
+      '      "matchCurrentVersion": "<1.0.0",\n      "automerge": false'
+    ),
   };
   for (const [name, mutation] of Object.entries(mutations)) {
     assert.notEqual(mutation, CANONICAL_RENOVATE, `${name} fixture no longer applies`);

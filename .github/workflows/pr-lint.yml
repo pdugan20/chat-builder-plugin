@@ -31,8 +31,9 @@ jobs:
             chore
             deps
           requireScope: false
-          subjectPattern: ^[a-z].*$
+          subjectPattern: ^(\[[Ss]ecurity\] [A-Za-z]|[a-z]).*$
           subjectPatternError: |
-            The subject must start with a lowercase letter.
+            The subject must start with a lowercase letter (an optional
+            Dependabot "[security] " prefix is also allowed).
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

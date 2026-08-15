@@ -28,3 +28,6 @@ CHANGELOG.md
 # Owned byte-exactly by scripts/automation-policy.test.mjs; keeping prettier
 # away avoids a future formatter-vs-policy deadlock on this file.
 renovate.json
+
+# Owned byte-exactly by scripts/automation-policy.test.mjs, like renovate.json.
+.github/dependabot.yml

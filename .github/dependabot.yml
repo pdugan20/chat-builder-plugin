@@ -1,6 +1,9 @@
 version: 2
 updates:
-  # npm dependencies
+  # Renovate owns routine npm and GitHub Actions updates. These entries are
+  # security-only customization: open-pull-requests-limit 0 disables version
+  # PRs while keeping commit prefixes and labels conforming for the security
+  # updates Dependabot still owns.
   - package-ecosystem: 'npm'
     directory: '/'
     schedule:
@@ -8,7 +11,7 @@ updates:
       day: 'monday'
       time: '09:00'
       timezone: 'America/New_York'
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 0
     commit-message:
       # `prefix: chore` + `include: scope` produces `chore(deps):` /
       # `chore(deps-dev):` titles. The earlier `prefix: chore(deps)` literal
@@ -23,42 +26,7 @@ updates:
       - 'pdugan20'
     assignees:
       - 'pdugan20'
-    # Skip major-version bumps — they regularly break CI and need a human.
-    ignore:
-      - dependency-name: '*'
-        update-types: ['version-update:semver-major']
-    # Group non-major updates together
-    groups:
-      development-dependencies:
-        patterns:
-          - '@types/*'
-          - '@testing-library/*'
-          - 'jest*'
-          - 'eslint*'
-          - 'prettier*'
-          - '@typescript-eslint/*'
-          - 'webpack*'
-          - 'ts-*'
-        update-types:
-          - 'minor'
-          - 'patch'
-      production-dependencies:
-        patterns:
-          - '*'
-        exclude-patterns:
-          - '@types/*'
-          - '@testing-library/*'
-          - 'jest*'
-          - 'eslint*'
-          - 'prettier*'
-          - '@typescript-eslint/*'
-          - 'webpack*'
-          - 'ts-*'
-        update-types:
-          - 'minor'
-          - 'patch'
 
-  # GitHub Actions
   - package-ecosystem: 'github-actions'
     directory: '/'
     schedule:
@@ -66,7 +34,7 @@ updates:
       day: 'monday'
       time: '09:00'
       timezone: 'America/New_York'
-    open-pull-requests-limit: 3
+    open-pull-requests-limit: 0
     commit-message:
       prefix: 'chore(ci)'
     labels:

@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.1](https://github.com/pdugan20/figma-chat-builder/compare/v2.0.0...v2.0.1) (2026-08-15)
+
+
+### Documentation
+
+* mark pr-lint empty run-body allowlist as a security control ([#114](https://github.com/pdugan20/figma-chat-builder/issues/114)) ([e6bdaea](https://github.com/pdugan20/figma-chat-builder/commit/e6bdaeac54714b253e1b64a97d48b0981e04ce40))
+
 ## [2.0.0](https://github.com/pdugan20/figma-chat-builder/compare/v1.3.1...v2.0.0) (2026-08-13)
 
 
